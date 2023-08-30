@@ -1,4 +1,3 @@
-using System.Security.Cryptography.X509Certificates;
 
 namespace ChessEngine {
     class Move {
@@ -10,6 +9,15 @@ namespace ChessEngine {
 
         public static bool Unprotected((int x, int y) pos) {
             // needs to be implemented
+            return true;
+        }
+
+        public static bool Unobstructed((int x, int y) pos, List<string> ownPieces) {
+            for (int i = 0; i < ownPieces.Count; i++) {
+                if (ownPieces[i].Contains($"{pos.x}{pos.y}")) {
+                    return false;
+                }
+            }
             return true;
         }
     }
