@@ -15,8 +15,8 @@ namespace ChessEngine
                         legalMoves.Add((posKing.x + x, posKing.y + y));
                 }
             }
-            string combinedString = string.Join( ",", legalMoves);
-            Console.WriteLine(combinedString);
+            string combinedString = string.Join( ", ", legalMoves);
+            Console.WriteLine($"King at {posKing} to {combinedString}");
             return legalMoves;
         }
 

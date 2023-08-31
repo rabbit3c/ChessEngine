@@ -3,49 +3,38 @@ namespace ChessEngine
 {
     class Search
     {
-        public static void Main(string[] position, bool whitesTurn)
-        {   
-            Position pos = new(whitesTurn);
-
-            //creating seperate arrays for the white and black pieces
-            List<string> piecesWhite = new();
-            for (int i = 0; i < position.Length; i++)
-            {
-                if (position[i][0] == 'w')
-                    piecesWhite.Add(position[i]);
-            }
-            pos.PiecesWhite = piecesWhite;
-
-            List<string> piecesBlack = new();
-            for (int i = 0; i < position.Length; i++)
-            {
-                if (position[i][0] == 'b')
-                    piecesBlack.Add(position[i]);
-            }
-            pos.PiecesBlack = piecesBlack;
-
+        static List<string> ownPieces = new();
+        public static void Main(Position pos)
+        {
+            ownPieces = pos.OwnPieces();
+            
             //getting every possible move
-            List<string> ownPieces = pos.OwnPieces();
+            Console.WriteLine("Legal Moves in this position:");
             for (int i = 0; i < ownPieces.Count; i++) {
                 switch (ownPieces[i][1]) {
                     case 'K':
-                        King.LegalMoves(posKing: StrToTuple(ownPieces[i], 2, 3), pos);
+                        King.LegalMoves(posKing: StrToTuple(i), pos);
                         break;
                     case 'Q':
+                        Queen.LegalMoves(posQueen: StrToTuple(i), pos);
                         break;
                     case 'B':
+                        Bishop.LegalMoves(posBishop: StrToTuple(i), pos);
                         break;
                     case 'R':
+                        Rook.LegalMoves(posRook: StrToTuple(i), pos);
                         break;
                     case 'N':
                         break;
                     default:
+                        Pawn.LegalMoves(posPawn: StrToTuple(i, 1, 2), pos);
                         break;
                 }
             }
         }
 
-        static (int, int) StrToTuple(string str, int i1, int i2) {
+        static (int, int) StrToTuple(int i, int i1 = 2, int i2 = 3) {
+            string str = ownPieces[i];
             return (Convert.ToInt32(str.Substring(i1, 1)), Convert.ToInt32(str.Substring(i2, 1)));
         }
     }
