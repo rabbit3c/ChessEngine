@@ -3,7 +3,7 @@ namespace ChessEngine
 {
     class Search
     {
-        static List<string> ownPieces = new();
+        static List<Piece> ownPieces = new();
         public static void Main(Position pos)
         {
             ownPieces = pos.OwnPieces();
@@ -11,31 +11,32 @@ namespace ChessEngine
             //getting every possible move
             Console.WriteLine("Legal Moves in this position:");
             for (int i = 0; i < ownPieces.Count; i++) {
-                switch (ownPieces[i][1]) {
-                    case 'K':
-                        King.LegalMoves(posKing: StrToTuple(i), pos);
+                switch (ownPieces[i].piece) {
+                    case Piece.King:
+                        King.LegalMoves(posKing: posPiece(i), pos);
                         break;
-                    case 'Q':
-                        Queen.LegalMoves(posQueen: StrToTuple(i), pos);
+                    case Piece.Queen:
+                        Queen.LegalMoves(posQueen: posPiece(i), pos);
                         break;
-                    case 'B':
-                        Bishop.LegalMoves(posBishop: StrToTuple(i), pos);
+                    case Piece.Bishop:
+                        Bishop.LegalMoves(posBishop: posPiece(i), pos);
                         break;
-                    case 'R':
-                        Rook.LegalMoves(posRook: StrToTuple(i), pos);
+                    case Piece.Rook:
+                        Rook.LegalMoves(posRook: posPiece(i), pos);
                         break;
-                    case 'N':
+                    case Piece.Knight:
+                        Knight.LegalMoves(posKnight: posPiece(i), pos);
                         break;
                     default:
-                        Pawn.LegalMoves(posPawn: StrToTuple(i, 1, 2), pos);
+                        Pawn.LegalMoves(posPawn: posPiece(i), pos);
                         break;
                 }
             }
         }
 
-        static (int, int) StrToTuple(int i, int i1 = 2, int i2 = 3) {
-            string str = ownPieces[i];
-            return (Convert.ToInt32(str.Substring(i1, 1)), Convert.ToInt32(str.Substring(i2, 1)));
+        static (int, int) posPiece(int i) {
+            Piece piece = ownPieces[i];
+            return (piece.pos.x, piece.pos.y);
         }
     }
 }

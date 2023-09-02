@@ -1,6 +1,4 @@
 
-using System.ComponentModel.DataAnnotations;
-
 namespace ChessEngine
 {
     class Move
@@ -12,17 +10,11 @@ namespace ChessEngine
             return false;
         }
 
-        public static bool Unprotected((int x, int y) pos)
+        public static bool Unobstructed((int x, int y) pos, List<Piece> pieces)
         {
-            // needs to be implemented
-            return true;
-        }
-
-        public static bool Unobstructed((int x, int y) pos, List<string> ownPieces)
-        {
-            for (int i = 0; i < ownPieces.Count; i++)
+            for (int i = 0; i < pieces.Count; i++)
             {
-                if (ownPieces[i].Contains($"{pos.x}{pos.y}"))
+                if (pieces[i].pos == (pos.x, pos.y))
                     return false;
             }
             return true;
@@ -37,7 +29,7 @@ namespace ChessEngine
                     (int, int) square = (x, newPos.y);
                     for (int i = 0; i < pos.Pieces.Count; i++)
                     {
-                        if (pos.Pieces[i].Contains($"{x}{newPos.y}") && square != oldPos && square != newPos)
+                        if (pos.Pieces[i].pos == (x, newPos.y) && square != oldPos && square != newPos)
                             return false;
                     }
                 }
@@ -49,7 +41,7 @@ namespace ChessEngine
                     (int, int) square = (newPos.x, y);
                     for (int i = 0; i < pos.Pieces.Count; i++)
                     {
-                        if (pos.Pieces[i].Contains($"{newPos.x}{y}") && square != oldPos && square != newPos)
+                        if (pos.Pieces[i].pos == (newPos.x, y) && square != oldPos && square != newPos)
                             return false;
                     }
                 }
@@ -64,7 +56,7 @@ namespace ChessEngine
                     Console.WriteLine(square);
                     for (int i = 0; i < pos.Pieces.Count; i++)
                     {
-                        if (pos.Pieces[i].Contains($"{x}{y}") && square != oldPos && square != newPos)
+                        if (pos.Pieces[i].pos == (x, y) && square != oldPos && square != newPos)
                             return false;
                     }
                 }
@@ -84,7 +76,7 @@ namespace ChessEngine
                     (int, int) move = (x, y);
                     if (Unobstructed(move, pos.OwnPieces()))
                     {
-                        if (Legal(move, posPiece, pos))
+                        if (NotInCheck(move, pos))
                             legalMoves.Add(move);
                     }
                     else if (move != posPiece)
@@ -108,7 +100,7 @@ namespace ChessEngine
                 (int, int) move = (x, posPiece.y);
                 if (Unobstructed(move, pos.OwnPieces()))
                 {
-                    if (Legal(move, posPiece, pos))
+                    if (NotInCheck(move, pos))
                         legalMoves.Add(move);
                 }
                 else if (move != posPiece)
@@ -125,7 +117,7 @@ namespace ChessEngine
                 (int, int) move = (posPiece.x, y);
                 if (Unobstructed(move, pos.OwnPieces()))
                 {
-                    if (Legal(move, posPiece, pos))
+                    if (NotInCheck(move, pos))
                         legalMoves.Add(move);
                 }
                 else if (move != posPiece)
@@ -141,11 +133,9 @@ namespace ChessEngine
             return legalMoves;
         }
 
-        static bool Legal((int x, int y) move, (int x, int y) posPiece, Position pos)
+        public static bool NotInCheck((int x, int y) move, Position pos)
         {
-            if (move != posPiece)
-                return true;
-            return false;
+            return true;
         }
     }
 }

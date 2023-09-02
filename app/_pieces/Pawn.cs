@@ -56,10 +56,10 @@ namespace ChessEngine
         }
         static bool Takeable((int x, int y) square, Position pos)
         {
-            List<string> enemyPieces = pos.EnemyPieces();
+            List<Piece> enemyPieces = pos.EnemyPieces();
             for (int i = 0; i < enemyPieces.Count; i++)
             {
-                if (enemyPieces[i].Contains($"{square.x}{square.y}"))
+                if (enemyPieces[i].pos == (square.x, square.y))
                     return true;
             }
             return false;

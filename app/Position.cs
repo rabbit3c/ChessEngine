@@ -3,46 +3,73 @@ namespace ChessEngine
     public class Position
     {
 
-        public List<string> Pieces { get; set; } = new();
-        public List<string> PiecesWhite { get; set; } = new();
-        public List<string> PiecesBlack { get; set; } = new();
+        public List<Piece> Pieces { get; set; } = new();
+        public List<Piece> PiecesWhite { get; set; } = new();
+        public List<Piece> PiecesBlack { get; set; } = new();
         public bool WhitesTurn;
 
-        public Position(bool whitesTurn)
+        public bool WShortCastle = true;
+        public bool WLongCastle = true;
+        public bool BShortCastle = true;
+        public bool BLongCastle = true;
+
+        public Position(bool whitesTurn, bool wShortCastle = true, bool wLongCastle = true, bool bShortCastle = true, bool bLongCastle = true)
         {
             WhitesTurn = whitesTurn;
+            WShortCastle = wShortCastle;
+            WLongCastle = wLongCastle;
+            BShortCastle = bShortCastle;
+            BLongCastle = bLongCastle;
         }
 
-        public List<string> OwnPieces()
+        public List<Piece> OwnPieces()
         {
             return WhitesTurn ? PiecesWhite : PiecesBlack;
         }
 
-        public List<string> EnemyPieces()
+        public List<Piece> EnemyPieces()
         {
             return WhitesTurn ? PiecesBlack : PiecesWhite;
         }
 
         public void FormatPosition(string[] position)
         {
-            //creating seperate arrays for the white and black pieces
-            List<string> piecesWhite = new();
-            for (int i = 0; i < position.Length; i++)
-            {
-                if (position[i][0] == 'w')
-                    piecesWhite.Add(position[i]);
+
+            foreach (string piece in position) {
+                bool whitePiece = false;
+                if (piece[0] == 'w') {
+                    whitePiece = true;
+                }
+                (int, int) pos = (ToInt(piece[2]), ToInt(piece[3]));
+                Piece piece1 = new(pos, whitePiece, ToInt(piece[1]));
+                Pieces.Add(piece1);
             }
 
-            List<string> piecesBlack = new();
-            for (int i = 0; i < position.Length; i++)
-            {
-                if (position[i][0] == 'b')
-                    piecesBlack.Add(position[i]);
+            foreach (Piece piece in Pieces) {
+                if (piece.isWhite) 
+                    PiecesWhite.Add(piece);
+                else
+                    PiecesBlack.Add(piece);
             }
+        }
 
-            Pieces = position.ToList();
-            PiecesWhite = piecesWhite;
-            PiecesBlack = piecesBlack;
+        public void ChangePosition((int x, int y) posPiece, (int x, int y) move) {
+            Piece newPiece = new();
+            foreach (Piece piece in Pieces) {
+                if (piece.pos == posPiece) {
+                    Pieces.Remove(piece);
+                    newPiece = piece;
+                }
+                if (piece.pos == posPiece) {
+                    Pieces.Remove(piece);
+                }
+            }
+            newPiece.pos = move;
+            Pieces.Add(newPiece);
+        }
+
+        static int ToInt(char c) {
+            return (int)(c - '0');
         }
     }
 }
