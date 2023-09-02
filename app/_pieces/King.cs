@@ -3,16 +3,16 @@ namespace ChessEngine
 {
     class King
     {
-        public static List<(int, int)> LegalMoves((int x, int y) posKing, Position pos)
+        public static List<(int, int)> LegalMoves(Piece piece, Position pos)
         {
             List<(int, int)> legalMoves = new();
             for (int x = -1; x < 2; x++)
             {
                 for (int y = -1; y < 2; y++)
                 {
-                    (int, int) move = (posKing.x + x, posKing.y + y);
-                    if (Legal(move, pos) && posKing != move)
-                        legalMoves.Add((posKing.x + x, posKing.y + y));
+                    (int, int) move = (piece.pos.x + x, piece.pos.y + y);
+                    if (Legal(piece, move, pos) && piece.pos != move)
+                        legalMoves.Add((piece.pos.x + x, piece.pos.y + y));
                 }
             }
             if (pos.WhitesTurn) {
@@ -35,15 +35,16 @@ namespace ChessEngine
                         legalMoves.Add((3, 8));
                 }
             }
-            string combinedString = string.Join( ", ", legalMoves);
-            Console.WriteLine($"King at {posKing} to {combinedString}");
+            /*string combinedString = string.Join( ", ", legalMoves);
+            Console.WriteLine($"King at {piece.pos} to {combinedString}");*/
             return legalMoves;
         }
 
-        static bool Legal((int x, int y) move, Position pos)
+        static bool Legal(Piece piece, (int x, int y) move, Position pos)
         {
-            if (Move.Inbound(move) && Move.NotInCheck(move, pos) && Move.Unobstructed(move, pos.OwnPieces()))
-                return true;
+            if (Move.Inbound(move) && Move.Unobstructed(move, pos.OwnPieces()))
+                if (Move.NotInCheck(piece, move, pos))
+                    return true;
             return false;
         }
     }

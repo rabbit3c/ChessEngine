@@ -1,3 +1,4 @@
+
 namespace ChessEngine
 {
     public class Position
@@ -6,21 +7,15 @@ namespace ChessEngine
         public List<Piece> Pieces { get; set; } = new();
         public List<Piece> PiecesWhite { get; set; } = new();
         public List<Piece> PiecesBlack { get; set; } = new();
-        public bool WhitesTurn;
+
+        public (int x, int y) EnPassantTarget { get; set; } = new();
+
+        public bool WhitesTurn = true;
 
         public bool WShortCastle = true;
         public bool WLongCastle = true;
         public bool BShortCastle = true;
         public bool BLongCastle = true;
-
-        public Position(bool whitesTurn, bool wShortCastle = true, bool wLongCastle = true, bool bShortCastle = true, bool bLongCastle = true)
-        {
-            WhitesTurn = whitesTurn;
-            WShortCastle = wShortCastle;
-            WLongCastle = wLongCastle;
-            BShortCastle = bShortCastle;
-            BLongCastle = bLongCastle;
-        }
 
         public List<Piece> OwnPieces()
         {
@@ -32,44 +27,94 @@ namespace ChessEngine
             return WhitesTurn ? PiecesBlack : PiecesWhite;
         }
 
-        public void FormatPosition(string[] position)
+        public object Copy()
+        {
+            Position copy = new()
+            {
+                Pieces = Pieces.GetClone(),
+                PiecesBlack = PiecesBlack.GetClone(),
+                PiecesWhite = PiecesWhite.GetClone(),
+                EnPassantTarget = (EnPassantTarget.x, EnPassantTarget.y),
+                WhitesTurn = WhitesTurn,
+                WLongCastle = WLongCastle,
+                WShortCastle = WShortCastle,
+                BLongCastle = BLongCastle,
+                BShortCastle = BShortCastle
+            };
+            return copy;
+        }
+
+        public void RemoveAt(int i)
+        {
+            Pieces.RemoveAt(i);
+        }
+
+        public void SplitColors()
         {
 
-            foreach (string piece in position) {
-                bool whitePiece = false;
-                if (piece[0] == 'w') {
-                    whitePiece = true;
-                }
-                (int, int) pos = (ToInt(piece[2]), ToInt(piece[3]));
-                Piece piece1 = new(pos, whitePiece, ToInt(piece[1]));
-                Pieces.Add(piece1);
-            }
+            PiecesWhite.Clear();
+            PiecesBlack.Clear();
 
-            foreach (Piece piece in Pieces) {
-                if (piece.isWhite) 
+            foreach (Piece piece in Pieces)
+            {
+                if (piece.isWhite)
                     PiecesWhite.Add(piece);
                 else
                     PiecesBlack.Add(piece);
             }
         }
 
-        public void ChangePosition((int x, int y) posPiece, (int x, int y) move) {
-            Piece newPiece = new();
-            foreach (Piece piece in Pieces) {
-                if (piece.pos == posPiece) {
-                    Pieces.Remove(piece);
-                    newPiece = piece;
-                }
-                if (piece.pos == posPiece) {
-                    Pieces.Remove(piece);
-                }
-            }
-            newPiece.pos = move;
-            Pieces.Add(newPiece);
+        public void ToggleTurn()
+        {
+            WhitesTurn = !WhitesTurn;
         }
 
-        static int ToInt(char c) {
-            return (int)(c - '0');
+        public void Add(Piece piece)
+        {
+            Pieces.Add(piece);
+        }
+
+        public void NoLongCastle(Piece piece)
+        {
+            if (piece.isWhite)
+                WShortCastle = false;
+            else
+                BShortCastle = false;
+
+        }
+
+        public void NoShortCastle(Piece piece)
+        {
+            if (piece.isWhite)
+                WShortCastle = false;
+            else
+                BShortCastle = false;
+        }
+
+        public void NoCastle(Piece piece)
+        {
+            if (piece.piece == Piece.King)
+            {
+                NoShortCastle(piece);
+                NoLongCastle(piece);
+            }
+            else if (piece.piece == Piece.Rook)
+            {
+                if (piece.pos.x == 8)
+                    NoShortCastle(piece);
+
+                else if (piece.pos.x == 1)
+                    NoLongCastle(piece);
+            }
+        }
+    }
+
+    public static class Extensions
+    {
+        public static List<Piece> GetClone(this List<Piece> source)
+        {
+            return source.Select(item => (Piece)item.Copy())
+                    .ToList();
         }
     }
 }

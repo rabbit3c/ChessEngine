@@ -3,23 +3,23 @@ namespace ChessEngine
 {
     class Pawn
     {
-        public static List<(int, int)> LegalMoves((int x, int y) posPawn, Position pos)
+        public static List<(int, int)> LegalMoves(Piece piece, Position pos)
         {
             List<(int, int)> moves = new();
             if (pos.WhitesTurn)
             {
-                moves.Add((posPawn.x, posPawn.y + 1));
-                if (posPawn.y == 2)
-                    moves.Add((posPawn.x, posPawn.y + 2));
+                moves.Add((piece.pos.x, piece.pos.y + 1));
+                if (piece.pos.y == 2)
+                    moves.Add((piece.pos.x, piece.pos.y + 2));
             }
             else
             {
-                moves.Add((posPawn.x, posPawn.y - 1));
-                if (posPawn.y == 7)
-                    moves.Add((posPawn.x, posPawn.y - 2));
+                moves.Add((piece.pos.x, piece.pos.y - 1));
+                if (piece.pos.y == 7)
+                    moves.Add((piece.pos.x, piece.pos.y - 2));
             }
             for (int i = 0; i < moves.Count; i++) {
-                if (!Legal(posPawn, moves[i], pos)) {
+                if (!Legal(piece, moves[i], pos)) {
                     moves.RemoveAt(i);
                     i--;
                 }
@@ -27,36 +27,39 @@ namespace ChessEngine
 
             if (pos.WhitesTurn)
             {   
-                var move = (posPawn.x + 1, posPawn.y + 1);
+                var move = (piece.pos.x + 1, piece.pos.y + 1);
                 if (Takeable(move, pos))
                     moves.Add(move);
-                move = (posPawn.x - 1, posPawn.y + 1);
+                move = (piece.pos.x - 1, piece.pos.y + 1);
                 if (Takeable(move, pos))
                     moves.Add(move);
             }
             else
             {
-                var move = (posPawn.x + 1, posPawn.y - 1);
+                var move = (piece.pos.x + 1, piece.pos.y - 1);
                 if (Takeable(move, pos))
                     moves.Add(move);
-                move = (posPawn.x - 1, posPawn.y - 1);
+                move = (piece.pos.x - 1, piece.pos.y - 1);
                 if (Takeable(move, pos))
                     moves.Add(move);
             }
-            string combinedString = string.Join(", ", moves);
-            Console.WriteLine($"Pawn at {posPawn} to {combinedString}");
+            /*string combinedString = string.Join(", ", moves);
+            Console.WriteLine($"Pawn at {piece.pos} to {combinedString}");*/
             return moves;
         }
 
-        static bool Legal((int x, int y)posPawn, (int x, int y) move, Position pos)
+        static bool Legal(Piece piece, (int x, int y) move, Position pos)
         {   
-            if (Move.NothingInTheWay(posPawn, move, pos) && Move.Unobstructed(move, pos.Pieces))
+            if (Move.NothingInTheWay(piece.pos, move, pos) && Move.Unobstructed(move, pos.Pieces) && Move.NotInCheck(piece, move, pos))
                 return true;
             return false;
         }
         static bool Takeable((int x, int y) square, Position pos)
         {
             List<Piece> enemyPieces = pos.EnemyPieces();
+            if (pos.EnPassantTarget == square) {
+                return true;
+            }
             for (int i = 0; i < enemyPieces.Count; i++)
             {
                 if (enemyPieces[i].pos == (square.x, square.y))

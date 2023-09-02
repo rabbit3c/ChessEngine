@@ -1,4 +1,6 @@
 
+using System.Runtime.CompilerServices;
+
 namespace ChessEngine
 {
     class Move
@@ -53,7 +55,6 @@ namespace ChessEngine
                     int x = newPos.x > oldPos.x ? oldPos.x + n : oldPos.x - n;
                     int y = newPos.y > oldPos.y ? oldPos.y + n : oldPos.y - n;
                     (int, int) square = (x, newPos.y);
-                    Console.WriteLine(square);
                     for (int i = 0; i < pos.Pieces.Count; i++)
                     {
                         if (pos.Pieces[i].pos == (x, y) && square != oldPos && square != newPos)
@@ -64,22 +65,22 @@ namespace ChessEngine
             return true;
         }
 
-        public static List<(int, int)> DiagonalMoves((int x, int y) posPiece, Position pos, bool xPos = true, bool yPos = true)
+        public static List<(int, int)> DiagonalMoves(Piece piece, Position pos, bool xPos = true, bool yPos = true)
         {
             List<(int, int)> legalMoves = new();
-            for (int n = 0; xPos ? n <= 8 - posPiece.x : n <= posPiece.x - 1; n++)
+            for (int n = 0; xPos ? n <= 8 - piece.pos.x : n <= piece.pos.x - 1; n++)
             {
-                int x = xPos ? posPiece.x + n : posPiece.x - n;
-                int y = yPos ? posPiece.y + n : posPiece.y - n;
+                int x = xPos ? piece.pos.x + n : piece.pos.x - n;
+                int y = yPos ? piece.pos.y + n : piece.pos.y - n;
                 if (yPos ? y <= 8 : y >= 1)
                 {
                     (int, int) move = (x, y);
                     if (Unobstructed(move, pos.OwnPieces()))
                     {
-                        if (NotInCheck(move, pos))
+                        if (NotInCheck(piece, move, pos))
                             legalMoves.Add(move);
                     }
-                    else if (move != posPiece)
+                    else if (move != piece.pos)
                         break;
                     if (!Unobstructed(move, pos.EnemyPieces()))
                         break;
@@ -92,39 +93,39 @@ namespace ChessEngine
             return legalMoves;
         }
 
-        public static List<(int, int)> StraightMoves((int x, int y) posPiece, Position pos, bool positiv = true)
+        public static List<(int, int)> StraightMoves(Piece piece, Position pos, bool positiv = true)
         {
             List<(int, int)> legalMoves = new();
-            for (int x = posPiece.x; positiv ? x <= 8 : x >= 1;)
+            for (int x = piece.pos.x; positiv ? x <= 8 : x >= 1;)
             {
-                (int, int) move = (x, posPiece.y);
+                (int, int) move = (x, piece.pos.y);
                 if (Unobstructed(move, pos.OwnPieces()))
                 {
-                    if (NotInCheck(move, pos))
+                    if (NotInCheck(piece, move, pos))
                         legalMoves.Add(move);
                 }
-                else if (move != posPiece)
+                else if (move != piece.pos)
                     break;
                 if (!Unobstructed(move, pos.EnemyPieces()))
                     break;
-                if (positiv) 
+                if (positiv)
                     x++;
                 else
                     x--;
             }
-            for (int y = posPiece.y; positiv ? y <= 8 : y >= 1;)
+            for (int y = piece.pos.y; positiv ? y <= 8 : y >= 1;)
             {
-                (int, int) move = (posPiece.x, y);
+                (int, int) move = (piece.pos.x, y);
                 if (Unobstructed(move, pos.OwnPieces()))
                 {
-                    if (NotInCheck(move, pos))
+                    if (NotInCheck(piece, move, pos))
                         legalMoves.Add(move);
                 }
-                else if (move != posPiece)
+                else if (move != piece.pos)
                     break;
                 if (!Unobstructed(move, pos.EnemyPieces()))
                     break;
-                if (positiv) 
+                if (positiv)
                     y++;
                 else
                     y--;
@@ -133,8 +134,54 @@ namespace ChessEngine
             return legalMoves;
         }
 
-        public static bool NotInCheck((int x, int y) move, Position pos)
+        public static bool NotInCheck(Piece piece, (int x, int y) move, Position pos)
         {
+            Position newPos = NewPos.Format(pos, piece, move);
+            newPos.ToggleTurn();
+
+            (int x, int y) posKing = (0, 0);
+            foreach (Piece p in newPos.OwnPieces())
+            {
+                if (p.piece == Piece.King)
+                {
+                    posKing = p.pos;
+                    break;
+                }
+            }
+
+            foreach (Piece p in newPos.EnemyPieces())
+            {
+                if (p.pos.x == posKing.x)
+                {
+                    if (NothingInTheWay(posKing, p.pos, newPos))
+                    {
+                        Console.WriteLine("illegal");
+                        Console.WriteLine(move);
+                        return false;
+                    }
+                }
+                else if (p.pos.y == posKing.y)
+                {
+                    if (NothingInTheWay(posKing, p.pos, newPos))
+                    {
+                        Console.WriteLine("illegal");
+                        Console.WriteLine(move);
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (p.Diagonal(posKing))
+                    {
+                        if (NothingInTheWay(posKing, p.pos, newPos))
+                        {
+                            Console.WriteLine("illegal");
+                            Console.WriteLine(move);
+                            return false;
+                        }
+                    }
+                }
+            }
             return true;
         }
     }
