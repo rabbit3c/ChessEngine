@@ -15,6 +15,7 @@ namespace ChessEngine
                 newPositions.AddRange(GeneratePositions(position, out int n));
                 newPos += n;
             }
+
             Console.WriteLine($"Amount of new positions: {newPos}");
 
             depth--;

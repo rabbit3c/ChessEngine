@@ -11,7 +11,7 @@ namespace ChessEngine
             legalMoves.AddRange(Move.DiagonalMoves(piece, pos, xPos: false, yPos: false));
 
             /*string combinedString = string.Join(", ", legalMoves);
-            Console.WriteLine($"Bishop at {posBishop} to {combinedString}");*/
+            Console.WriteLine($"Bishop at {piece.pos} to {combinedString}");*/
             return legalMoves;
         }
     }

@@ -9,7 +9,7 @@ namespace ChessEngine
             legalMoves.AddRange(Move.StraightMoves(piece, pos, positiv: false));
 
             /*string combinedString = string.Join(", ", legalMoves);
-            Console.WriteLine($"Rook at {piece} to {combinedString}");*/
+            Console.WriteLine($"Rook at {piece.pos} to {combinedString}");*/
             return legalMoves;
         }
     }

@@ -3,7 +3,7 @@ namespace ChessEngine {
         public void FormatPosition(string positionFEN)
         {   
             int i = positionFEN.IndexOf(' ');
-            string positionPiecesFEN = positionFEN.Substring(0, i);
+            string positionPiecesFEN = positionFEN[..i];
 
             (int x, int y) currPos = (1, 8);
 
@@ -70,7 +70,7 @@ namespace ChessEngine {
             if (!infoCastling.Contains('Q'))
                 WLongCastle = false;
             if (!infoCastling.Contains('q'))
-                WLongCastle = false;
+                BLongCastle = false;
 
             info = info[(info.IndexOf(' ') + 1)..];
             if (info[0] != '-')
