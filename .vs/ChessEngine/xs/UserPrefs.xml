@@ -1,0 +1,31 @@
+﻿<Properties StartupConfiguration="{359501F3-FAE4-492F-997A-623F767407FF}|Default">
+  <MonoDevelop.Ide.ItemProperties.app PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.Workbench ActiveDocument="app/Program.cs">
+    <Files>
+      <File FileName="app/NewPos.cs" Line="79" Column="1" />
+      <File FileName="app/Program.cs" Line="14" Column="2" />
+      <File FileName="app/Position.cs" Line="1" Column="1" />
+      <File FileName="app/FEM.cs" Line="1" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="ChessEngine">
+            <Node name="app">
+              <Node name="Program.cs" selected="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
+</Properties>

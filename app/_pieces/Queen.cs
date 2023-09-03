@@ -14,8 +14,8 @@ namespace ChessEngine
             legalMoves.AddRange(Move.DiagonalMoves(piece, pos, xPos: false));
             legalMoves.AddRange(Move.DiagonalMoves(piece, pos, xPos: false, yPos: false));
 
-            /*string combinedString = string.Join(", ", legalMoves);
-            Console.WriteLine($"Queen at {piece.pos} to {combinedString}");*/
+            //string combinedString = string.Join(", ", legalMoves);
+            //Console.WriteLine($"Queen at {piece.pos} to {combinedString}");
             return legalMoves;
         }
     }

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "skbPHCdA2YecF12jLG8d1HlSrz9muFWrC6buwQEI3mulGMfBuWgSuMDq4p5+Ab3Rzsi6Qlz3ZqBDLh8mBA/Z+A==",
+  "dgSpecHash": "18aFvmyfKbNKNyc5IG59kz3AVh3IRQ7AFyZJ9lDYAqh2e3mImeWXmdc5qCO1aRtPaajZpZJ64F5mBM5UGkmONw==",
   "success": true,
   "projectFilePath": "/Users/matthieu/Documents/Coding/C#/ChessEngine/app/app.csproj",
   "expectedPackageFiles": [],

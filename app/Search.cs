@@ -1,4 +1,6 @@
 
+using System.Diagnostics.Metrics;
+
 namespace ChessEngine
 {
     class Search
@@ -13,16 +15,24 @@ namespace ChessEngine
             foreach (Position position in positions)
             {
                 newPositions.AddRange(GeneratePositions(position, out int n));
+                /*string pos = "";
+                foreach (Piece piece in position.Pieces) {
+                    pos += $"{piece.pos}, ";
+                }
+                Console.WriteLine($"{pos}: {n}");*/
                 newPos += n;
             }
+            /*foreach (Position newPosition in newPositions) {
+                FEN pos = (FEN)newPosition.Convert();
+
+                Console.WriteLine(pos.FormatFEN());
+            }*/
 
             Console.WriteLine($"Amount of new positions: {newPos}");
 
             depth--;
             if (depth == 0)
-            {
                 return;
-            }
 
             Main(newPositions, depth);
         }

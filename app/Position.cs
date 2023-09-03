@@ -34,7 +34,24 @@ namespace ChessEngine
                 Pieces = Pieces.GetClone(),
                 PiecesBlack = PiecesBlack.GetClone(),
                 PiecesWhite = PiecesWhite.GetClone(),
-                EnPassantTarget = (EnPassantTarget.x, EnPassantTarget.y),
+                EnPassantTarget = EnPassantTarget.GetClone(),
+                WhitesTurn = WhitesTurn,
+                WLongCastle = WLongCastle,
+                WShortCastle = WShortCastle,
+                BLongCastle = BLongCastle,
+                BShortCastle = BShortCastle
+            };
+            return copy;
+        }
+
+        public object Convert()
+        {
+            FEN copy = new()
+            {
+                Pieces = Pieces.GetClone(),
+                PiecesBlack = PiecesBlack.GetClone(),
+                PiecesWhite = PiecesWhite.GetClone(),
+                EnPassantTarget = EnPassantTarget.GetClone(),
                 WhitesTurn = WhitesTurn,
                 WLongCastle = WLongCastle,
                 WShortCastle = WShortCastle,
@@ -115,6 +132,11 @@ namespace ChessEngine
         {
             return source.Select(item => (Piece)item.Copy())
                     .ToList();
+        }
+
+        public static (int, int) GetClone(this (int, int) source)
+        {
+            return (source.Item1, source.Item2);
         }
     }
 }

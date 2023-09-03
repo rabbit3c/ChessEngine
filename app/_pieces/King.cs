@@ -15,36 +15,50 @@ namespace ChessEngine
                         legalMoves.Add((piece.pos.x + x, piece.pos.y + y));
                 }
             }
-            if (pos.WhitesTurn) {
-                if (pos.WShortCastle) {
-                    if (Move.NothingInTheWay((5, 1), (8, 1), pos)) 
-                        legalMoves.Add((7, 1));
+            if (Move.NotInCheck(piece, piece.pos, pos))
+            {
+                if (pos.WhitesTurn)
+                {
+                    if (pos.WShortCastle)
+                    {
+                        if (Move.NothingInTheWay((5, 1), (8, 1), pos))
+                            if (Move.NotInCheck(piece, (6, 1), pos) && Move.NotInCheck(piece, (7, 1), pos))
+                                legalMoves.Add((7, 1));
+                    }
+                    if (pos.WLongCastle)
+                    {
+                        if (Move.NothingInTheWay((5, 1), (1, 1), pos))
+                            if (Move.NotInCheck(piece, (4, 1), pos) && Move.NotInCheck(piece, (3, 1), pos))
+                                legalMoves.Add((3, 1));
+                    }
                 }
-                if (pos.WLongCastle) {
-                    if (Move.NothingInTheWay((5, 1), (1, 1), pos))
-                        legalMoves.Add((3, 1));
+                else
+                {
+                    if (pos.BShortCastle)
+                    {
+                        if (Move.NothingInTheWay((5, 8), (8, 8), pos))
+                            if (Move.NotInCheck(piece, (6, 8), pos) && Move.NotInCheck(piece, (7, 8), pos))
+                                legalMoves.Add((7, 8));
+                    }
+                    if (pos.BLongCastle && Move.NotInCheck(piece, (4, 8), pos))
+                    {
+                        if (Move.NothingInTheWay((5, 8), (1, 8), pos))
+                            if (Move.NotInCheck(piece, (4, 8), pos) && Move.NotInCheck(piece, (3, 8), pos))
+                                legalMoves.Add((3, 8));
+                    }
                 }
             }
-            else {
-                if (pos.BShortCastle) {
-                    if (Move.NothingInTheWay((5, 8), (8, 8), pos)) 
-                        legalMoves.Add((7, 8));
-                }
-                if (pos.BLongCastle) {
-                    if (Move.NothingInTheWay((5, 8), (1, 8), pos))
-                        legalMoves.Add((3, 8));
-                }
-            }
-            /*string combinedString = string.Join( ", ", legalMoves);
-            Console.WriteLine($"King at {piece.pos} to {combinedString}");*/
+            //string combinedString = string.Join( ", ", legalMoves);
+            //Console.WriteLine($"King at {piece.pos} to {combinedString}");
             return legalMoves;
         }
 
         static bool Legal(Piece piece, (int x, int y) move, Position pos)
         {
             if (Move.Inbound(move) && Move.Unobstructed(move, pos.OwnPieces()))
-                if (Move.NotInCheck(piece, move, pos))
+                if (Move.NotInCheck(piece, move, pos)) {
                     return true;
+                }
             return false;
         }
     }

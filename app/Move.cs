@@ -1,6 +1,4 @@
 
-using System.Runtime.CompilerServices;
-
 namespace ChessEngine
 {
     class Move
@@ -50,15 +48,16 @@ namespace ChessEngine
             }
             else
             {
-                for (int n = 0; n < Math.Abs(newPos.x - oldPos.x); n++)
+                foreach (Piece piece in pos.Pieces)
                 {
-                    int x = newPos.x > oldPos.x ? oldPos.x + n : oldPos.x - n;
-                    int y = newPos.y > oldPos.y ? oldPos.y + n : oldPos.y - n;
-                    (int, int) square = (x, newPos.y);
-                    for (int i = 0; i < pos.Pieces.Count; i++)
+                    if (piece.pos != oldPos && piece.pos != newPos)
                     {
-                        if (pos.Pieces[i].pos == (x, y) && square != oldPos && square != newPos)
-                            return false;
+                        if (Math.Abs(oldPos.x - piece.pos.x) == Math.Abs(oldPos.y - piece.pos.y))
+                        {
+                            if (Math.Max(oldPos.x, newPos.x) > piece.pos.x && piece.pos.x > Math.Min(oldPos.x, newPos.x))
+                                if (Math.Max(oldPos.y, newPos.y) > piece.pos.y && piece.pos.y > Math.Min(oldPos.y, newPos.y))
+                                    return false;
+                        }
                     }
                 }
             }
@@ -77,8 +76,11 @@ namespace ChessEngine
                     (int, int) move = (x, y);
                     if (Unobstructed(move, pos.OwnPieces()))
                     {
-                        if (NotInCheck(piece, move, pos))
-                            legalMoves.Add(move);
+                        if (!piece.IsPinned(move, pos))
+                        {
+                            if (NotInCheck(piece, move, pos))
+                                legalMoves.Add(move);
+                        }
                     }
                     else if (move != piece.pos)
                         break;
@@ -101,13 +103,18 @@ namespace ChessEngine
                 (int, int) move = (x, piece.pos.y);
                 if (Unobstructed(move, pos.OwnPieces()))
                 {
-                    if (NotInCheck(piece, move, pos))
-                        legalMoves.Add(move);
+                    if (!piece.IsPinned(move, pos))
+                    {
+                        if (NotInCheck(piece, move, pos))
+                            legalMoves.Add(move);
+                    }
                 }
                 else if (move != piece.pos)
                     break;
                 if (!Unobstructed(move, pos.EnemyPieces()))
+                {
                     break;
+                }
                 if (positiv)
                     x++;
                 else
@@ -118,8 +125,11 @@ namespace ChessEngine
                 (int, int) move = (piece.pos.x, y);
                 if (Unobstructed(move, pos.OwnPieces()))
                 {
-                    if (NotInCheck(piece, move, pos))
-                        legalMoves.Add(move);
+                    if (!piece.IsPinned(move, pos))
+                    {
+                        if (NotInCheck(piece, move, pos))
+                            legalMoves.Add(move);
+                    }
                 }
                 else if (move != piece.pos)
                     break;
@@ -136,50 +146,53 @@ namespace ChessEngine
 
         public static bool NotInCheck(Piece piece, (int x, int y) move, Position pos)
         {
-            Position newPos = NewPos.Format(pos, piece, move);
-            newPos.ToggleTurn();
+            Position newPos = NewPos.Format(pos, piece, move)[0];
 
             (int x, int y) posKing = (0, 0);
-            foreach (Piece p in newPos.OwnPieces())
+            if (piece.piece != Piece.King)
             {
-                if (p.piece == Piece.King)
+                foreach (Piece p in newPos.EnemyPieces()) //The own king is now an enemy, because the turn switched
                 {
-                    posKing = p.pos;
-                    break;
+                    if (p.piece == Piece.King)
+                    {
+                        posKing = p.pos;
+                        break;
+                    }
                 }
             }
-
-            foreach (Piece p in newPos.EnemyPieces())
+            else
             {
-                if (p.pos.x == posKing.x)
+                posKing = move;
+            }
+
+            foreach (Piece p in newPos.OwnPieces())
+            {
+                if (p.pos.x == posKing.x && (p.piece == Piece.Rook || p.piece == Piece.Queen))
                 {
                     if (NothingInTheWay(posKing, p.pos, newPos))
-                    {
-                        Console.WriteLine("illegal");
-                        Console.WriteLine(move);
                         return false;
-                    }
                 }
-                else if (p.pos.y == posKing.y)
+                else if (p.pos.y == posKing.y && (p.piece == Piece.Rook || p.piece == Piece.Queen))
                 {
                     if (NothingInTheWay(posKing, p.pos, newPos))
-                    {
-                        Console.WriteLine("illegal");
-                        Console.WriteLine(move);
                         return false;
-                    }
                 }
-                else
+                else if (Math.Abs(p.pos.x - posKing.x) == Math.Abs(p.pos.y - posKing.y) && (p.piece == Piece.Bishop || p.piece == Piece.Queen))
                 {
-                    if (p.Diagonal(posKing))
-                    {
-                        if (NothingInTheWay(posKing, p.pos, newPos))
-                        {
-                            Console.WriteLine("illegal");
-                            Console.WriteLine(move);
+                    if (NothingInTheWay(posKing, p.pos, newPos))
+                        return false;
+                }
+                else if (p.piece == Piece.Knight)
+                {
+                    foreach ((int, int) moveN in Knight.Moves(p, newPos))
+                        if (moveN == posKing)
                             return false;
-                        }
-                    }
+                }
+                else if (p.piece == Piece.Pawn)
+                {
+                    foreach ((int, int) moveP in Pawn.Moves(p, newPos))
+                        if (moveP == posKing)
+                            return false;
                 }
             }
             return true;
