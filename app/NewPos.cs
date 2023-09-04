@@ -62,10 +62,11 @@ namespace ChessEngine
                     {
                         foreach (Piece piece in newPosition.Pieces)
                         {
-                            if (move.x == 3)
+                            if (move.x == 3) {
                                 if (piece.pos == (1, move.y))
                                     piece.pos = (4, move.y);
-                                else
+                            }
+                            else if (move.x == 7)
                                 if (piece.pos == (8, move.y))
                                     piece.pos = (6, move.y);
                         }

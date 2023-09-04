@@ -93,18 +93,18 @@ namespace ChessEngine
 
         public void NoLongCastle(Piece piece)
         {
-            if (piece.isWhite)
-                WShortCastle = false;
-            else
-                BShortCastle = false;
+            if (piece.isWhite && piece.pos.y == 1)
+                WLongCastle = false;
+            else if (piece.pos.y == 8)
+                BLongCastle = false;
 
         }
 
         public void NoShortCastle(Piece piece)
         {
-            if (piece.isWhite)
+            if (piece.isWhite && piece.pos.y == 1)
                 WShortCastle = false;
-            else
+            else if (piece.pos.y == 8)
                 BShortCastle = false;
         }
 
@@ -119,7 +119,6 @@ namespace ChessEngine
             {
                 if (piece.pos.x == 8)
                     NoShortCastle(piece);
-
                 else if (piece.pos.x == 1)
                     NoLongCastle(piece);
             }
