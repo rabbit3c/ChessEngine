@@ -1,6 +1,6 @@
 namespace ChessEngine
 {
-    class FEN : Position
+    public class FEN : Position
     {
         public void FormatPosition(string positionFEN)
         {

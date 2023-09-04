@@ -3,11 +3,11 @@ using System.Diagnostics.Metrics;
 
 namespace ChessEngine
 {
-    class Search
+    public class Search
     {
         static List<Piece> ownPieces = new();
 
-        public static void Main(List<Position> positions, int depth)
+        public static void Main(List<Position> positions, int depth, out int AmountPos)
         {
             List<Position> newPositions = new();
             int newPos = 0;
@@ -28,13 +28,12 @@ namespace ChessEngine
                 Console.WriteLine(pos.FormatFEN());
             }*/
 
-            Console.WriteLine($"Amount of new positions: {newPos}");
-
             depth--;
-            if (depth == 0)
+            if (depth == 0) {
+                AmountPos = newPos;
                 return;
-
-            Main(newPositions, depth);
+            }
+            Main(newPositions, depth, out AmountPos);
         }
         public static List<Position> GeneratePositions(Position pos, out int newPos)
         {
