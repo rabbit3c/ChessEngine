@@ -61,7 +61,7 @@ namespace ChessEngine
 
         public static bool Legal(Piece piece, (int, int) move, Position pos)
         {
-            if (Move.Unobstructed(move, pos.OwnPieces()) && Move.NotInCheck(piece, move, pos) && Move.Inbound(move))
+            if (Move.Unobstructed(move, pos.OwnPieces()) && Move.Inbound(move))
                 return true;
             return false;
         }

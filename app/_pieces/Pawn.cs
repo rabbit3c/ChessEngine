@@ -14,11 +14,6 @@ namespace ChessEngine
                     moves.RemoveAt(i);
                     i--;
                 }
-                else if (!Move.NotInCheck(piece, moves[i], pos))
-                {
-                    moves.RemoveAt(i);
-                    i--;
-                }
             }
 
             //string combinedString = string.Join(", ", moves);
