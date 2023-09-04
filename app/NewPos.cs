@@ -37,6 +37,7 @@ namespace ChessEngine
 
             newPiece.pos = move;
 
+            //check if any pawn is promoting
             if (newPiece.Promoting())
             {
                 for (int i = 1; i <= 3; i++)
@@ -52,8 +53,11 @@ namespace ChessEngine
 
             newPositions[0].EnPassantTarget = (0, 0);
 
+            //Check if there is a new enPassant target
             if (MovedPiece.piece == Piece.Pawn && Math.Abs(MovedPiece.pos.y - move.y) == 2)
                 newPositions[0].EnPassantTarget = (MovedPiece.pos.x, MovedPiece.isWhite ? MovedPiece.pos.y + 1 : MovedPiece.pos.y - 1);
+
+            //Castle and remove Castling Rights
             if (MovedPiece.piece == Piece.King)
             {
 
@@ -75,6 +79,7 @@ namespace ChessEngine
                 newPositions[0].NoCastle(MovedPiece);
             }
 
+            //Remove Castling Rights
             if (MovedPiece.piece == Piece.Rook)
             {
                 newPositions[0].NoCastle(MovedPiece);
@@ -86,6 +91,7 @@ namespace ChessEngine
                 newPos.ToggleTurn();
             }
 
+            // Check if the Enemies could take the King
             if (!NotInCheck(newPositions[0])) {
                 newPositions.Clear();
                 return newPositions;
