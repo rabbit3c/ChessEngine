@@ -5,8 +5,8 @@ namespace ChessEngine
     {
 
         public List<Piece> Pieces { get; set; } = new();
-        public List<Piece> PiecesWhite { get; set; } = new();
-        public List<Piece> PiecesBlack { get; set; } = new();
+        List<int> PiecesWhite { get; set; } = new();
+        List<int> PiecesBlack { get; set; } = new();
 
         public (int x, int y) EnPassantTarget { get; set; } = new();
 
@@ -19,12 +19,34 @@ namespace ChessEngine
 
         public List<Piece> OwnPieces()
         {
-            return WhitesTurn ? PiecesWhite : PiecesBlack;
+            List<Piece> ownPieces = new();
+            if (WhitesTurn) {
+                foreach (int i in PiecesWhite) {
+                    ownPieces.Add(Pieces[i]);
+                }
+            }
+            else {
+                foreach (int i in PiecesBlack) {
+                    ownPieces.Add(Pieces[i]);
+                }
+            }
+            return ownPieces;
         }
 
         public List<Piece> EnemyPieces()
         {
-            return WhitesTurn ? PiecesBlack : PiecesWhite;
+            List<Piece> enemyPieces = new();
+            if (WhitesTurn) {
+                foreach (int i in PiecesBlack) {
+                    enemyPieces.Add(Pieces[i]);
+                }
+            }
+            else {
+                foreach (int i in PiecesWhite) {
+                    enemyPieces.Add(Pieces[i]);
+                }
+            }
+            return enemyPieces;
         }
 
         public object Copy()
@@ -72,12 +94,12 @@ namespace ChessEngine
             PiecesWhite.Clear();
             PiecesBlack.Clear();
 
-            foreach (Piece piece in Pieces)
+            for (int i = 0; i < Pieces.Count; i++) 
             {
-                if (piece.isWhite)
-                    PiecesWhite.Add(piece);
+                if (Pieces[i].isWhite)
+                    PiecesWhite.Add(i);
                 else
-                    PiecesBlack.Add(piece);
+                    PiecesBlack.Add(i);
             }
         }
 
@@ -131,6 +153,11 @@ namespace ChessEngine
         {
             return source.Select(item => (Piece)item.Copy())
                     .ToList();
+        }
+
+        public static List<int> GetClone(this List<int> source)
+        {
+            return source.ToList();
         }
 
         public static (int, int) GetClone(this (int, int) source)

@@ -104,13 +104,7 @@ namespace ChessEngine
             if (info[0] != '-')
                 EnPassantTarget = (char.ToUpper(info[0]) - 64, ToInt(info[1]));
 
-            foreach (Piece piece in Pieces)
-            {
-                if (piece.isWhite)
-                    PiecesWhite.Add(piece);
-                else
-                    PiecesBlack.Add(piece);
-            }
+            SplitColors();
         }
 
         public string FormatFEN()

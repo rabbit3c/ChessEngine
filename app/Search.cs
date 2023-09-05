@@ -36,7 +36,7 @@ namespace ChessEngine
 
             for (int i = 0; i < ownPieces.Count; i++)
             {
-                List<(sbyte, sbyte)> moves = ownPieces[i].piece switch
+                List<(int, int)> moves = ownPieces[i].piece switch
                 {
                     Piece.King => King.LegalMoves(ownPieces[i], pos),
                     Piece.Queen => Queen.LegalMoves(ownPieces[i], pos),
