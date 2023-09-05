@@ -1,12 +1,15 @@
 
+using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
+
 namespace ChessEngine
 {
     public class Position
     {
 
         public List<Piece> Pieces { get; set; } = new();
-        List<int> PiecesWhite { get; set; } = new();
-        List<int> PiecesBlack { get; set; } = new();
+        public List<Piece> PiecesWhite { get; set; } = new();
+        public List<Piece> PiecesBlack { get; set; } = new();
 
         public (int x, int y) EnPassantTarget { get; set; } = new();
 
@@ -19,34 +22,12 @@ namespace ChessEngine
 
         public List<Piece> OwnPieces()
         {
-            List<Piece> ownPieces = new();
-            if (WhitesTurn) {
-                foreach (int i in PiecesWhite) {
-                    ownPieces.Add(Pieces[i]);
-                }
-            }
-            else {
-                foreach (int i in PiecesBlack) {
-                    ownPieces.Add(Pieces[i]);
-                }
-            }
-            return ownPieces;
+            return WhitesTurn ? PiecesWhite : PiecesBlack;
         }
 
         public List<Piece> EnemyPieces()
         {
-            List<Piece> enemyPieces = new();
-            if (WhitesTurn) {
-                foreach (int i in PiecesBlack) {
-                    enemyPieces.Add(Pieces[i]);
-                }
-            }
-            else {
-                foreach (int i in PiecesWhite) {
-                    enemyPieces.Add(Pieces[i]);
-                }
-            }
-            return enemyPieces;
+            return WhitesTurn ? PiecesBlack : PiecesWhite;
         }
 
         public object Copy()
@@ -94,12 +75,12 @@ namespace ChessEngine
             PiecesWhite.Clear();
             PiecesBlack.Clear();
 
-            for (int i = 0; i < Pieces.Count; i++) 
+            foreach (Piece piece in Pieces)
             {
-                if (Pieces[i].isWhite)
-                    PiecesWhite.Add(i);
+                if (piece.isWhite)
+                    PiecesWhite.Add(piece);
                 else
-                    PiecesBlack.Add(i);
+                    PiecesBlack.Add(piece);
             }
         }
 
@@ -145,6 +126,32 @@ namespace ChessEngine
                     NoLongCastle(piece);
             }
         }
+
+        public ulong Hash() {
+            ulong hash = 0;
+            foreach (Piece piece in Pieces) {
+                int i = 0;
+                i += piece.pos.x - 1 + (piece.pos.y - 1) * 8;
+                i += piece.piece * 64;
+                i += System.Convert.ToInt32(piece.isWhite) * 384;
+                hash ^= ZobristHashes.hashes[i];
+            }
+            if (!WhitesTurn)
+                hash ^= ZobristHashes.hashes[768];
+            if (WShortCastle)
+                hash ^= ZobristHashes.hashes[769];
+            if (WLongCastle)
+                hash ^= ZobristHashes.hashes[770];
+            if (BShortCastle)
+                hash ^= ZobristHashes.hashes[771];
+            if (BLongCastle)
+                hash ^= ZobristHashes.hashes[772];
+            if (EnPassantTarget != (0, 0)) {
+                int enPassant = EnPassantTarget.x - 1 + (EnPassantTarget.y - 1) * 8;
+                hash ^= ZobristHashes.hashes[enPassant + 773];
+            }
+            return hash;
+        }
     }
 
     public static class Extensions
@@ -153,11 +160,6 @@ namespace ChessEngine
         {
             return source.Select(item => (Piece)item.Copy())
                     .ToList();
-        }
-
-        public static List<int> GetClone(this List<int> source)
-        {
-            return source.ToList();
         }
 
         public static (int, int) GetClone(this (int, int) source)

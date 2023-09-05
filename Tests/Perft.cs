@@ -24,6 +24,10 @@ public class Perft
         FEN pos = new();
         pos.FormatPosition(positionFEN);
         Console.WriteLine(pos.FormatFEN());
+        ZobristHashes.hashes.Clear();
+        Transpositions.lookupTable.Clear();
+        ZobristHashes.GenerateHashes();
+
         Stopwatch stopwatch = new();
 
         stopwatch.Start();

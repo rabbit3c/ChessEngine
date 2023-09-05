@@ -96,7 +96,7 @@ namespace ChessEngine
                 newPositions.Clear();
                 return newPositions;
             }
-
+            
             return newPositions;
         }
 
