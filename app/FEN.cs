@@ -197,32 +197,7 @@ namespace ChessEngine
             FEN += ' ';
 
             if (EnPassantTarget != (0, 0)) {
-                switch (EnPassantTarget.x) {
-                    case 1:
-                        FEN += 'a';
-                        break;
-                    case 2:
-                        FEN += 'b';
-                        break;
-                    case 3:
-                        FEN += 'c';
-                        break;
-                    case 4:
-                        FEN += 'd';
-                        break;
-                    case 5:
-                        FEN += 'e';
-                        break;
-                    case 6:
-                        FEN += 'f';
-                        break;  
-                    case 7: 
-                        FEN += 'g';
-                        break;
-                    case 8:
-                        FEN += 'h';
-                        break;  
-                }
+                FEN += char.ToLower(System.Convert.ToChar(EnPassantTarget.x + 64));
                 FEN += EnPassantTarget.y.ToString();
             }
             else {
