@@ -23,9 +23,22 @@ namespace ChessEngine
 
             foreach (Position newPosition in newPositions)
             {
-                Main(newPosition, depth, out int AmountNewPos);
+                int AmountNewPos = 0;
+                ulong hash = newPosition.Hash();
+                if (Transpositions.lookupTable.ContainsKey(hash)) { // checking if position is in look up table
+                    TranspositionInfo transposInfo = Transpositions.lookupTable[hash];
+                    if (transposInfo.depth == depth) { //checking if transposition is at right depth
+                        AmountNewPos = transposInfo.resultingPositions;
+                    }
+                    else {
+                        Main(newPosition, depth, out AmountNewPos);
+                    }
+                }
+                else { //if not generate resulting positions and add to Transposition table
+                    Main(newPosition, depth, out AmountNewPos);
+                    Transpositions.Add(newPosition, AmountNewPos, depth, 0);
+                }
                 AmountPos += AmountNewPos;
-
             }
         }
         public static List<Position> GeneratePositions(Position pos, out int newPos)
