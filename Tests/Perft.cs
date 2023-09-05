@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Tests;
 
 public class Perft
@@ -22,8 +24,13 @@ public class Perft
         FEN pos = new();
         pos.FormatPosition(positionFEN);
         Console.WriteLine(pos.FormatFEN());
-        List<Position> positions = new() { pos };
-        Search.Main(positions, depth, out int amountPos);
+        Stopwatch stopwatch = new();
+
+        stopwatch.Start();
+        Search.Main(pos, depth, out int amountPos);
+        stopwatch.Stop();
+        
+        Console.WriteLine($"{amountPos}   -   time: {stopwatch.Elapsed}ms");
         Assert.True(expectedAmountPos == amountPos, $"Perft({depth}): {amountPos} - Expected: {expectedAmountPos})");
     }
 }

@@ -1,18 +1,22 @@
 ﻿
+using System.Diagnostics;
+
 namespace ChessEngine
 {
     class Program
     {
         static void Main()
         {
-            string positionFEN = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq e3";
+            string positionFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
             Console.WriteLine("Starting...");
             FEN pos = new();
             pos.FormatPosition(positionFEN);
             Console.WriteLine(pos.FormatFEN());
-            List<Position> positions = new() { pos };
-            Search.Main(positions, 3, out int amount);
-            Console.WriteLine(amount);
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+            Search.Main(pos, 4, out int amount);
+            stopwatch.Stop();
+            Console.WriteLine($"{amount}   -   time: {stopwatch.Elapsed}ms");
         }
     }
 }
