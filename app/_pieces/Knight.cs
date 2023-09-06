@@ -15,7 +15,7 @@ namespace ChessEngine
                     for (int y = -1; y <= 1; y += 2)
                     {
                         (int, int) move = (piece.pos.x + x, piece.pos.y + y);
-                        if (Legal(piece, move, pos))
+                        if (Legal(move, pos))
                             legalMoves.Add(move);
                     }
                 }
@@ -24,7 +24,7 @@ namespace ChessEngine
                     for (int x = -1; x <= 1; x += 2)
                     {
                         (int, int) move = (piece.pos.x + x, piece.pos.y + y);
-                        if (Legal(piece, move, pos))
+                        if (Legal(move, pos))
                             legalMoves.Add(move);
                     }
                 }
@@ -59,7 +59,7 @@ namespace ChessEngine
             return moves;
         }
 
-        public static bool Legal(Piece piece, (int, int) move, Position pos)
+        public static bool Legal((int, int) move, Position pos)
         {
             if (Move.Unobstructed(move, pos.OwnPieces()) && Move.Inbound(move))
                 return true;
