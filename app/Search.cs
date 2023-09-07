@@ -5,15 +5,12 @@ namespace ChessEngine
     {
         public static void Main(Position position, int depth, out int AmountPos)
         {
-            int newPos = 0;
-            AmountPos = 0; 
-
+            AmountPos = 0;
             depth--;
 
             if (depth == 0) {
                 GeneratePositions(position, out int n);
-                newPos += n;
-                AmountPos = newPos;
+                AmountPos = n;
                 return;
             }
 

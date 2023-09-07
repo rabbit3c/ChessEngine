@@ -1,7 +1,7 @@
 
 namespace ChessEngine
 {
-    class Move
+    struct Move
     {
         public static bool Inbound((int x, int y) pos)
         {
@@ -12,14 +12,15 @@ namespace ChessEngine
 
         public static bool Unobstructed((int x, int y) pos, bool isWhite, Position position)
         {
-            Square targetSquare = position.Board[pos.PosXYToInt()];
+            return Unobstructed(pos.PosXYToInt(), isWhite, position);
+        }
+
+        public static bool Unobstructed(int pos, bool isWhite, Position position)
+        {
+            Square targetSquare = position.Board[pos];
             if (!targetSquare.empty)
-            {
                 if (targetSquare.isWhite == isWhite)
-                {
                     return false;
-                }
-            }
             return true;
         }
 
@@ -32,10 +33,11 @@ namespace ChessEngine
         {
             if (oldPos.y() == newPos.y() && Math.Abs(oldPos - newPos) > 1)
             {
-                List<Square> line = pos.GetLine(oldPos, newPos);
+                List<Square> line = pos.GetRank(oldPos, newPos);
                 foreach (Square square in line)
                 {
-                    if (!square.empty) {
+                    if (!square.empty)
+                    {
                         return false;
                     }
                 }
@@ -43,7 +45,7 @@ namespace ChessEngine
             }
             else if (oldPos.x() == newPos.x() && Math.Abs(oldPos - newPos) > 8)
             {
-                List<Square> column = pos.GetColumn(oldPos, newPos);
+                List<Square> column = pos.GetFile(oldPos, newPos);
                 foreach (Square square in column)
                 {
                     if (!square.empty)
@@ -100,48 +102,30 @@ namespace ChessEngine
 
         public static List<(int, int)> StraightMoves(Piece piece, Position pos, bool positiv = true)
         {
+            int[] directions = { 8, -8, -1, 1 };
+            int posInt = piece.pos.PosXYToInt();
             List<(int, int)> legalMoves = new();
-            for (int x = positiv ? piece.pos.x + 1 : piece.pos.x - 1; positiv ? x <= 8 : x >= 1;)
+            for (int i = 0; i < directions.Length; i++)
             {
-                (int, int) move = (x, piece.pos.y);
-                if (Unobstructed(move, pos.WhitesTurn, pos))
+                for (int n = 0; n < PrecomputedData.numSquareToEdge[posInt][i]; n++)
                 {
-                    if (!piece.IsPinned(move, pos))
+                    int move = posInt + directions[i] * (n + 1);
+                    if (Unobstructed(move, pos.WhitesTurn, pos))
                     {
-                        legalMoves.Add(move);
-                    }
-                }
-                else if (move != piece.pos)
-                    break;
-                if (!Unobstructed(move, !pos.WhitesTurn, pos))
-                {
-                    break;
-                }
-                if (positiv)
-                    x++;
-                else
-                    x--;
-            }
-            for (int y = positiv ? piece.pos.y + 1 : piece.pos.y - 1; positiv ? y <= 8 : y >= 1;)
-            {
-                (int, int) move = (piece.pos.x, y);
-                if (Unobstructed(move, pos.WhitesTurn, pos))
-                {
-                    if (!piece.IsPinned(move, pos))
-                    {
-                        legalMoves.Add(move);
-                    }
-                }
-                else if (move != piece.pos)
-                    break;
-                if (!Unobstructed(move, !pos.WhitesTurn, pos))
-                    break;
-                if (positiv)
-                    y++;
-                else
-                    y--;
-            }
 
+                        if (!piece.IsPinned(move.IntToPosXY(), pos))
+                        {
+                            legalMoves.Add(move.IntToPosXY());
+                        }
+                    }
+                    else if (move != posInt)
+                        break;
+                    if (!Unobstructed(move, !pos.WhitesTurn, pos))
+                    {
+                        break;
+                    }
+                }
+            }
             return legalMoves;
         }
 

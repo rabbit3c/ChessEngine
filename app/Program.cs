@@ -7,11 +7,11 @@ namespace ChessEngine
     {
         static void Main()
         {
-            string positionFEN = "r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ - 0 1 ";
+            string positionFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
             Console.WriteLine("Starting...");
             FEN pos = new();
             pos.FormatPosition(positionFEN); //Creating Position
-            ZobristHashes.GenerateHashes(); //Generating Hashes for Transpositions
+            PrecomputedData.Precompute(); //Generating Hashes for Transpositions
             Console.WriteLine(FEN.FormatFEN(pos));
 
             Stopwatch stopwatch = new();

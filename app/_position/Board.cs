@@ -11,7 +11,9 @@ namespace ChessEngine
                 new(), new(), new(), new(), new(), new(), new(), new(),
                 new(), new(), new(), new(), new(), new(), new(), new(),
                 new(), new(), new(), new(), new(), new(), new(), new(),
-            };
+        };
+
+        public int[][] numSquareToEdge = new int[64][];
         public List<int> PiecesWhite { get; set; } = new();
         public List<int> PiecesBlack { get; set; } = new();
 
@@ -32,7 +34,7 @@ namespace ChessEngine
             Board[square.pos.PosXYToInt()] = square;
         }
 
-        public List<Square> GetColumn(int iStart, int iEnd, bool including = false)
+        public List<Square> GetFile(int iStart, int iEnd, bool including = false)
         {
             List<Square> column = new();
             if (including)
@@ -50,7 +52,7 @@ namespace ChessEngine
             return column;
         }
 
-        public List<Square> GetLine(int iStart, int iEnd, bool including = false)
+        public List<Square> GetRank(int iStart, int iEnd, bool including = false)
         {
             if (including)
             {

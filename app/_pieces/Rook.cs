@@ -4,14 +4,11 @@ namespace ChessEngine
     {
         public static List<(int, int)> LegalMoves(Piece piece, Position pos)
         {
-            List<(int, int)> legalMoves = new();
-            legalMoves.AddRange(Move.StraightMoves(piece, pos));
-            legalMoves.AddRange(Move.StraightMoves(piece, pos, positiv: false));
+            return Move.StraightMoves(piece, pos);
 
             //string combinedString = string.Join(", ", legalMoves);
             //Console.WriteLine($"Rook at {piece.pos} to {combinedString}");
             //Console.WriteLine($"{piece.piece}, {legalMoves.Count}");
-            return legalMoves;
         }
     }
 }

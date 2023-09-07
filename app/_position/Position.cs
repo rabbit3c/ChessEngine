@@ -119,23 +119,23 @@ namespace ChessEngine
                     i += square.pos.x - 1 + (square.pos.y - 1) * 8;
                     i += square.piece * 64;
                     i += System.Convert.ToInt32(square.isWhite) * 384;
-                    hash ^= ZobristHashes.hashes[i];
+                    hash ^= PrecomputedData.hashes[i];
                 }
             }
             if (!WhitesTurn)
-                hash ^= ZobristHashes.hashes[768];
+                hash ^= PrecomputedData.hashes[768];
             if (WShortCastle)
-                hash ^= ZobristHashes.hashes[769];
+                hash ^= PrecomputedData.hashes[769];
             if (WLongCastle)
-                hash ^= ZobristHashes.hashes[770];
+                hash ^= PrecomputedData.hashes[770];
             if (BShortCastle)
-                hash ^= ZobristHashes.hashes[771];
+                hash ^= PrecomputedData.hashes[771];
             if (BLongCastle)
-                hash ^= ZobristHashes.hashes[772];
+                hash ^= PrecomputedData.hashes[772];
             if (EnPassantTarget != (0, 0))
             {
                 ;
-                hash ^= ZobristHashes.hashes[EnPassantTarget.PosXYToInt() + 773];
+                hash ^= PrecomputedData.hashes[EnPassantTarget.PosXYToInt() + 773];
             }
             return hash;
         }
