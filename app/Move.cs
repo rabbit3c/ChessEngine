@@ -69,43 +69,11 @@ namespace ChessEngine
             return true;
         }
 
-        public static List<(int, int)> DiagonalMoves(Piece piece, Position pos)
-        {
-            int[] directions = { 9, -9, 7, -7 };
-            List<(int, int)> legalMoves = new();
-            int posInt = piece.pos.PosXYToInt();
-            foreach (int direction in directions)
-            {
-                for (int i = posInt; direction > 0 ? i < 7 * direction + posInt : i > 7 * direction + posInt; i += direction)
-                {
-                    (int x, int y) move = i.IntToPosXY();
-                    if (Inbound(move) && Math.Abs(piece.pos.x - move.x) == Math.Abs(piece.pos.y - move.y))
-                    {
-                        if (Unobstructed(move, pos.WhitesTurn, pos))
-                        {
-                            if (!piece.IsPinned(move, pos))
-                            {
-                                legalMoves.Add(move);
-                            }
-                        }
-                        else if (move != piece.pos)
-                            break;
-                        if (!Unobstructed(move, !pos.WhitesTurn, pos))
-                            break;
-                    }
-                    else
-                        break;
-                }
-            }
-            return legalMoves;
-        }
-
-        public static List<(int, int)> StraightMoves(Piece piece, Position pos, bool positiv = true)
-        {
-            int[] directions = { 8, -8, -1, 1 };
+        public static List<(int, int)> SlidingMoves(Piece piece, Position pos) {
+            int[] directions = { 8, -8, -1, 1, 9, -9, 7, -7};
             int posInt = piece.pos.PosXYToInt();
             List<(int, int)> legalMoves = new();
-            for (int i = 0; i < directions.Length; i++)
+            for (int i = piece.piece == Piece.Bishop ? 4 : 0; i < (piece.piece == Piece.Rook ? 4 : directions.Length); i++)
             {
                 for (int n = 0; n < PrecomputedData.numSquareToEdge[posInt][i]; n++)
                 {

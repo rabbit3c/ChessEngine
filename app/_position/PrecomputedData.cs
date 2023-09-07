@@ -1,3 +1,4 @@
+
 namespace ChessEngine
 {
     public class PrecomputedData
@@ -18,11 +19,15 @@ namespace ChessEngine
                     int numEast = 7 - file;
 
                     int squareIndex = rank * 8 + file;
-                    numSquareToEdge[squareIndex] = new int[4] {
+                    numSquareToEdge[squareIndex] = new int[8] {
                         numNorth,
                         numSouth,
                         numWest,
-                        numEast
+                        numEast,
+                        Math.Min(numNorth, numEast),
+                        Math.Min(numSouth, numWest),
+                        Math.Min(numNorth, numWest),
+                        Math.Min(numSouth, numEast)
                     };
                 }
             }

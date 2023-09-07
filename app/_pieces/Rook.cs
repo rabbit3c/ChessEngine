@@ -4,7 +4,7 @@ namespace ChessEngine
     {
         public static List<(int, int)> LegalMoves(Piece piece, Position pos)
         {
-            return Move.StraightMoves(piece, pos);
+            return Move.SlidingMoves(piece, pos);
 
             //string combinedString = string.Join(", ", legalMoves);
             //Console.WriteLine($"Rook at {piece.pos} to {combinedString}");
