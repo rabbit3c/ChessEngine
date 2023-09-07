@@ -8,34 +8,18 @@ namespace ChessEngine
             {
                 (Position)oldPos.Copy()
             };
-            Piece newPiece = new();
-
-            for (int i = 0; i < newPositions[0].Pieces.Count;)
-            {
-                if (newPositions[0].Pieces[i].pos == MovedPiece.pos)
-                {
-                    newPiece = (Piece)newPositions[0].Pieces[i].Copy();
-                    newPositions[0].RemoveAt(i);
-                }
-                else if (newPositions[0].Pieces[i].pos == move)
-                {
-                    if (newPositions[0].Pieces[i].piece == Piece.Rook)
-                        newPositions[0].NoCastle(newPositions[0].Pieces[i]);
-                    newPositions[0].RemoveAt(i);
-                }
-                else if (MovedPiece.piece == Piece.Pawn && newPositions[0].Pieces[i].piece == Piece.Pawn && move == oldPos.EnPassantTarget)
-                {
-                    if (MovedPiece.isWhite ? newPositions[0].Pieces[i].pos == (move.x, move.y - 1) : newPositions[0].Pieces[i].pos == (move.x, move.y + 1))
-                        newPositions[0].RemoveAt(i);
-                    else
-                        i++;
-                }
-                else
-                    i++;
-
-            }
-
+            Piece newPiece = (Piece)MovedPiece.Copy();
             newPiece.pos = move;
+            newPositions[0].RemoveAt(MovedPiece.pos.PosXYToInt());
+            Square targetSquare = (Square)newPositions[0].Board[move.PosXYToInt()].Copy();
+            if (!targetSquare.empty && targetSquare.piece == Piece.Rook)
+            {
+                newPositions[0].NoCastle(targetSquare);
+            }
+            else if (MovedPiece.piece == Piece.Pawn && move == oldPos.EnPassantTarget)
+            {
+                newPositions[0].RemoveAt(oldPos.EnPassantTarget.PosXYToInt() + (MovedPiece.isWhite ? -8 : 8));
+            }
 
             //check if any pawn is promoting
             if (newPiece.Promoting())
@@ -60,22 +44,24 @@ namespace ChessEngine
             //Castle and remove Castling Rights
             if (MovedPiece.piece == Piece.King)
             {
-
                 if (Math.Abs(MovedPiece.pos.x - move.x) == 2)
-                    foreach (Position newPosition in newPositions)
+                {
+                    Piece rook = new();
+
+                    if (move.x == 3)
                     {
-                        foreach (Piece piece in newPosition.Pieces)
-                        {
-                            if (move.x == 3)
-                            {
-                                if (piece.pos == (1, move.y))
-                                    piece.pos = (4, move.y);
-                            }
-                            else if (move.x == 7)
-                                if (piece.pos == (8, move.y))
-                                    piece.pos = (6, move.y);
-                        }
+                        rook = (Piece)newPositions[0].Board[(1, move.y).PosXYToInt()].Copy();
+                        rook.pos = (4, move.y);
+                        newPositions[0].RemoveAt((1, move.y).PosXYToInt());
                     }
+                    else if (move.x == 7)
+                    {
+                        rook = (Piece)newPositions[0].Board[(8, move.y).PosXYToInt()].Copy();
+                        rook.pos = (6, move.y);
+                        newPositions[0].RemoveAt((8, move.y).PosXYToInt());
+                    }
+                    newPositions[0].Add(rook);
+                }
                 newPositions[0].NoCastle(MovedPiece);
             }
 
@@ -92,11 +78,13 @@ namespace ChessEngine
             }
 
             // Check if the Enemies could take the King
-            if (InCheck(newPositions[0])) {
+            if (InCheck(newPositions[0]))
+            {
                 newPositions.Clear();
                 return newPositions;
             }
-            
+
+            //Console.WriteLine(MovedPiece.piece);
             return newPositions;
         }
 
@@ -113,43 +101,45 @@ namespace ChessEngine
 
         public static bool InCheck(Position pos)
         {
-            (int x, int y) posKing = (0, 0);
-            foreach (Piece p in pos.EnemyPieces())
+            int posKing = 0;
+            foreach (int i in pos.EnemyPieces())
             {
-                if (p.piece == Piece.King)
+                if (pos.Board[i].piece == Piece.King)
                 {
-                    posKing = p.pos;
+                    posKing = pos.Board[i].pos.PosXYToInt();
                     break;
                 }
             }
 
-            foreach (Piece p in pos.OwnPieces())
+            foreach (int i in pos.OwnPieces())
             {
-                if (p.pos.x == posKing.x && (p.piece == Piece.Rook || p.piece == Piece.Queen))
+                if (i.x() == posKing.x() && (pos.Board[i].piece == Piece.Rook || pos.Board[i].piece == Piece.Queen))
                 {
-                    if (Move.NothingInTheWay(posKing, p.pos, pos))
+                    if (Move.NothingInTheWay(posKing, i, pos))
                         return true;
                 }
-                else if (p.pos.y == posKing.y && (p.piece == Piece.Rook || p.piece == Piece.Queen))
+                else if (i.y() == posKing.y() && (pos.Board[i].piece == Piece.Rook || pos.Board[i].piece == Piece.Queen))
                 {
-                    if (Move.NothingInTheWay(posKing, p.pos, pos))
+                    if (Move.NothingInTheWay(posKing, i, pos))
+                    {
+                        return true;
+                    }
+                }
+                else if (Math.Abs(i.x() - posKing.x()) == Math.Abs(i.y() - posKing.y()) && (pos.Board[i].piece == Piece.Bishop || pos.Board[i].piece == Piece.Queen))
+                {
+                    if (Move.NothingInTheWay(posKing, i, pos))
                         return true;
                 }
-                else if (Math.Abs(p.pos.x - posKing.x) == Math.Abs(p.pos.y - posKing.y) && (p.piece == Piece.Bishop || p.piece == Piece.Queen))
+                else if (pos.Board[i].piece == Piece.Knight)
                 {
-                    if (Move.NothingInTheWay(posKing, p.pos, pos))
-                        return true;
-                }
-                else if (p.piece == Piece.Knight)
-                {
-                    foreach ((int, int) moveN in Knight.Moves(p, pos))
-                        if (moveN == posKing)
+                    foreach ((int, int) moveN in Knight.Moves(pos.Board[i], pos))
+                        if (moveN.PosXYToInt() == posKing)
                             return true;
                 }
-                else if (p.piece == Piece.Pawn)
+                else if (pos.Board[i].piece == Piece.Pawn)
                 {
-                    foreach ((int, int) moveP in Pawn.Moves(p, pos))
-                        if (moveP == posKing)
+                    foreach ((int, int) moveP in Pawn.Moves(pos.Board[i], pos))
+                        if (moveP.PosXYToInt() == posKing)
                             return true;
                 }
             }

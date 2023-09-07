@@ -1,6 +1,6 @@
 namespace ChessEngine
 {
-    public class FEN : Position
+    public class FEN: Position
     {
         public void FormatPosition(string positionFEN)
         {
@@ -77,7 +77,7 @@ namespace ChessEngine
                     case 'k':
                     case 'K':
                         piece.pos = currPos;
-                        Pieces.Add(piece);
+                        Board[currPos.PosXYToInt()] = new(piece);
                         currPos.x++;
                         break;
                     default:
@@ -107,7 +107,7 @@ namespace ChessEngine
             SplitColors();
         }
 
-        public string FormatFEN()
+        public static string FormatFEN(Position pos)
         {
             string FEN = "";
             for (int y = 8; y >= 1; y--)
@@ -116,11 +116,12 @@ namespace ChessEngine
                 for (int x = 1; x <= 8; x++)
                 {
                     char p = 'x';
-                    foreach (Piece piece in Pieces)
+                    foreach (Square square in pos.Board)
                     {
-                        if (piece.pos.x == x && piece.pos.y == y)
+                        if (!square.empty) {
+                            if (square.pos.x == x && square.pos.y == y)
                         {
-                            switch (piece.piece)
+                            switch (square.piece)
                             {
                                 case Piece.Pawn:
                                     p = 'p';
@@ -143,10 +144,11 @@ namespace ChessEngine
                                 default:
                                     break;
                             }
-                            if (piece.isWhite)
+                            if (square.isWhite)
                             {
                                 p = char.ToUpper(p);
                             }
+                        }
                         }
                     }
                     if (p != 'x')
@@ -172,27 +174,27 @@ namespace ChessEngine
                 }
             }
             FEN += ' ';
-            if (WhitesTurn) 
+            if (pos.WhitesTurn) 
                 FEN += "w";
             else 
                 FEN += "b";
             FEN += ' ';
 
-            if (WShortCastle) 
+            if (pos.WShortCastle) 
                 FEN += "K";
-            if (WLongCastle) 
+            if (pos.WLongCastle) 
                 FEN += "Q";
-            if (BShortCastle) 
+            if (pos.BShortCastle) 
                 FEN += "k";
-            if (BLongCastle) 
+            if (pos.BLongCastle) 
                 FEN += "q";
-            if (!WShortCastle && !WLongCastle && !BShortCastle && !BLongCastle)
+            if (!pos.WShortCastle && !pos.WLongCastle && !pos.BShortCastle && !pos.BLongCastle)
                 FEN += '-';
             FEN += ' ';
 
-            if (EnPassantTarget != (0, 0)) {
-                FEN += char.ToLower(System.Convert.ToChar(EnPassantTarget.x + 64));
-                FEN += EnPassantTarget.y.ToString();
+            if (pos.EnPassantTarget != (0, 0)) {
+                FEN += char.ToLower(System.Convert.ToChar(pos.EnPassantTarget.x + 64));
+                FEN += pos.EnPassantTarget.y.ToString();
             }
             else {
                 FEN += '-';

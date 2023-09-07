@@ -10,85 +10,89 @@ namespace ChessEngine
             return false;
         }
 
-        public static bool Unobstructed((int x, int y) pos, List<Piece> pieces)
+        public static bool Unobstructed((int x, int y) pos, bool isWhite, Position position)
         {
-            for (int i = 0; i < pieces.Count; i++)
+            Square targetSquare = position.Board[pos.PosXYToInt()];
+            if (!targetSquare.empty)
             {
-                if (pieces[i].pos == (pos.x, pos.y))
+                if (targetSquare.isWhite == isWhite)
+                {
                     return false;
+                }
             }
             return true;
         }
 
-        public static bool NothingInTheWay((int x, int y) oldPos, (int x, int y) newPos, Position pos)
+        public static bool NothingInTheWay((int, int) oldPos, (int, int) newPos, Position pos)
         {
-            if (oldPos.y == newPos.y)
+            return NothingInTheWay(oldPos.PosXYToInt(), newPos.PosXYToInt(), pos);
+        }
+
+        public static bool NothingInTheWay(int oldPos, int newPos, Position pos)
+        {
+            if (oldPos.y() == newPos.y() && Math.Abs(oldPos - newPos) > 1)
             {
-                for (int x = Math.Min(oldPos.x, newPos.x); x <= Math.Max(oldPos.x, newPos.x); x++)
+                List<Square> line = pos.GetLine(oldPos, newPos);
+                foreach (Square square in line)
                 {
-                    (int, int) square = (x, newPos.y);
-                    for (int i = 0; i < pos.Pieces.Count; i++)
-                    {
-                        if (pos.Pieces[i].pos == (x, newPos.y) && square != oldPos && square != newPos)
-                            return false;
+                    if (!square.empty) {
+                        return false;
                     }
                 }
+                return true;
             }
-            else if (oldPos.x == newPos.x)
+            else if (oldPos.x() == newPos.x() && Math.Abs(oldPos - newPos) > 8)
             {
-                for (int y = Math.Min(oldPos.y, newPos.y); y <= Math.Max(oldPos.y, newPos.y); y++)
+                List<Square> column = pos.GetColumn(oldPos, newPos);
+                foreach (Square square in column)
                 {
-                    (int, int) square = (newPos.x, y);
-                    for (int i = 0; i < pos.Pieces.Count; i++)
-                    {
-                        if (pos.Pieces[i].pos == (newPos.x, y) && square != oldPos && square != newPos)
-                            return false;
-                    }
+                    if (!square.empty)
+                        return false;
                 }
+                return true;
             }
             else
             {
-                foreach (Piece piece in pos.Pieces)
+                if (Math.Abs(oldPos - newPos) >= 14)
                 {
-                    if (piece.pos != oldPos && piece.pos != newPos)
+                    List<Square> diagonal = pos.GetDiagonal(oldPos, newPos);
+                    foreach (Square square in diagonal)
                     {
-                        if (Math.Abs(oldPos.x - piece.pos.x) == Math.Abs(oldPos.y - piece.pos.y))
-                        {
-                            if (Math.Max(oldPos.x, newPos.x) > piece.pos.x && piece.pos.x > Math.Min(oldPos.x, newPos.x))
-                                if (Math.Max(oldPos.y, newPos.y) > piece.pos.y && piece.pos.y > Math.Min(oldPos.y, newPos.y))
-                                    return false;
-                        }
+                        if (!square.empty)
+                            return false;
                     }
+                    return true;
                 }
             }
             return true;
         }
 
-        public static List<(int, int)> DiagonalMoves(Piece piece, Position pos, bool xPos = true, bool yPos = true)
+        public static List<(int, int)> DiagonalMoves(Piece piece, Position pos)
         {
+            int[] directions = { 9, -9, 7, -7 };
             List<(int, int)> legalMoves = new();
-            for (int n = 0; xPos ? n <= 8 - piece.pos.x : n <= piece.pos.x - 1; n++)
+            int posInt = piece.pos.PosXYToInt();
+            foreach (int direction in directions)
             {
-                int x = xPos ? piece.pos.x + n : piece.pos.x - n;
-                int y = yPos ? piece.pos.y + n : piece.pos.y - n;
-                if (yPos ? y <= 8 : y >= 1)
+                for (int i = posInt; direction > 0 ? i < 7 * direction + posInt : i > 7 * direction + posInt; i += direction)
                 {
-                    (int, int) move = (x, y);
-                    if (Unobstructed(move, pos.OwnPieces()))
+                    (int x, int y) move = i.IntToPosXY();
+                    if (Inbound(move) && Math.Abs(piece.pos.x - move.x) == Math.Abs(piece.pos.y - move.y))
                     {
-                        if (!piece.IsPinned(move, pos))
+                        if (Unobstructed(move, pos.WhitesTurn, pos))
                         {
-                            legalMoves.Add(move);
+                            if (!piece.IsPinned(move, pos))
+                            {
+                                legalMoves.Add(move);
+                            }
                         }
+                        else if (move != piece.pos)
+                            break;
+                        if (!Unobstructed(move, !pos.WhitesTurn, pos))
+                            break;
                     }
-                    else if (move != piece.pos)
+                    else
                         break;
-                    if (!Unobstructed(move, pos.EnemyPieces()))
-                        break;
-                }
-                else
-                {
-                    break;
                 }
             }
             return legalMoves;
@@ -97,10 +101,10 @@ namespace ChessEngine
         public static List<(int, int)> StraightMoves(Piece piece, Position pos, bool positiv = true)
         {
             List<(int, int)> legalMoves = new();
-            for (int x = piece.pos.x; positiv ? x <= 8 : x >= 1;)
+            for (int x = positiv ? piece.pos.x + 1 : piece.pos.x - 1; positiv ? x <= 8 : x >= 1;)
             {
                 (int, int) move = (x, piece.pos.y);
-                if (Unobstructed(move, pos.OwnPieces()))
+                if (Unobstructed(move, pos.WhitesTurn, pos))
                 {
                     if (!piece.IsPinned(move, pos))
                     {
@@ -109,7 +113,7 @@ namespace ChessEngine
                 }
                 else if (move != piece.pos)
                     break;
-                if (!Unobstructed(move, pos.EnemyPieces()))
+                if (!Unobstructed(move, !pos.WhitesTurn, pos))
                 {
                     break;
                 }
@@ -118,10 +122,10 @@ namespace ChessEngine
                 else
                     x--;
             }
-            for (int y = piece.pos.y; positiv ? y <= 8 : y >= 1;)
+            for (int y = positiv ? piece.pos.y + 1 : piece.pos.y - 1; positiv ? y <= 8 : y >= 1;)
             {
                 (int, int) move = (piece.pos.x, y);
-                if (Unobstructed(move, pos.OwnPieces()))
+                if (Unobstructed(move, pos.WhitesTurn, pos))
                 {
                     if (!piece.IsPinned(move, pos))
                     {
@@ -130,7 +134,7 @@ namespace ChessEngine
                 }
                 else if (move != piece.pos)
                     break;
-                if (!Unobstructed(move, pos.EnemyPieces()))
+                if (!Unobstructed(move, !pos.WhitesTurn, pos))
                     break;
                 if (positiv)
                     y++;

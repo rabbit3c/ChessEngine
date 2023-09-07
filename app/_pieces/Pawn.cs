@@ -1,24 +1,27 @@
 
+using System.Security.Cryptography.X509Certificates;
+
 namespace ChessEngine
 {
     class Pawn
     {
         public static List<(int, int)> LegalMoves(Piece piece, Position pos)
         {
-            List<(int, int)> moves = Moves(piece, pos);
+            List<(int, int)> legalMoves = Moves(piece, pos);
 
-            for (int i = 0; i < moves.Count; i++)
+            for (int i = 0; i < legalMoves.Count; i++)
             {
-                if (piece.IsPinned(moves[i], pos))
+                if (piece.IsPinned(legalMoves[i], pos))
                 {
-                    moves.RemoveAt(i);
+                    legalMoves.RemoveAt(i);
                     i--;
                 }
             }
 
             //string combinedString = string.Join(", ", moves);
             //Console.WriteLine($"Pawn at {piece.pos} to {combinedString}");
-            return moves;
+            //Console.WriteLine($"{piece.pos}, {legalMoves.Count}");
+            return legalMoves;
         }
 
         public static List<(int, int)> Moves(Piece piece, Position pos)
@@ -38,7 +41,7 @@ namespace ChessEngine
             }
             for (int i = 0; i < moves.Count; i++)
             {
-                if (!Move.Unobstructed(moves[i], pos.Pieces) || !Move.NothingInTheWay(piece.pos, moves[i], pos))
+                if (!Move.Unobstructed(moves[i], piece.isWhite, pos) || !Move.Unobstructed(moves[i], !piece.isWhite, pos) || !Move.NothingInTheWay(piece.pos.PosXYToInt(), moves[i].PosXYToInt(), pos))
                 {
                     moves.RemoveAt(i);
                     i--;
@@ -68,14 +71,13 @@ namespace ChessEngine
 
         static bool Takeable((int x, int y) square, Position pos)
         {
-            List<Piece> enemyPieces = pos.EnemyPieces();
+            List<int> enemyPieces = pos.EnemyPieces();
             if (pos.EnPassantTarget == square)
             {
                 return true;
             }
-            for (int i = 0; i < enemyPieces.Count; i++)
-            {
-                if (enemyPieces[i].pos == (square.x, square.y))
+            if (square.x >= 1 && square.x <= 8) {
+                if (enemyPieces.Contains(square.PosXYToInt()))
                     return true;
             }
             return false;

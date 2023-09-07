@@ -23,7 +23,7 @@ public class Perft
         Console.WriteLine("Starting...");
         FEN pos = new();
         pos.FormatPosition(positionFEN);
-        Console.WriteLine(pos.FormatFEN());
+        Console.WriteLine(FEN.FormatFEN(pos));
         ZobristHashes.hashes.Clear();
         Transpositions.lookupTable.Clear();
         ZobristHashes.GenerateHashes();
@@ -34,7 +34,7 @@ public class Perft
         Search.Main(pos, depth, out int amountPos);
         stopwatch.Stop();
         
-        Console.WriteLine($"{amountPos}   -   time: {stopwatch.Elapsed}ms");
+        Console.WriteLine($"{amountPos}   -   time: {stopwatch.Elapsed}");
         Assert.True(expectedAmountPos == amountPos, $"Perft({depth}): {amountPos} - Expected: {expectedAmountPos})");
     }
 }

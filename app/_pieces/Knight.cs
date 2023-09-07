@@ -15,8 +15,9 @@ namespace ChessEngine
                     for (int y = -1; y <= 1; y += 2)
                     {
                         (int, int) move = (piece.pos.x + x, piece.pos.y + y);
-                        if (Legal(move, pos))
-                            legalMoves.Add(move);
+                        if (Move.Inbound(move))
+                            if (Move.Unobstructed(move, piece.isWhite, pos))
+                                legalMoves.Add(move);
                     }
                 }
                 for (int y = -2; y <= 2; y += 4)
@@ -24,8 +25,9 @@ namespace ChessEngine
                     for (int x = -1; x <= 1; x += 2)
                     {
                         (int, int) move = (piece.pos.x + x, piece.pos.y + y);
-                        if (Legal(move, pos))
-                            legalMoves.Add(move);
+                        if (Move.Inbound(move))
+                            if (Move.Unobstructed(move, piece.isWhite, pos))
+                                legalMoves.Add(move);
                     }
                 }
             }
@@ -44,7 +46,8 @@ namespace ChessEngine
                 for (int y = -1; y <= 1; y += 2)
                 {
                     (int, int) move = (piece.pos.x + x, piece.pos.y + y);
-                    moves.Add(move);
+                    if (Move.Inbound(move))
+                        moves.Add(move);
                 }
             }
             for (int y = -2; y <= 2; y += 4)
@@ -52,18 +55,12 @@ namespace ChessEngine
                 for (int x = -1; x <= 1; x += 2)
                 {
                     (int, int) move = (piece.pos.x + x, piece.pos.y + y);
-                    moves.Add(move);
+                    if (Move.Inbound(move))
+                        moves.Add(move);
                 }
             }
 
             return moves;
-        }
-
-        public static bool Legal((int, int) move, Position pos)
-        {
-            if (Move.Unobstructed(move, pos.OwnPieces()) && Move.Inbound(move))
-                return true;
-            return false;
         }
     }
 }

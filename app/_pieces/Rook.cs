@@ -10,6 +10,7 @@ namespace ChessEngine
 
             //string combinedString = string.Join(", ", legalMoves);
             //Console.WriteLine($"Rook at {piece.pos} to {combinedString}");
+            //Console.WriteLine($"{piece.piece}, {legalMoves.Count}");
             return legalMoves;
         }
     }

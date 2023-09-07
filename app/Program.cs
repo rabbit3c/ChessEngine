@@ -7,20 +7,20 @@ namespace ChessEngine
     {
         static void Main()
         {
-            string positionFEN = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -";
+            string positionFEN = "r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ - 0 1 ";
             Console.WriteLine("Starting...");
             FEN pos = new();
             pos.FormatPosition(positionFEN); //Creating Position
             ZobristHashes.GenerateHashes(); //Generating Hashes for Transpositions
-            Console.WriteLine(pos.FormatFEN());
+            Console.WriteLine(FEN.FormatFEN(pos));
 
             Stopwatch stopwatch = new();
 
             stopwatch.Start();
-            Search.Main(pos, 5, out int amount); //Search all moves, in given depth
+            Search.Main(pos, 4, out int amount); //Search all moves, in given depth
             stopwatch.Stop();
 
-            Console.WriteLine($"{amount}   -   time: {stopwatch.Elapsed}ms");
+            Console.WriteLine($"{amount}   -   time: {stopwatch.Elapsed}");
         }
     }
 }

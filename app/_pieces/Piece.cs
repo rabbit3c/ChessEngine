@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace ChessEngine
 {
 
@@ -5,7 +7,6 @@ namespace ChessEngine
     {
         public (int x, int y) pos;
         public bool isWhite;
-
         public int piece;
         public const int Pawn = 0;
         public const int Knight = 1;
@@ -21,7 +22,7 @@ namespace ChessEngine
             isWhite = whitePiece;
         }
 
-        public object Copy()
+        public virtual object Copy()
         {
             Piece copy = new(pos, isWhite, piece);
             return copy;
@@ -29,51 +30,64 @@ namespace ChessEngine
 
         public bool IsPinned((int x, int y) move, Position position)
         {
-            (int x, int y) posKing = (0, 0);
-            foreach (Piece p in position.OwnPieces())
+            int posKing = 0;
+            List<Square> Pieces = position.Board;
+
+            foreach (int i in position.OwnPieces())
             {
-                if (p.piece == King)
+                if (position.Board[i].piece == King)
                 {
-                    posKing = p.pos;
+                    posKing = i;
                     break;
                 }
             }
 
-            if (pos.x == posKing.x && move.x != posKing.x)
+            if (pos.x == posKing.x() && move.x != posKing.x())
             {
-                foreach (Piece p in position.EnemyPieces())
-                    if (p.piece == Queen || p.piece == Rook)
-                        if (p.pos.x == posKing.x)
-                            if (Move.NothingInTheWay(posKing, p.pos, position))
-                                return true;
+                foreach (int i in position.EnemyPieces())
+                    if (i.x() == posKing.x())
+                        if (Pieces[i].piece == Queen || Pieces[i].piece == Rook)
+                            if ((i < pos.PosXYToInt() && pos.PosXYToInt() < posKing) || (i > pos.PosXYToInt() && pos.PosXYToInt() > posKing))
+                                if (Move.NothingInTheWay(posKing, pos.PosXYToInt(), position) && Move.NothingInTheWay(pos.PosXYToInt(), i, position))
+                                    return true;
+                return false;
             }
 
-            else if (pos.y == posKing.y && move.y != posKing.y)
+            else if (pos.y == posKing.y() && move.y != posKing.y())
             {
-                foreach (Piece p in position.EnemyPieces())
-                    if (p.piece == Queen || p.piece == Rook)
-                        if (p.pos.y == posKing.y)
-                            if (Move.NothingInTheWay(posKing, p.pos, position))
-                                return true;
+                foreach (int i in position.EnemyPieces())
+                    if (i.y() == posKing.y())
+                        if (Pieces[i].piece == Queen || Pieces[i].piece == Rook)
+                            if ((i < pos.PosXYToInt() && pos.PosXYToInt() < posKing) || (i > pos.PosXYToInt() && pos.PosXYToInt() > posKing))
+                                if (Move.NothingInTheWay(posKing, pos.PosXYToInt(), position) && Move.NothingInTheWay(pos.PosXYToInt(), i, position))
+                                    return true;
+                return false;
             }
 
-            else
+            else if (Math.Abs(pos.y - posKing.y()) == Math.Abs(pos.x - posKing.x()))
             {
-                if (Math.Abs(pos.y - posKing.y) == Math.Abs(pos.x - posKing.x))
+                if (Math.Abs(move.y - posKing.y()) != Math.Abs(move.x - posKing.x()))
                 {
-                    if (Math.Abs(move.y - posKing.y) != Math.Abs(move.x - posKing.x))
-                        foreach (Piece p in position.EnemyPieces())
-                            if (p.piece == Queen || p.piece == Bishop)
-                                if (Math.Abs(p.pos.y - posKing.y) == Math.Abs(p.pos.x - posKing.x))
-                                    if (Move.NothingInTheWay(posKing, p.pos, position))
+                    foreach (int i in position.EnemyPieces())
+                    {
+                        if (Pieces[i].piece == Queen || Pieces[i].piece == Bishop)
+                        {
+                            if (Math.Abs(Pieces[i].pos.y - posKing.y()) == Math.Abs(Pieces[i].pos.x - posKing.x())) {
+                                if ((i.x() < pos.x && pos.x < posKing.x()) || (i.x() > pos.x && pos.x > posKing.x()))
+                                    if (Move.NothingInTheWay(posKing, pos.PosXYToInt(), position) && Move.NothingInTheWay(pos.PosXYToInt(), i, position))
                                         return true;
+                            }
+                        }
+                    }
                 }
+                return false;
             }
             return false;
         }
 
-        public bool Promoting() {
-            if (piece == Pawn) 
+        public bool Promoting()
+        {
+            if (piece == Pawn)
                 return isWhite ? pos.y == 8 : pos.y == 1;
             return false;
         }

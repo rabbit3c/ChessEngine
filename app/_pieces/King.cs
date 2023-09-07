@@ -11,7 +11,7 @@ namespace ChessEngine
                 for (int y = -1; y < 2; y++)
                 {
                     (int, int) move = (piece.pos.x + x, piece.pos.y + y);
-                    if (Legal(move, pos) && piece.pos != move)
+                    if (Legal(move, piece.isWhite, pos) && piece.pos != move)
                         legalMoves.Add((piece.pos.x + x, piece.pos.y + y));
                 }
             }
@@ -50,12 +50,14 @@ namespace ChessEngine
             }
             //string combinedString = string.Join( ", ", legalMoves);
             //Console.WriteLine($"King at {piece.pos} to {combinedString}");
+            //Console.WriteLine($"{piece.piece}, {legalMoves.Count}");
             return legalMoves;
         }
 
-        static bool Legal((int x, int y) move, Position pos)
+        static bool Legal((int x, int y) move, bool isWhite, Position pos)
         {
-            if (Move.Inbound(move) && Move.Unobstructed(move, pos.OwnPieces()))
+            if (Move.Inbound(move))
+                if (Move.Unobstructed(move, isWhite, pos))
                     return true;
             return false;
         }

@@ -1,31 +1,14 @@
 
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
-
 namespace ChessEngine
 {
-    public class Position
+    public class Position : ChessBoard
     {
-
-        public List<Piece> Pieces { get; set; } = new();
-        public List<Piece> PiecesWhite { get; set; } = new();
-        public List<Piece> PiecesBlack { get; set; } = new();
-
-        public (int x, int y) EnPassantTarget { get; set; } = new();
-
-        public bool WhitesTurn = true;
-
-        public bool WShortCastle = true;
-        public bool WLongCastle = true;
-        public bool BShortCastle = true;
-        public bool BLongCastle = true;
-
-        public List<Piece> OwnPieces()
+        public List<int> OwnPieces()
         {
             return WhitesTurn ? PiecesWhite : PiecesBlack;
         }
 
-        public List<Piece> EnemyPieces()
+        public List<int> EnemyPieces()
         {
             return WhitesTurn ? PiecesBlack : PiecesWhite;
         }
@@ -34,7 +17,7 @@ namespace ChessEngine
         {
             Position copy = new()
             {
-                Pieces = Pieces.GetClone(),
+                Board = Board.GetClone(),
                 PiecesBlack = PiecesBlack.GetClone(),
                 PiecesWhite = PiecesWhite.GetClone(),
                 EnPassantTarget = EnPassantTarget.GetClone(),
@@ -51,7 +34,7 @@ namespace ChessEngine
         {
             FEN copy = new()
             {
-                Pieces = Pieces.GetClone(),
+                Board = Board.GetClone(),
                 PiecesBlack = PiecesBlack.GetClone(),
                 PiecesWhite = PiecesWhite.GetClone(),
                 EnPassantTarget = EnPassantTarget.GetClone(),
@@ -66,7 +49,7 @@ namespace ChessEngine
 
         public void RemoveAt(int i)
         {
-            Pieces.RemoveAt(i);
+            Board[i] = new();
         }
 
         public void SplitColors()
@@ -75,12 +58,15 @@ namespace ChessEngine
             PiecesWhite.Clear();
             PiecesBlack.Clear();
 
-            foreach (Piece piece in Pieces)
+            for (int i = 0; i < 64; i++)
             {
-                if (piece.isWhite)
-                    PiecesWhite.Add(piece);
-                else
-                    PiecesBlack.Add(piece);
+                if (!Board[i].empty)
+                {
+                    if (Board[i].isWhite)
+                        PiecesWhite.Add(i);
+                    else
+                        PiecesBlack.Add(i);
+                }
             }
         }
 
@@ -89,16 +75,11 @@ namespace ChessEngine
             WhitesTurn = !WhitesTurn;
         }
 
-        public void Add(Piece piece)
-        {
-            Pieces.Add(piece);
-        }
-
         public void NoLongCastle(Piece piece)
         {
             if (piece.isWhite && piece.pos.y == 1)
                 WLongCastle = false;
-            else if (piece.pos.y == 8)
+            else if (!piece.isWhite && piece.pos.y == 8)
                 BLongCastle = false;
 
         }
@@ -107,7 +88,7 @@ namespace ChessEngine
         {
             if (piece.isWhite && piece.pos.y == 1)
                 WShortCastle = false;
-            else if (piece.pos.y == 8)
+            else if (!piece.isWhite && piece.pos.y == 8)
                 BShortCastle = false;
         }
 
@@ -127,14 +108,19 @@ namespace ChessEngine
             }
         }
 
-        public ulong Hash() {
+        public ulong Hash()
+        {
             ulong hash = 0;
-            foreach (Piece piece in Pieces) {
-                int i = 0;
-                i += piece.pos.x - 1 + (piece.pos.y - 1) * 8;
-                i += piece.piece * 64;
-                i += System.Convert.ToInt32(piece.isWhite) * 384;
-                hash ^= ZobristHashes.hashes[i];
+            foreach (Square square in Board)
+            {
+                if (!square.empty)
+                {
+                    int i = 0;
+                    i += square.pos.x - 1 + (square.pos.y - 1) * 8;
+                    i += square.piece * 64;
+                    i += System.Convert.ToInt32(square.isWhite) * 384;
+                    hash ^= ZobristHashes.hashes[i];
+                }
             }
             if (!WhitesTurn)
                 hash ^= ZobristHashes.hashes[768];
@@ -146,25 +132,12 @@ namespace ChessEngine
                 hash ^= ZobristHashes.hashes[771];
             if (BLongCastle)
                 hash ^= ZobristHashes.hashes[772];
-            if (EnPassantTarget != (0, 0)) {
-                int enPassant = EnPassantTarget.x - 1 + (EnPassantTarget.y - 1) * 8;
-                hash ^= ZobristHashes.hashes[enPassant + 773];
+            if (EnPassantTarget != (0, 0))
+            {
+                ;
+                hash ^= ZobristHashes.hashes[EnPassantTarget.PosXYToInt() + 773];
             }
             return hash;
-        }
-    }
-
-    public static class Extensions
-    {
-        public static List<Piece> GetClone(this List<Piece> source)
-        {
-            return source.Select(item => (Piece)item.Copy())
-                    .ToList();
-        }
-
-        public static (int, int) GetClone(this (int, int) source)
-        {
-            return (source.Item1, source.Item2);
         }
     }
 }

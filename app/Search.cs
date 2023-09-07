@@ -3,8 +3,6 @@ namespace ChessEngine
 {
     public class Search
     {
-        static List<Piece> ownPieces = new();
-
         public static void Main(Position position, int depth, out int AmountPos)
         {
             int newPos = 0;
@@ -23,6 +21,9 @@ namespace ChessEngine
 
             foreach (Position newPosition in newPositions)
             {
+                /*if (depth == 2) {
+                    Console.WriteLine(FEN.FormatFEN(newPosition));
+                }*/
                 int AmountNewPos = 0;
                 ulong hash = newPosition.Hash();
                 if (Transpositions.lookupTable.ContainsKey(hash)) { // checking if position is in look up table
@@ -38,27 +39,31 @@ namespace ChessEngine
                     Main(newPosition, depth, out AmountNewPos);
                     Transpositions.Add(newPosition, AmountNewPos, depth, 0);
                 }
+                /*if (depth == 2) {
+                    Console.WriteLine(AmountNewPos);
+                }*/
                 AmountPos += AmountNewPos;
             }
         }
         public static List<Position> GeneratePositions(Position pos, out int newPos)
         {
-            ownPieces = pos.OwnPieces();
             newPos = 0;
+            List<Square> Pieces = pos.Board;
             List<Position> newPositions = new();
 
-            for (int i = 0; i < ownPieces.Count; i++)
+            foreach (int i in pos.OwnPieces())
             {
-                List<(int, int)> moves = ownPieces[i].piece switch
+                List<(int, int)> moves = Pieces[i].piece switch
                 {
-                    Piece.King => King.LegalMoves(ownPieces[i], pos),
-                    Piece.Queen => Queen.LegalMoves(ownPieces[i], pos),
-                    Piece.Bishop => Bishop.LegalMoves(ownPieces[i], pos),
-                    Piece.Rook => Rook.LegalMoves(ownPieces[i], pos),
-                    Piece.Knight => Knight.LegalMoves(ownPieces[i], pos),
-                    _ => Pawn.LegalMoves(ownPieces[i], pos),
+                    Piece.King => King.LegalMoves(Pieces[i], pos),
+                    Piece.Queen => Queen.LegalMoves(Pieces[i], pos),
+                    Piece.Bishop => Bishop.LegalMoves(Pieces[i], pos),
+                    Piece.Rook => Rook.LegalMoves(Pieces[i], pos),
+                    Piece.Knight => Knight.LegalMoves(Pieces[i], pos),
+                    _ => Pawn.LegalMoves(Pieces[i], pos),
                 };
-                newPositions.AddRange(NewPos.New(pos, ownPieces[i], moves, out int n));
+                newPositions.AddRange(NewPos.New(pos, Pieces[i], moves, out int n));
+                //Console.WriteLine($"{Pieces[i].piece}, {n}");
                 newPos += n;
             }
             return newPositions;
