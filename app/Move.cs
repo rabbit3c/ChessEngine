@@ -70,7 +70,7 @@ namespace ChessEngine
         }
 
         public static List<(int, int)> SlidingMoves(Piece piece, Position pos) {
-            int[] directions = { 8, -8, -1, 1, 9, -9, 7, -7};
+            int[] directions = {8, -8, -1, 1, 9, -9, 7, -7};
             int posInt = piece.pos.PosXYToInt();
             List<(int, int)> legalMoves = new();
             for (int i = piece.piece == Piece.Bishop ? 4 : 0; i < (piece.piece == Piece.Rook ? 4 : directions.Length); i++)
@@ -99,7 +99,7 @@ namespace ChessEngine
 
         public static bool NotInCheck(Piece piece, (int x, int y) move, Position pos)
         {
-            List<Position> newPositions = NewPos.Format(pos, piece, move);
+            List<Position> newPositions = NewPos.Format(pos, piece, move.PosXYToInt());
             if (newPositions.Count == 0) // if there are zero new position, the move results in the king being taken
             {
                 return false;

@@ -2,21 +2,21 @@ namespace ChessEngine
 {
     class NewPos
     {
-        public static List<Position> Format(Position oldPos, Piece MovedPiece, (int x, int y) move)
+        public static List<Position> Format(Position oldPos, Piece MovedPiece, int move)
         {
             List<Position> newPositions = new()
             {
                 (Position)oldPos.Copy()
             };
             Piece newPiece = (Piece)MovedPiece.Copy();
-            newPiece.pos = move;
+            newPiece.pos = move.IntToPosXY();
             newPositions[0].RemoveAt(MovedPiece.pos.PosXYToInt());
-            Square targetSquare = (Square)newPositions[0].Board[move.PosXYToInt()].Copy();
+            Square targetSquare = (Square)newPositions[0].Board[move].Copy();
             if (!targetSquare.empty && targetSquare.piece == Piece.Rook)
             {
                 newPositions[0].NoCastle(targetSquare);
             }
-            else if (MovedPiece.piece == Piece.Pawn && move == oldPos.EnPassantTarget)
+            else if (MovedPiece.piece == Piece.Pawn && move.IntToPosXY() == oldPos.EnPassantTarget)
             {
                 newPositions[0].RemoveAt(oldPos.EnPassantTarget.PosXYToInt() + (MovedPiece.isWhite ? -8 : 8));
             }
@@ -35,35 +35,36 @@ namespace ChessEngine
 
             newPositions[0].Add(newPiece);
 
-            newPositions[0].RemoveEnPassantTarget();
-
-            //Check if there is a new enPassant target
-            if (MovedPiece.piece == Piece.Pawn && Math.Abs(MovedPiece.pos.y - move.y) == 2)
-                newPositions[0].AddEnPassantTarget((MovedPiece.pos.x, MovedPiece.isWhite ? MovedPiece.pos.y + 1 : MovedPiece.pos.y - 1));
-
             //Castle and remove Castling Rights
             if (MovedPiece.piece == Piece.King)
             {
-                if (Math.Abs(MovedPiece.pos.x - move.x) == 2)
+                if (Math.Abs(MovedPiece.pos.x - move.X()) == 2)
                 {
                     Piece rook = new();
 
-                    if (move.x == 3)
+                    if (move.X() == 3)
                     {
-                        rook = (Piece)newPositions[0].Board[(1, move.y).PosXYToInt()].Copy();
-                        rook.pos = (4, move.y);
-                        newPositions[0].RemoveAt((1, move.y).PosXYToInt());
+                        rook = (Piece)newPositions[0].Board[(1, move.Y()).PosXYToInt()].Copy();
+                        rook.pos = (4, move.Y());
+                        newPositions[0].RemoveAt((1, move.Y()).PosXYToInt());
                     }
-                    else if (move.x == 7)
+                    else if (move.X() == 7)
                     {
-                        rook = (Piece)newPositions[0].Board[(8, move.y).PosXYToInt()].Copy();
-                        rook.pos = (6, move.y);
-                        newPositions[0].RemoveAt((8, move.y).PosXYToInt());
+                        rook = (Piece)newPositions[0].Board[(8, move.Y()).PosXYToInt()].Copy();
+                        rook.pos = (6, move.Y());
+                        newPositions[0].RemoveAt((8, move.Y()).PosXYToInt());
                     }
                     newPositions[0].Add(rook);
                 }
                 newPositions[0].NoCastle(MovedPiece);
             }
+
+            newPositions[0].RemoveEnPassantTarget();
+
+            //Check if there is a new enPassant target
+            if (MovedPiece.piece == Piece.Pawn && Math.Abs(MovedPiece.pos.y - move.Y()) == 2)
+                newPositions[0].AddEnPassantTarget((MovedPiece.pos.x, MovedPiece.isWhite ? MovedPiece.pos.y + 1 : MovedPiece.pos.y - 1));
+
 
             //Remove Castling Rights
             if (MovedPiece.piece == Piece.Rook)
@@ -93,7 +94,7 @@ namespace ChessEngine
             List<Position> newPositions = new();
             foreach ((int, int) move in moves)
             {
-                newPositions.AddRange(Format(oldPos, Piece, move));
+                newPositions.AddRange(Format(oldPos, Piece, move.PosXYToInt()));
             }
             newPos = newPositions.Count;
             return newPositions;
