@@ -139,8 +139,8 @@ namespace ChessEngine
                 }
                 else if (pos.Board[i].piece == Piece.Pawn)
                 {
-                    foreach ((int, int) moveP in Pawn.Moves(pos.Board[i], pos))
-                        if (moveP.PosXYToInt() == posKing)
+                    foreach (int moveP in Pawn.Moves(pos.Board[i], pos))
+                        if (moveP == posKing)
                             return true;
                 }
             }
