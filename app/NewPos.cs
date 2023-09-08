@@ -9,16 +9,16 @@ namespace ChessEngine
                 (Position)oldPos.Copy()
             };
             Piece newPiece = (Piece)MovedPiece.Copy();
-            newPiece.pos = move.IntToPosXY();
-            newPositions[0].RemoveAt(MovedPiece.pos.PosXYToInt());
+            newPiece.pos = move;
+            newPositions[0].RemoveAt(MovedPiece.pos);
             Square targetSquare = (Square)newPositions[0].Board[move].Copy();
             if (!targetSquare.empty && targetSquare.piece == Piece.Rook)
             {
                 newPositions[0].NoCastle(targetSquare);
             }
-            else if (MovedPiece.piece == Piece.Pawn && move.IntToPosXY() == oldPos.EnPassantTarget)
+            else if (MovedPiece.piece == Piece.Pawn && move == oldPos.EnPassantTarget)
             {
-                newPositions[0].RemoveAt(oldPos.EnPassantTarget.PosXYToInt() + (MovedPiece.isWhite ? -8 : 8));
+                newPositions[0].RemoveAt(oldPos.EnPassantTarget + (MovedPiece.isWhite ? -8 : 8));
             }
 
             //check if any pawn is promoting
@@ -38,20 +38,20 @@ namespace ChessEngine
             //Castle and remove Castling Rights
             if (MovedPiece.piece == Piece.King)
             {
-                if (Math.Abs(MovedPiece.pos.x - move.X()) == 2)
+                if (Math.Abs(MovedPiece.pos.X() - move.X()) == 2)
                 {
                     Piece rook = new();
 
                     if (move.X() == 3)
                     {
                         rook = (Piece)newPositions[0].Board[(1, move.Y()).PosXYToInt()].Copy();
-                        rook.pos = (4, move.Y());
+                        rook.pos = (4, move.Y()).PosXYToInt();
                         newPositions[0].RemoveAt((1, move.Y()).PosXYToInt());
                     }
                     else if (move.X() == 7)
                     {
                         rook = (Piece)newPositions[0].Board[(8, move.Y()).PosXYToInt()].Copy();
-                        rook.pos = (6, move.Y());
+                        rook.pos = (6, move.Y()).PosXYToInt();
                         newPositions[0].RemoveAt((8, move.Y()).PosXYToInt());
                     }
                     newPositions[0].Add(rook);
@@ -62,8 +62,8 @@ namespace ChessEngine
             newPositions[0].RemoveEnPassantTarget();
 
             //Check if there is a new enPassant target
-            if (MovedPiece.piece == Piece.Pawn && Math.Abs(MovedPiece.pos.y - move.Y()) == 2)
-                newPositions[0].AddEnPassantTarget((MovedPiece.pos.x, MovedPiece.isWhite ? MovedPiece.pos.y + 1 : MovedPiece.pos.y - 1));
+            if (MovedPiece.piece == Piece.Pawn && Math.Abs(MovedPiece.pos.Y() - move.Y()) == 2)
+                newPositions[0].AddEnPassantTarget((MovedPiece.pos.X(), MovedPiece.isWhite ? MovedPiece.pos.Y() + 1 : MovedPiece.pos.Y() - 1).PosXYToInt());
 
 
             //Remove Castling Rights
@@ -89,12 +89,12 @@ namespace ChessEngine
             return newPositions;
         }
 
-        public static List<Position> New(Position oldPos, Piece Piece, List<(int x, int y)> moves, out int newPos)
+        public static List<Position> New(Position oldPos, Piece Piece, List<int> moves, out int newPos)
         {
             List<Position> newPositions = new();
-            foreach ((int, int) move in moves)
+            foreach (int move in moves)
             {
-                newPositions.AddRange(Format(oldPos, Piece, move.PosXYToInt()));
+                newPositions.AddRange(Format(oldPos, Piece, move));
             }
             newPos = newPositions.Count;
             return newPositions;
@@ -107,7 +107,7 @@ namespace ChessEngine
             {
                 if (pos.Board[i].piece == Piece.King)
                 {
-                    posKing = pos.Board[i].pos.PosXYToInt();
+                    posKing = pos.Board[i].pos;
                     break;
                 }
             }
@@ -133,8 +133,8 @@ namespace ChessEngine
                 }
                 else if (pos.Board[i].piece == Piece.Knight)
                 {
-                    foreach ((int, int) moveN in Knight.Moves(pos.Board[i], pos))
-                        if (moveN.PosXYToInt() == posKing)
+                    foreach (int moveN in Knight.Moves(pos.Board[i], pos))
+                        if (moveN == posKing)
                             return true;
                 }
                 else if (pos.Board[i].piece == Piece.Pawn)

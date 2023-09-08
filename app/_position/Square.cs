@@ -8,7 +8,7 @@ namespace ChessEngine {
             return copy;
         }
 
-        public Square((int, int) posPiece, bool whitePiece, int pieceType, bool squareEmpty = false)
+        public Square(int posPiece, bool whitePiece, int pieceType, bool squareEmpty = false)
         {
             pos = posPiece;
             piece = pieceType;

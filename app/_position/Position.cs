@@ -23,7 +23,7 @@ namespace ChessEngine
                 Board = Board.GetClone(),
                 PiecesBlack = PiecesBlack.GetClone(),
                 PiecesWhite = PiecesWhite.GetClone(),
-                EnPassantTarget = EnPassantTarget.GetClone(),
+                EnPassantTarget = EnPassantTarget,
                 WhitesTurn = WhitesTurn,
                 WLongCastle = WLongCastle,
                 WShortCastle = WShortCastle,
@@ -35,26 +35,26 @@ namespace ChessEngine
         }
 
         public void RemoveEnPassantTarget() {
-            if (EnPassantTarget != (0, 0))
+            if (EnPassantTarget != -1)
             {
-                hash ^= PrecomputedData.hashes[EnPassantTarget.PosXYToInt() + 773];
-                EnPassantTarget = (0, 0);
+                hash ^= PrecomputedData.hashes[EnPassantTarget + 773];
+                EnPassantTarget = -1;
             }
         }
 
-        public void AddEnPassantTarget((int, int) pos) {
+        public void AddEnPassantTarget(int pos) {
             EnPassantTarget = pos;
-            hash ^= PrecomputedData.hashes[EnPassantTarget.PosXYToInt() + 773];
+            hash ^= PrecomputedData.hashes[EnPassantTarget + 773];
         }
 
         public virtual void Add(Piece piece)
         {
             HashPiece(piece);
-            Square targetSquare = Board[piece.pos.PosXYToInt()];
+            Square targetSquare = Board[piece.pos];
             if (!targetSquare.empty) {
                 HashPiece(targetSquare);
             }
-            Board[piece.pos.PosXYToInt()] = new(piece.pos, piece.isWhite, piece.piece);
+            Board[piece.pos] = new(piece.pos, piece.isWhite, piece.piece);
         }
 
         public void RemoveAt(int i)
@@ -89,12 +89,12 @@ namespace ChessEngine
 
         public void NoLongCastle(Piece piece)
         {
-            if (piece.isWhite && piece.pos.y == 1 && WLongCastle)
+            if (piece.isWhite && piece.pos.Y() == 1 && WLongCastle)
             {
                 hash ^= PrecomputedData.hashes[770];
                 WLongCastle = false;
             }
-            else if (!piece.isWhite && piece.pos.y == 8 && BLongCastle)
+            else if (!piece.isWhite && piece.pos.Y() == 8 && BLongCastle)
             {
                 hash ^= PrecomputedData.hashes[772];
                 BLongCastle = false;
@@ -104,12 +104,12 @@ namespace ChessEngine
 
         public void NoShortCastle(Piece piece)
         {
-            if (piece.isWhite && piece.pos.y == 1 && WShortCastle)
+            if (piece.isWhite && piece.pos.Y() == 1 && WShortCastle)
             {
                 hash ^= PrecomputedData.hashes[769];
                 WShortCastle = false;
             }
-            else if (!piece.isWhite && piece.pos.y == 8 && BShortCastle)
+            else if (!piece.isWhite && piece.pos.Y() == 8 && BShortCastle)
             {
                 hash ^= PrecomputedData.hashes[771];
                 BShortCastle = false;
@@ -126,9 +126,9 @@ namespace ChessEngine
             }
             else if (piece.piece == Piece.Rook)
             {
-                if (piece.pos.x == 8)
+                if (piece.pos.X() == 8)
                     NoShortCastle(piece);
-                else if (piece.pos.x == 1)
+                else if (piece.pos.X() == 1)
                     NoLongCastle(piece);
             }
         }
@@ -153,15 +153,15 @@ namespace ChessEngine
                 hash ^= PrecomputedData.hashes[771];
             if (BLongCastle)
                 hash ^= PrecomputedData.hashes[772];
-            if (EnPassantTarget != (0, 0))
+            if (EnPassantTarget != -1)
             {
-                hash ^= PrecomputedData.hashes[EnPassantTarget.PosXYToInt() + 773];
+                hash ^= PrecomputedData.hashes[EnPassantTarget + 773];
             }
         }
         public void HashPiece(Piece piece)
         {
             int i = 0;
-            i += piece.pos.PosXYToInt();
+            i += piece.pos;
             i += piece.piece * 64;
             i += Convert.ToInt32(piece.isWhite) * 384;
             hash ^= PrecomputedData.hashes[i];

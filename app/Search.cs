@@ -49,7 +49,7 @@ namespace ChessEngine
 
             foreach (int i in pos.OwnPieces())
             {
-                List<(int, int)> moves = Pieces[i].piece switch
+                List<int> moves = Pieces[i].piece switch
                 {
                     Piece.King => King.LegalMoves(Pieces[i], pos),
                     Piece.Queen => Queen.LegalMoves(Pieces[i], pos),

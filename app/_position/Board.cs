@@ -15,7 +15,7 @@ namespace ChessEngine
         public List<int> PiecesWhite { get; set; } = new();
         public List<int> PiecesBlack { get; set; } = new();
 
-        public (int x, int y) EnPassantTarget { get; set; } = new();
+        public int EnPassantTarget { get; set; } = new();
         public bool WhitesTurn = true;
         public bool WShortCastle = true;
         public bool WLongCastle = true;

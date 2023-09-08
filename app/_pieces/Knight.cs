@@ -4,9 +4,9 @@ namespace ChessEngine
     class Knight
     {
 
-        public static List<(int, int)> LegalMoves(Piece piece, Position pos)
+        public static List<int> LegalMoves(Piece piece, Position pos)
         {
-            List<(int, int)> legalMoves = new();
+            List<int> legalMoves = new();
 
             if (!piece.IsPinned(new(), pos))
             {
@@ -18,18 +18,18 @@ namespace ChessEngine
             return legalMoves;
         }
 
-        public static List<(int, int)> Moves(Piece piece, Position pos)
+        public static List<int> Moves(Piece piece, Position pos)
         {
-            List<(int, int)> moves = new();
+            List<int> moves = new();
             int[] directions = { 17, 15, 10, 6, -6, -10, -15, -17 };
 
             for (int i = 0; i < directions.Length; i++)
             {
-                if (Inbound(piece.pos.PosXYToInt(), i))
+                if (Inbound(piece.pos, i))
                 {
-                    int move = piece.pos.PosXYToInt() + directions[i];
+                    int move = piece.pos + directions[i];
                     if (Move.Unobstructed(move, piece.isWhite, pos))
-                        moves.Add(move.IntToPosXY());
+                        moves.Add(move);
                 }
             }
 

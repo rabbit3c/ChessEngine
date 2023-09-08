@@ -19,11 +19,6 @@ namespace ChessEngine
             return source.ToList();
         }
 
-        public static (int, int) GetClone(this (int, int) source)
-        {
-            return (source.Item1, source.Item2);
-        }
-
         public static int PosXYToInt (this (int x, int y) source) {
             return source.x - 1 + (source.y - 1) * 8;
         }
@@ -34,11 +29,6 @@ namespace ChessEngine
 
         public static int Y (this int source) {
             return (source >> 3 & 0b_111) + 1;
-        }
-
-        public static (int, int) IntToPosXY (this int source) {
-            int y = Math.DivRem(source, 8, out int x);
-            return (x + 1, y + 1);
         }
     }
 }

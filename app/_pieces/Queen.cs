@@ -4,7 +4,7 @@ namespace ChessEngine
     class Queen
     {
 
-        public static List<(int, int)> LegalMoves(Piece piece, Position pos)
+        public static List<int> LegalMoves(Piece piece, Position pos)
         {
             return Move.SlidingMoves(piece, pos);
 

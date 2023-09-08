@@ -76,7 +76,7 @@ namespace ChessEngine
                     case 'Q':
                     case 'k':
                     case 'K':
-                        piece.pos = currPos;
+                        piece.pos = currPos.PosXYToInt();
                         Board[currPos.PosXYToInt()] = new(piece);
                         currPos.x++;
                         break;
@@ -102,7 +102,7 @@ namespace ChessEngine
 
             info = info[(info.IndexOf(' ') + 1)..];
             if (info[0] != '-')
-                EnPassantTarget = (char.ToUpper(info[0]) - 64, ToInt(info[1]));
+                EnPassantTarget = (char.ToUpper(info[0]) - 64, ToInt(info[1])).PosXYToInt();
 
             SplitColors();
         }
@@ -119,7 +119,7 @@ namespace ChessEngine
                     foreach (Square square in pos.Board)
                     {
                         if (!square.empty) {
-                            if (square.pos.x == x && square.pos.y == y)
+                            if (square.pos.X() == x && square.pos.Y() == y)
                         {
                             switch (square.piece)
                             {
@@ -192,9 +192,9 @@ namespace ChessEngine
                 FEN += '-';
             FEN += ' ';
 
-            if (pos.EnPassantTarget != (0, 0)) {
-                FEN += char.ToLower(System.Convert.ToChar(pos.EnPassantTarget.x + 64));
-                FEN += pos.EnPassantTarget.y.ToString();
+            if (pos.EnPassantTarget != -1) {
+                FEN += char.ToLower(Convert.ToChar(pos.EnPassantTarget.X() + 64));
+                FEN += pos.EnPassantTarget.Y().ToString();
             }
             else {
                 FEN += '-';
