@@ -13,6 +13,7 @@ namespace ChessEngine
             pos.FormatPosition(positionFEN); //Creating Position
             PrecomputedData.Precompute(); //Generating Hashes for Transpositions
             Console.WriteLine(FEN.FormatFEN(pos));
+            pos.Hash();
 
             Stopwatch stopwatch = new();
 

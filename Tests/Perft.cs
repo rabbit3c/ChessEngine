@@ -27,6 +27,7 @@ public class Perft
         Transpositions.lookupTable.Clear();
         PrecomputedData.hashes.Clear();
         PrecomputedData.Precompute();
+        pos.Hash();
 
         Stopwatch stopwatch = new();
 

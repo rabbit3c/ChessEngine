@@ -12,8 +12,6 @@ namespace ChessEngine
                 new(), new(), new(), new(), new(), new(), new(), new(),
                 new(), new(), new(), new(), new(), new(), new(), new(),
         };
-
-        public int[][] numSquareToEdge = new int[64][];
         public List<int> PiecesWhite { get; set; } = new();
         public List<int> PiecesBlack { get; set; } = new();
 
@@ -23,16 +21,6 @@ namespace ChessEngine
         public bool WLongCastle = true;
         public bool BShortCastle = true;
         public bool BLongCastle = true;
-
-        public virtual void Add(Piece piece)
-        {
-            Board[piece.pos.PosXYToInt()] = new(piece.pos, piece.isWhite, piece.piece);
-        }
-
-        public void Add(Square square)
-        {
-            Board[square.pos.PosXYToInt()] = square;
-        }
 
         public List<Square> GetFile(int iStart, int iEnd, bool including = false)
         {

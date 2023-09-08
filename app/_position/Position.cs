@@ -1,8 +1,11 @@
 
+using System.Net;
+
 namespace ChessEngine
 {
     public class Position : ChessBoard
     {
+        public ulong hash;
         public List<int> OwnPieces()
         {
             return WhitesTurn ? PiecesWhite : PiecesBlack;
@@ -25,30 +28,38 @@ namespace ChessEngine
                 WLongCastle = WLongCastle,
                 WShortCastle = WShortCastle,
                 BLongCastle = BLongCastle,
-                BShortCastle = BShortCastle
+                BShortCastle = BShortCastle,
+                hash = hash
             };
             return copy;
         }
 
-        public object Convert()
-        {
-            FEN copy = new()
+        public void RemoveEnPassantTarget() {
+            if (EnPassantTarget != (0, 0))
             {
-                Board = Board.GetClone(),
-                PiecesBlack = PiecesBlack.GetClone(),
-                PiecesWhite = PiecesWhite.GetClone(),
-                EnPassantTarget = EnPassantTarget.GetClone(),
-                WhitesTurn = WhitesTurn,
-                WLongCastle = WLongCastle,
-                WShortCastle = WShortCastle,
-                BLongCastle = BLongCastle,
-                BShortCastle = BShortCastle
-            };
-            return copy;
+                hash ^= PrecomputedData.hashes[EnPassantTarget.PosXYToInt() + 773];
+                EnPassantTarget = (0, 0);
+            }
+        }
+
+        public void AddEnPassantTarget((int, int) pos) {
+            EnPassantTarget = pos;
+            hash ^= PrecomputedData.hashes[EnPassantTarget.PosXYToInt() + 773];
+        }
+
+        public virtual void Add(Piece piece)
+        {
+            HashPiece(piece);
+            Square targetSquare = Board[piece.pos.PosXYToInt()];
+            if (!targetSquare.empty) {
+                HashPiece(targetSquare);
+            }
+            Board[piece.pos.PosXYToInt()] = new(piece.pos, piece.isWhite, piece.piece);
         }
 
         public void RemoveAt(int i)
         {
+            HashPiece(Board[i]);
             Board[i] = new();
         }
 
@@ -73,23 +84,37 @@ namespace ChessEngine
         public void ToggleTurn()
         {
             WhitesTurn = !WhitesTurn;
+            hash ^= PrecomputedData.hashes[768];
         }
 
         public void NoLongCastle(Piece piece)
         {
-            if (piece.isWhite && piece.pos.y == 1)
+            if (piece.isWhite && piece.pos.y == 1 && WLongCastle)
+            {
+                hash ^= PrecomputedData.hashes[770];
                 WLongCastle = false;
-            else if (!piece.isWhite && piece.pos.y == 8)
+            }
+            else if (!piece.isWhite && piece.pos.y == 8 && BLongCastle)
+            {
+                hash ^= PrecomputedData.hashes[772];
                 BLongCastle = false;
+            }
 
         }
 
         public void NoShortCastle(Piece piece)
         {
-            if (piece.isWhite && piece.pos.y == 1)
+            if (piece.isWhite && piece.pos.y == 1 && WShortCastle)
+            {
+                hash ^= PrecomputedData.hashes[769];
                 WShortCastle = false;
-            else if (!piece.isWhite && piece.pos.y == 8)
+            }
+            else if (!piece.isWhite && piece.pos.y == 8 && BShortCastle)
+            {
+                hash ^= PrecomputedData.hashes[771];
                 BShortCastle = false;
+
+            }
         }
 
         public void NoCastle(Piece piece)
@@ -108,18 +133,14 @@ namespace ChessEngine
             }
         }
 
-        public ulong Hash()
+        public void Hash()
         {
-            ulong hash = 0;
+            hash = 0;
             foreach (Square square in Board)
             {
                 if (!square.empty)
                 {
-                    int i = 0;
-                    i += square.pos.x - 1 + (square.pos.y - 1) * 8;
-                    i += square.piece * 64;
-                    i += System.Convert.ToInt32(square.isWhite) * 384;
-                    hash ^= PrecomputedData.hashes[i];
+                    HashPiece(square);
                 }
             }
             if (!WhitesTurn)
@@ -134,10 +155,16 @@ namespace ChessEngine
                 hash ^= PrecomputedData.hashes[772];
             if (EnPassantTarget != (0, 0))
             {
-                ;
                 hash ^= PrecomputedData.hashes[EnPassantTarget.PosXYToInt() + 773];
             }
-            return hash;
+        }
+        public void HashPiece(Piece piece)
+        {
+            int i = 0;
+            i += piece.pos.PosXYToInt();
+            i += piece.piece * 64;
+            i += Convert.ToInt32(piece.isWhite) * 384;
+            hash ^= PrecomputedData.hashes[i];
         }
     }
 }

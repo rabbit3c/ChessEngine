@@ -31,7 +31,7 @@ namespace ChessEngine
 
         public static bool NothingInTheWay(int oldPos, int newPos, Position pos)
         {
-            if (oldPos.y() == newPos.y() && Math.Abs(oldPos - newPos) > 1)
+            if (oldPos.Y() == newPos.Y() && Math.Abs(oldPos - newPos) > 1)
             {
                 List<Square> line = pos.GetRank(oldPos, newPos);
                 foreach (Square square in line)
@@ -43,7 +43,7 @@ namespace ChessEngine
                 }
                 return true;
             }
-            else if (oldPos.x() == newPos.x() && Math.Abs(oldPos - newPos) > 8)
+            else if (oldPos.X() == newPos.X() && Math.Abs(oldPos - newPos) > 8)
             {
                 List<Square> column = pos.GetFile(oldPos, newPos);
                 foreach (Square square in column)

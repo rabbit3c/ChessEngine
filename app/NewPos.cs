@@ -35,11 +35,11 @@ namespace ChessEngine
 
             newPositions[0].Add(newPiece);
 
-            newPositions[0].EnPassantTarget = (0, 0);
+            newPositions[0].RemoveEnPassantTarget();
 
             //Check if there is a new enPassant target
             if (MovedPiece.piece == Piece.Pawn && Math.Abs(MovedPiece.pos.y - move.y) == 2)
-                newPositions[0].EnPassantTarget = (MovedPiece.pos.x, MovedPiece.isWhite ? MovedPiece.pos.y + 1 : MovedPiece.pos.y - 1);
+                newPositions[0].AddEnPassantTarget((MovedPiece.pos.x, MovedPiece.isWhite ? MovedPiece.pos.y + 1 : MovedPiece.pos.y - 1));
 
             //Castle and remove Castling Rights
             if (MovedPiece.piece == Piece.King)
@@ -113,19 +113,19 @@ namespace ChessEngine
 
             foreach (int i in pos.OwnPieces())
             {
-                if (i.x() == posKing.x() && (pos.Board[i].piece == Piece.Rook || pos.Board[i].piece == Piece.Queen))
+                if (i.X() == posKing.X() && (pos.Board[i].piece == Piece.Rook || pos.Board[i].piece == Piece.Queen))
                 {
                     if (Move.NothingInTheWay(posKing, i, pos))
                         return true;
                 }
-                else if (i.y() == posKing.y() && (pos.Board[i].piece == Piece.Rook || pos.Board[i].piece == Piece.Queen))
+                else if (i.Y() == posKing.Y() && (pos.Board[i].piece == Piece.Rook || pos.Board[i].piece == Piece.Queen))
                 {
                     if (Move.NothingInTheWay(posKing, i, pos))
                     {
                         return true;
                     }
                 }
-                else if (Math.Abs(i.x() - posKing.x()) == Math.Abs(i.y() - posKing.y()) && (pos.Board[i].piece == Piece.Bishop || pos.Board[i].piece == Piece.Queen))
+                else if (Math.Abs(i.X() - posKing.X()) == Math.Abs(i.Y() - posKing.Y()) && (pos.Board[i].piece == Piece.Bishop || pos.Board[i].piece == Piece.Queen))
                 {
                     if (Move.NothingInTheWay(posKing, i, pos))
                         return true;

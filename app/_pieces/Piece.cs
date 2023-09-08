@@ -42,10 +42,10 @@ namespace ChessEngine
                 }
             }
 
-            if (pos.x == posKing.x() && move.x != posKing.x())
+            if (pos.x == posKing.X() && move.x != posKing.X())
             {
                 foreach (int i in position.EnemyPieces())
-                    if (i.x() == posKing.x())
+                    if (i.X() == posKing.X())
                         if (Pieces[i].piece == Queen || Pieces[i].piece == Rook)
                             if ((i < pos.PosXYToInt() && pos.PosXYToInt() < posKing) || (i > pos.PosXYToInt() && pos.PosXYToInt() > posKing))
                                 if (Move.NothingInTheWay(posKing, pos.PosXYToInt(), position) && Move.NothingInTheWay(pos.PosXYToInt(), i, position))
@@ -53,10 +53,10 @@ namespace ChessEngine
                 return false;
             }
 
-            else if (pos.y == posKing.y() && move.y != posKing.y())
+            else if (pos.y == posKing.Y() && move.y != posKing.Y())
             {
                 foreach (int i in position.EnemyPieces())
-                    if (i.y() == posKing.y())
+                    if (i.Y() == posKing.Y())
                         if (Pieces[i].piece == Queen || Pieces[i].piece == Rook)
                             if ((i < pos.PosXYToInt() && pos.PosXYToInt() < posKing) || (i > pos.PosXYToInt() && pos.PosXYToInt() > posKing))
                                 if (Move.NothingInTheWay(posKing, pos.PosXYToInt(), position) && Move.NothingInTheWay(pos.PosXYToInt(), i, position))
@@ -64,16 +64,16 @@ namespace ChessEngine
                 return false;
             }
 
-            else if (Math.Abs(pos.y - posKing.y()) == Math.Abs(pos.x - posKing.x()))
+            else if (Math.Abs(pos.y - posKing.Y()) == Math.Abs(pos.x - posKing.X()))
             {
-                if (Math.Abs(move.y - posKing.y()) != Math.Abs(move.x - posKing.x()))
+                if (Math.Abs(move.y - posKing.Y()) != Math.Abs(move.x - posKing.X()))
                 {
                     foreach (int i in position.EnemyPieces())
                     {
                         if (Pieces[i].piece == Queen || Pieces[i].piece == Bishop)
                         {
-                            if (Math.Abs(Pieces[i].pos.y - posKing.y()) == Math.Abs(Pieces[i].pos.x - posKing.x())) {
-                                if ((i.x() < pos.x && pos.x < posKing.x()) || (i.x() > pos.x && pos.x > posKing.x()))
+                            if (Math.Abs(Pieces[i].pos.y - posKing.Y()) == Math.Abs(Pieces[i].pos.x - posKing.X())) {
+                                if ((i.X() < pos.x && pos.x < posKing.X()) || (i.X() > pos.x && pos.x > posKing.X()))
                                     if (Move.NothingInTheWay(posKing, pos.PosXYToInt(), position) && Move.NothingInTheWay(pos.PosXYToInt(), i, position))
                                         return true;
                             }

@@ -22,9 +22,8 @@ namespace ChessEngine
                     Console.WriteLine(FEN.FormatFEN(newPosition));
                 }*/
                 int AmountNewPos = 0;
-                ulong hash = newPosition.Hash();
-                if (Transpositions.lookupTable.ContainsKey(hash)) { // checking if position is in look up table
-                    TranspositionInfo transposInfo = Transpositions.lookupTable[hash];
+                if (Transpositions.lookupTable.ContainsKey(newPosition.hash)) { // checking if position is in look up table
+                    TranspositionInfo transposInfo = Transpositions.lookupTable[newPosition.hash];
                     if (transposInfo.depth == depth) { //checking if transposition is at right depth
                         AmountNewPos = transposInfo.resultingPositions;
                     }

@@ -28,13 +28,12 @@ namespace ChessEngine
             return source.x - 1 + (source.y - 1) * 8;
         }
 
-        public static int x (this int source) {
-            Math.DivRem(source, 8, out int remainder);
-            return remainder + 1;
+        public static int X (this int source) {
+            return (source & 0b_111) + 1;
         }
 
-        public static int y (this int source) {
-            return Math.DivRem(source, 8, out int _) + 1;
+        public static int Y (this int source) {
+            return (source >> 3 & 0b_111) + 1;
         }
 
         public static (int, int) IntToPosXY (this int source) {
