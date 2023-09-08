@@ -13,7 +13,7 @@ namespace ChessEngine
                 if (PrecomputedData.numSquareToEdge[piece.pos.PosXYToInt()][i] != 0)
                 {
                     int move = piece.pos.PosXYToInt() + directions[i];
-                    if (Legal(move.IntToPosXY(), piece.isWhite, pos) && piece.pos.PosXYToInt() != move)
+                    if (Legal(move, piece.isWhite, pos) && piece.pos.PosXYToInt() != move)
                         legalMoves.Add(move.IntToPosXY());
                 }
             }
@@ -57,11 +57,10 @@ namespace ChessEngine
             return legalMoves;
         }
 
-        static bool Legal((int x, int y) move, bool isWhite, Position pos)
+        static bool Legal(int move, bool isWhite, Position pos)
         {
-            if (Move.Inbound(move))
-                if (Move.Unobstructed(move, isWhite, pos))
-                    return true;
+            if (Move.Unobstructed(move, isWhite, pos))
+                return true;
             return false;
         }
     }

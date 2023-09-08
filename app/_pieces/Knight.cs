@@ -10,26 +10,7 @@ namespace ChessEngine
 
             if (!piece.IsPinned(new(), pos))
             {
-                for (int x = -2; x <= 2; x += 4)
-                {
-                    for (int y = -1; y <= 1; y += 2)
-                    {
-                        (int, int) move = (piece.pos.x + x, piece.pos.y + y);
-                        if (Move.Inbound(move))
-                            if (Move.Unobstructed(move, piece.isWhite, pos))
-                                legalMoves.Add(move);
-                    }
-                }
-                for (int y = -2; y <= 2; y += 4)
-                {
-                    for (int x = -1; x <= 1; x += 2)
-                    {
-                        (int, int) move = (piece.pos.x + x, piece.pos.y + y);
-                        if (Move.Inbound(move))
-                            if (Move.Unobstructed(move, piece.isWhite, pos))
-                                legalMoves.Add(move);
-                    }
-                }
+                return Moves(piece, pos);
             }
 
             //string combinedString = string.Join(", ", legalMoves);
@@ -40,27 +21,39 @@ namespace ChessEngine
         public static List<(int, int)> Moves(Piece piece, Position pos)
         {
             List<(int, int)> moves = new();
+            int[] directions = { 17, 15, 10, 6, -6, -10, -15, -17 };
 
-            for (int x = -2; x <= 2; x += 4)
+            for (int i = 0; i < directions.Length; i++)
             {
-                for (int y = -1; y <= 1; y += 2)
+                if (Inbound(piece.pos.PosXYToInt(), i))
                 {
-                    (int, int) move = (piece.pos.x + x, piece.pos.y + y);
-                    if (Move.Inbound(move))
-                        moves.Add(move);
-                }
-            }
-            for (int y = -2; y <= 2; y += 4)
-            {
-                for (int x = -1; x <= 1; x += 2)
-                {
-                    (int, int) move = (piece.pos.x + x, piece.pos.y + y);
-                    if (Move.Inbound(move))
-                        moves.Add(move);
+                    int move = piece.pos.PosXYToInt() + directions[i];
+                    if (Move.Unobstructed(move, piece.isWhite, pos))
+                        moves.Add(move.IntToPosXY());
                 }
             }
 
             return moves;
         }
+
+        public static bool Inbound(int pos, int i)
+        {
+            if (PrecomputedData.numSquareToEdge[pos][i < 4 ? 0 : 1] >= ((i > 1 && i < 6) ? 1 : 2)) //some logic to check if the move will be inbound or not
+                if (PrecomputedData.numSquareToEdge[pos][(i & 1) == 1 ? 2 : 3] >= ((i > 1 && i < 6) ? 2 : 1))
+                    return true;
+            return false;
+        }
+        /*
+        bool[] inbound = {
+            squareToEdge[0] >= 2 && squareToEdge[3] >= 1, 
+            squareToEdge[0] >= 2 && squareToEdge[2] >= 1, 
+            squareToEdge[0] >= 1 && squareToEdge[3] >= 2, 
+            squareToEdge[0] >= 1 && squareToEdge[2] >= 2,
+            squareToEdge[1] >= 1 && squareToEdge[3] >= 2, 
+            squareToEdge[1] >= 1 && squareToEdge[2] >= 2, 
+            squareToEdge[1] >= 2 && squareToEdge[3] >= 1, 
+            squareToEdge[1] >= 2 && squareToEdge[2] >= 1,
+        };
+        */
     }
 }
