@@ -14,15 +14,15 @@ namespace ChessEngine
         }
 
         public static int PosXYToInt (this (int x, int y) source) {
-            return source.x - 1 + (source.y - 1) * 8;
+            return source.x + source.y * 8;
         }
 
         public static int X (this int source) {
-            return (source & 0b_111) + 1;
+            return source & 0b_111;
         }
 
         public static int Y (this int source) {
-            return (source >> 3 & 0b_111) + 1;
+            return source >> 3 & 0b_111;
         }
     }
 }

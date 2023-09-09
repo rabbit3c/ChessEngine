@@ -54,17 +54,17 @@ namespace ChessEngine
                 {
                     Piece rook = new();
 
-                    if (move.X() == 3)
+                    if (move.X() == 2)
                     {
-                        rook = (Piece)newPositions[0].Board[(1, move.Y()).PosXYToInt()].Copy();
-                        rook.pos = (4, move.Y()).PosXYToInt();
-                        newPositions[0].RemoveAt((1, move.Y()).PosXYToInt());
+                        rook = (Piece)newPositions[0].Board[(0, move.Y()).PosXYToInt()].Copy();
+                        rook.pos = (3, move.Y()).PosXYToInt();
+                        newPositions[0].RemoveAt((0, move.Y()).PosXYToInt());
                     }
-                    else if (move.X() == 7)
+                    else if (move.X() == 6)
                     {
-                        rook = (Piece)newPositions[0].Board[(8, move.Y()).PosXYToInt()].Copy();
-                        rook.pos = (6, move.Y()).PosXYToInt();
-                        newPositions[0].RemoveAt((8, move.Y()).PosXYToInt());
+                        rook = (Piece)newPositions[0].Board[(7, move.Y()).PosXYToInt()].Copy();
+                        rook.pos = (5, move.Y()).PosXYToInt();
+                        newPositions[0].RemoveAt((7, move.Y()).PosXYToInt());
                     }
                     newPositions[0].Add(rook);
                 }

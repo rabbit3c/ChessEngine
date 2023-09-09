@@ -46,7 +46,9 @@ namespace ChessEngine
             if (pos.X() == posKing.X())
             {
                 foreach (int i in position.EnemyPieces())
+                {
                     if (i.X() == posKing.X())
+                    {
                         if (Pieces[i].piece == Queen || Pieces[i].piece == Rook)
                             if ((i < pos && pos < posKing) || (i > pos && pos > posKing))
                                 if (Move.NothingInTheWay(posKing, pos, position) && Move.NothingInTheWay(pos, i, position))
@@ -54,6 +56,8 @@ namespace ChessEngine
                                     isPinned[0] = true;
                                     return isPinned;
                                 }
+                    }
+                }
             }
 
             else if (pos.Y() == posKing.Y())
@@ -117,7 +121,7 @@ namespace ChessEngine
         public bool Promoting()
         {
             if (piece == Pawn)
-                return isWhite ? pos.Y() == 8 : pos.Y() == 1;
+                return isWhite ? pos.Y() == 7 : pos.Y() == 0;
             return false;
         }
     }

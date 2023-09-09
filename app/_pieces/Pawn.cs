@@ -23,14 +23,14 @@ namespace ChessEngine
                     if (pos.WhitesTurn)
                     {
                         moves.Add(piece.pos + 8);
-                        if (piece.pos.Y() == 2)
+                        if (piece.pos.Y() == 1)
                             moves.Add(piece.pos + 16);
                     }
 
                     else
                     {
                         moves.Add(piece.pos - 8);
-                        if (piece.pos.Y() == 7)
+                        if (piece.pos.Y() == 6)
                             moves.Add(piece.pos - 16);
                     }
                     for (int i = 0; i < moves.Count; i++)

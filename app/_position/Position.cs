@@ -97,12 +97,12 @@ namespace ChessEngine
 
         public void NoLongCastle(Piece piece)
         {
-            if (piece.isWhite && piece.pos.Y() == 1 && WLongCastle)
+            if (piece.isWhite && piece.pos.Y() == 0 && WLongCastle)
             {
                 hash ^= PrecomputedData.hashes[770];
                 WLongCastle = false;
             }
-            else if (!piece.isWhite && piece.pos.Y() == 8 && BLongCastle)
+            else if (!piece.isWhite && piece.pos.Y() == 7 && BLongCastle)
             {
                 hash ^= PrecomputedData.hashes[772];
                 BLongCastle = false;
@@ -112,12 +112,12 @@ namespace ChessEngine
 
         public void NoShortCastle(Piece piece)
         {
-            if (piece.isWhite && piece.pos.Y() == 1 && WShortCastle)
+            if (piece.isWhite && piece.pos.Y() == 0 && WShortCastle)
             {
                 hash ^= PrecomputedData.hashes[769];
                 WShortCastle = false;
             }
-            else if (!piece.isWhite && piece.pos.Y() == 8 && BShortCastle)
+            else if (!piece.isWhite && piece.pos.Y() == 7 && BShortCastle)
             {
                 hash ^= PrecomputedData.hashes[771];
                 BShortCastle = false;
@@ -134,9 +134,9 @@ namespace ChessEngine
             }
             else if (piece.piece == Piece.Rook)
             {
-                if (piece.pos.X() == 8)
+                if (piece.pos.X() == 7)
                     NoShortCastle(piece);
-                else if (piece.pos.X() == 1)
+                else if (piece.pos.X() == 0)
                     NoLongCastle(piece);
             }
         }
