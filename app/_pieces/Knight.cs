@@ -6,16 +6,15 @@ namespace ChessEngine
 
         public static List<int> LegalMoves(Piece piece, Position pos)
         {
-            List<int> legalMoves = new();
-
-            if (!piece.IsPinned(new(), pos))
+            piece.IsPinned(pos, out bool pinned);
+            if (!pinned)
             {
                 return Moves(piece, pos);
             }
+            return new();
 
             //string combinedString = string.Join(", ", legalMoves);
             //Console.WriteLine($"Knight at {piece.pos} to {combinedString}");
-            return legalMoves;
         }
 
         public static List<int> Moves(Piece piece, Position pos)

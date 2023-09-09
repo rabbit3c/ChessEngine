@@ -27,8 +27,10 @@ namespace ChessEngine
             return copy;
         }
 
-        public bool IsPinned(int move, Position position)
+        public bool[] IsPinned(Position position, out bool pinned)
         {
+            bool[] isPinned = { false, false, false, false }; //North-South, West-East, Northeast - Southwest, Northwest - Southeast
+            pinned = true;
             int posKing = 0;
             List<Square> Pieces = position.Board;
 
@@ -41,47 +43,75 @@ namespace ChessEngine
                 }
             }
 
-            if (pos.X() == posKing.X() && move.X() != posKing.X())
+            if (pos.X() == posKing.X())
             {
                 foreach (int i in position.EnemyPieces())
                     if (i.X() == posKing.X())
                         if (Pieces[i].piece == Queen || Pieces[i].piece == Rook)
                             if ((i < pos && pos < posKing) || (i > pos && pos > posKing))
                                 if (Move.NothingInTheWay(posKing, pos, position) && Move.NothingInTheWay(pos, i, position))
-                                    return true;
-                return false;
+                                {
+                                    isPinned[0] = true;
+                                    return isPinned;
+                                }
             }
 
-            else if (pos.Y() == posKing.Y() && move.Y() != posKing.Y())
+            else if (pos.Y() == posKing.Y())
             {
                 foreach (int i in position.EnemyPieces())
                     if (i.Y() == posKing.Y())
                         if (Pieces[i].piece == Queen || Pieces[i].piece == Rook)
                             if ((i < pos && pos < posKing) || (i > pos && pos > posKing))
                                 if (Move.NothingInTheWay(posKing, pos, position) && Move.NothingInTheWay(pos, i, position))
-                                    return true;
-                return false;
+                                {
+                                    isPinned[1] = true;
+                                    return isPinned;
+                                }
             }
 
             else if (Math.Abs(pos.Y() - posKing.Y()) == Math.Abs(pos.X() - posKing.X()))
             {
-                if (Math.Abs(move.Y() - posKing.Y()) != Math.Abs(move.X() - posKing.X()))
+                Math.DivRem(pos - posKing, 9, out int remainder);
+                if (remainder == 0)
                 {
                     foreach (int i in position.EnemyPieces())
                     {
                         if (Pieces[i].piece == Queen || Pieces[i].piece == Bishop)
                         {
-                            if (Math.Abs(Pieces[i].pos.Y() - posKing.Y()) == Math.Abs(Pieces[i].pos.X() - posKing.X())) {
+                            if (Math.Abs(Pieces[i].pos.Y() - posKing.Y()) == Math.Abs(Pieces[i].pos.X() - posKing.X()))
+                            {
                                 if ((i.X() < pos.X() && pos.X() < posKing.X()) || (i.X() > pos.X() && pos.X() > posKing.X()))
                                     if (Move.NothingInTheWay(posKing, pos, position) && Move.NothingInTheWay(pos, i, position))
-                                        return true;
+                                    {
+                                        isPinned[2] = true;
+                                        return isPinned;
+                                    }
                             }
                         }
                     }
                 }
-                return false;
+                else
+                {
+                    foreach (int i in position.EnemyPieces())
+                    {
+                        if (Pieces[i].piece == Queen || Pieces[i].piece == Bishop)
+                        {
+                            if (Math.Abs(Pieces[i].pos.Y() - posKing.Y()) == Math.Abs(Pieces[i].pos.X() - posKing.X()))
+                            {
+                                if ((i.X() < pos.X() && pos.X() < posKing.X()) || (i.X() > pos.X() && pos.X() > posKing.X()))
+                                    if (Move.NothingInTheWay(posKing, pos, position) && Move.NothingInTheWay(pos, i, position))
+                                    {
+                                        isPinned[3] = true;
+                                        return isPinned;
+                                    }
+                            }
+                        }
+                    }
+                }
             }
-            return false;
+            pinned = false;
+            bool[] defaultValues = { true, true, true, true };
+            return defaultValues;
         }
 
         public bool Promoting()

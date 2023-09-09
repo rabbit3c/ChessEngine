@@ -103,6 +103,9 @@ namespace ChessEngine
             info = info[(info.IndexOf(' ') + 1)..];
             if (info[0] != '-')
                 EnPassantTarget = (char.ToUpper(info[0]) - 64, ToInt(info[1])).PosXYToInt();
+            else {
+                EnPassantTarget = -1;
+            }
 
             SplitColors();
         }

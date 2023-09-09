@@ -13,7 +13,7 @@ namespace ChessEngine
                 if (PrecomputedData.numSquareToEdge[piece.pos][i] != 0)
                 {
                     int move = piece.pos + directions[i];
-                    if (Legal(move, piece.isWhite, pos) && piece.pos != move)
+                    if (Move.Unobstructed(move, piece.isWhite, pos) && piece.pos != move)
                         legalMoves.Add(move);
                 }
             }
@@ -51,17 +51,11 @@ namespace ChessEngine
                     }
                 }
             }
+            
             //string combinedString = string.Join( ", ", legalMoves);
             //Console.WriteLine($"King at {piece.pos} to {combinedString}");
             //Console.WriteLine($"{piece.piece}, {legalMoves.Count}");
             return legalMoves;
-        }
-
-        static bool Legal(int move, bool isWhite, Position pos)
-        {
-            if (Move.Unobstructed(move, isWhite, pos))
-                return true;
-            return false;
         }
 
         public static bool NotInCheck(Piece piece, int move, Position pos)

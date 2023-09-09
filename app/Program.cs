@@ -3,11 +3,16 @@ using System.Diagnostics;
 
 namespace ChessEngine
 {
-    class Program
+    public class Program
     {
         static void Main()
         {
             string positionFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+            PerftMain(positionFEN, 4, out int _);
+        }
+
+        public static void PerftMain(string positionFEN, int depth, out int amountPos) {
+            Transpositions.lookupTable.Clear();
             Console.WriteLine("Starting...");
             FEN pos = new();
             pos.FormatPosition(positionFEN); //Creating Position
@@ -18,9 +23,10 @@ namespace ChessEngine
             Stopwatch stopwatch = new();
 
             stopwatch.Start();
-            Search.Main(pos, 4, out int amount); //Search all moves, in given depth
+            Search.Main(pos, depth, out int amount); //Search all moves, in given depth
             stopwatch.Stop();
 
+            amountPos = amount;
             Console.WriteLine($"{amount}   -   time: {stopwatch.Elapsed}");
         }
     }

@@ -52,28 +52,28 @@ namespace ChessEngine
             return true;
         }
 
-        public static List<int> SlidingMoves(Piece piece, Position pos) {
-            int[] directions = {8, -8, -1, 1, 9, -9, 7, -7};
-            int posInt = piece.pos;
+        public static List<int> SlidingMoves(Piece piece, Position pos)
+        {
+            int[] directions = { 8, -8, -1, 1, 9, -9, 7, -7 };
+            bool[] allowedDirections = piece.IsPinned(pos, out bool _);
             List<int> legalMoves = new();
             for (int i = piece.piece == Piece.Bishop ? 4 : 0; i < (piece.piece == Piece.Rook ? 4 : directions.Length); i++)
             {
-                for (int n = 0; n < PrecomputedData.numSquareToEdge[posInt][i]; n++)
+                if (allowedDirections[Math.DivRem(i, 2, out int _)])
                 {
-                    int move = posInt + directions[i] * (n + 1);
-                    if (Unobstructed(move, pos.WhitesTurn, pos))
+                    for (int n = 0; n < PrecomputedData.numSquareToEdge[piece.pos][i]; n++)
                     {
-
-                        if (!piece.IsPinned(move, pos))
+                        int move = piece.pos + directions[i] * (n + 1);
+                        if (Unobstructed(move, pos.WhitesTurn, pos))
                         {
                             legalMoves.Add(move);
                         }
-                    }
-                    else if (move != posInt)
-                        break;
-                    if (!Unobstructed(move, !pos.WhitesTurn, pos))
-                    {
-                        break;
+                        else if (move != piece.pos)
+                            break;
+                        if (!Unobstructed(move, !pos.WhitesTurn, pos))
+                        {
+                            break;
+                        }
                     }
                 }
             }

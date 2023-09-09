@@ -2,6 +2,18 @@ namespace ChessEngine
 {
     class NewPos
     {
+
+        public static List<Position> New(Position oldPos, Piece Piece, List<int> moves, out int newPos)
+        {
+            List<Position> newPositions = new();
+            foreach (int move in moves)
+            {
+                newPositions.AddRange(Format(oldPos, Piece, move));
+            }
+            newPos = newPositions.Count;
+            return newPositions;
+        }
+        
         public static List<Position> Format(Position oldPos, Piece MovedPiece, int move)
         {
             List<Position> newPositions = new()
@@ -74,7 +86,6 @@ namespace ChessEngine
 
             foreach (Position newPos in newPositions)
             {
-                newPos.SplitColors();
                 newPos.ToggleTurn();
             }
 
@@ -86,17 +97,6 @@ namespace ChessEngine
             }
 
             //Console.WriteLine(MovedPiece.piece);
-            return newPositions;
-        }
-
-        public static List<Position> New(Position oldPos, Piece Piece, List<int> moves, out int newPos)
-        {
-            List<Position> newPositions = new();
-            foreach (int move in moves)
-            {
-                newPositions.AddRange(Format(oldPos, Piece, move));
-            }
-            newPos = newPositions.Count;
             return newPositions;
         }
 

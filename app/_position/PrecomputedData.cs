@@ -1,4 +1,6 @@
 
+using System.Text.Json.Serialization;
+
 namespace ChessEngine
 {
     public class PrecomputedData
@@ -35,15 +37,19 @@ namespace ChessEngine
 
         public static void GenerateZobristHashes()
         {
-            Random random = new();
-
-            for (int i = 0; i < 837; i++)
+            if (hashes.Count != 837)
             {
-                hashes.Add(i, (ulong)random.NextInt64() * (ulong)(random.NextDouble() + 1));
+                Random random = new();
+
+                for (int i = 0; i < 837; i++)
+                {
+                    hashes.Add(i, (ulong)random.NextInt64() * (ulong)(random.NextDouble() + 1));
+                }
             }
         }
 
-        public static void Precompute() {
+        public static void Precompute()
+        {
             GenerateZobristHashes();
             PrecomputedMoveData();
         }

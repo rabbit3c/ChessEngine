@@ -4,8 +4,7 @@ namespace ChessEngine {
 
         public override object Copy()
         {
-            Square copy = new(pos, isWhite, piece, empty);
-            return copy;
+            return MemberwiseClone();
         }
 
         public Square(int posPiece, bool whitePiece, int pieceType, bool squareEmpty = false)

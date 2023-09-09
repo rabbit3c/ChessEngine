@@ -1,6 +1,4 @@
 
-using System.Net;
-
 namespace ChessEngine
 {
     public class Position : ChessBoard
@@ -53,12 +51,22 @@ namespace ChessEngine
             Square targetSquare = Board[piece.pos];
             if (!targetSquare.empty) {
                 HashPiece(targetSquare);
+                if (targetSquare.isWhite)
+                    PiecesWhite.Remove(targetSquare.pos);
+                else
+                    PiecesBlack.Remove(targetSquare.pos);
             }
+            if (piece.isWhite)
+                PiecesWhite.Add(piece.pos);
+            else 
+                PiecesBlack.Add(piece.pos);
             Board[piece.pos] = new(piece.pos, piece.isWhite, piece.piece);
         }
 
         public void RemoveAt(int i)
         {
+            PiecesBlack.Remove(i);
+            PiecesWhite.Remove(i);
             HashPiece(Board[i]);
             Board[i] = new();
         }

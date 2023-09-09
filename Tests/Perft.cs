@@ -1,15 +1,8 @@
-using System.Diagnostics;
 
 namespace Tests;
 
 public class Perft
 {
-    private readonly Search _search;
-    public Perft()
-    {
-        _search = new Search();
-    }
-
     [Theory]
     [InlineData("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 4, 197281)]
     [InlineData("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -", 3, 97862)]
@@ -20,22 +13,7 @@ public class Perft
     [InlineData("r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10", 3, 89890)]
     public void Test(string positionFEN, int depth, int expectedAmountPos)
     {
-        Console.WriteLine("Starting...");
-        FEN pos = new();
-        pos.FormatPosition(positionFEN);
-        Console.WriteLine(FEN.FormatFEN(pos));
-        Transpositions.lookupTable.Clear();
-        PrecomputedData.hashes.Clear();
-        PrecomputedData.Precompute();
-        pos.Hash();
-
-        Stopwatch stopwatch = new();
-
-        stopwatch.Start();
-        Search.Main(pos, depth, out int amountPos);
-        stopwatch.Stop();
-        
-        Console.WriteLine($"{amountPos}   -   time: {stopwatch.Elapsed}");
+        Program.PerftMain(positionFEN, depth, out int amountPos);
         Assert.True(expectedAmountPos == amountPos, $"Perft({depth}): {amountPos} - Expected: {expectedAmountPos})");
     }
 }

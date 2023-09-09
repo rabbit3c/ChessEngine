@@ -1,7 +1,7 @@
 
 namespace ChessEngine
 {
-    public class Search
+    class Search
     {
         public static void Main(Position position, int depth, out int AmountPos)
         {
