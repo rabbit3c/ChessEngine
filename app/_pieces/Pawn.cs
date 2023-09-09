@@ -5,6 +5,7 @@ namespace ChessEngine
     {
         public static List<int> LegalMoves(Piece piece, Position pos)
         {
+            //List<int> legalMoves = Moves(piece, pos, true);
             //string combinedString = string.Join(", ", legalMoves);
             //Console.WriteLine($"Pawn at {piece.pos} to {combinedString}");
             //Console.WriteLine($"{piece.pos}, {legalMoves.Count}");

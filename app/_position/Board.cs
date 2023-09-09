@@ -27,15 +27,20 @@ namespace ChessEngine
             List<Square> column = new();
             if (including)
             {
-                for (int i = Math.Min(iStart, iEnd); i <= Math.Max(iEnd, iStart); i += 8)
+                if (Math.Abs(iStart - iEnd) >= 0 && iStart >= 0 && iEnd >= 0 && iStart < 64 && iEnd < 64)
+                {
+                    for (int i = Math.Min(iStart, iEnd); i <= Math.Max(iEnd, iStart); i += 8)
+                    {
+                        column.Add(Board[i]);
+                    }
+                }
+            }
+            else
+            {
+                for (int i = Math.Min(iStart, iEnd) + 8; i <= Math.Max(iEnd, iStart) - 8; i += 8)
                 {
                     column.Add(Board[i]);
                 }
-                return column;
-            }
-            for (int i = Math.Min(iStart, iEnd) + 8; i <= Math.Max(iEnd, iStart) - 8; i += 8)
-            {
-                column.Add(Board[i]);
             }
             return column;
         }
@@ -44,11 +49,18 @@ namespace ChessEngine
         {
             if (including)
             {
-                List<Square> lineIncluding = Board.GetRange(Math.Min(iStart, iEnd), Math.Abs(iEnd - iStart) + 1);
-                return lineIncluding;
+                if (Math.Abs(iStart - iEnd) >= 0 && iStart >= 0 && iEnd >= 0 && iStart < 64 && iEnd < 64)
+                {
+                    List<Square> lineIncluding = Board.GetRange(Math.Min(iStart, iEnd), Math.Abs(iEnd - iStart) + 1);
+                    return lineIncluding;
+                }
             }
-            List<Square> line = Board.GetRange(Math.Min(iStart, iEnd) + 1, Math.Abs(iEnd - iStart) - 1);
-            return line;
+            else
+            {
+                List<Square> line = Board.GetRange(Math.Min(iStart, iEnd) + 1, Math.Abs(iEnd - iStart) - 1);
+                return line;
+            }
+            return new();
         }
 
         public List<Square> GetDiagonal(int pos1, int pos2, bool including = false)
@@ -60,22 +72,26 @@ namespace ChessEngine
             if (!including)
             {
                 iStart = rem9 == 0 ? Math.Min(pos1, pos2) + 9 : Math.Min(pos1, pos2) + 7;
-                iEnd = rem9 == 0 ? Math.Max(pos1, pos2) -  9 : Math.Max(pos1, pos2) - 7;
+                iEnd = rem9 == 0 ? Math.Max(pos1, pos2) - 9 : Math.Max(pos1, pos2) - 7;
             }
 
-            if (rem9 == 0)
+            if (Math.Abs(iStart - iEnd) >= 0 && iStart >= 0 && iEnd >= 0 && iStart < 64 && iEnd < 64)
             {
-                for (int i = Math.Min(iStart, iEnd); i <= Math.Max(iEnd, iStart); i += 9)
+                if (rem9 == 0)
+                {
+                    for (int i = Math.Min(iStart, iEnd); i <= Math.Max(iEnd, iStart); i += 9)
+                    {
+                        diagonal.Add(Board[i]);
+                    }
+                    return diagonal;
+                }
+                for (int i = Math.Min(iStart, iEnd); i <= Math.Max(iEnd, iStart); i += 7)
                 {
                     diagonal.Add(Board[i]);
                 }
                 return diagonal;
             }
-            for (int i = Math.Min(iStart, iEnd); i <= Math.Max(iEnd, iStart); i += 7)
-            {
-                diagonal.Add(Board[i]);
-            }
-            return diagonal;
+            return new();
         }
     }
 }

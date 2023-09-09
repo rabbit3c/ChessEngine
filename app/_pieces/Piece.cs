@@ -1,4 +1,9 @@
 
+using System.Data.Common;
+using System.Reflection;
+using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
+
 namespace ChessEngine
 {
 
@@ -29,10 +34,10 @@ namespace ChessEngine
 
         public bool[] IsPinned(Position position, out bool pinned)
         {
-            bool[] isPinned = { false, false, false, false }; //North-South, West-East, Northeast - Southwest, Northwest - Southeast
-            pinned = true;
+            bool[] allowedDirections = { false, false, false, false }; //North-South, West-East, Northeast - Southwest, Northwest - Southeast
+            bool[] defaultValues = { true, true, true, true };
+            pinned = false;
             int posKing = 0;
-            List<Square> Pieces = position.Board;
 
             foreach (int i in position.OwnPieces())
             {
@@ -45,32 +50,32 @@ namespace ChessEngine
 
             if (pos.X() == posKing.X())
             {
-                foreach (int i in position.EnemyPieces())
+                if (Move.NothingInTheWay(posKing, pos, position))
                 {
-                    if (i.X() == posKing.X())
-                    {
-                        if (Pieces[i].piece == Queen || Pieces[i].piece == Rook)
-                            if ((i < pos && pos < posKing) || (i > pos && pos > posKing))
-                                if (Move.NothingInTheWay(posKing, pos, position) && Move.NothingInTheWay(pos, i, position))
-                                {
-                                    isPinned[0] = true;
-                                    return isPinned;
-                                }
-                    }
+                    List<Square> file = pos < posKing ? position.GetFile(pos.X(), pos - 8, true) : position.GetFile(pos + 8, pos.X() + 56, true);
+                    pinned = CheckSquares(file, posKing, Rook);
                 }
+                if (pinned)
+                {
+                    allowedDirections[0] = true;
+                    return allowedDirections;
+                }
+                return defaultValues;
             }
 
             else if (pos.Y() == posKing.Y())
             {
-                foreach (int i in position.EnemyPieces())
-                    if (i.Y() == posKing.Y())
-                        if (Pieces[i].piece == Queen || Pieces[i].piece == Rook)
-                            if ((i < pos && pos < posKing) || (i > pos && pos > posKing))
-                                if (Move.NothingInTheWay(posKing, pos, position) && Move.NothingInTheWay(pos, i, position))
-                                {
-                                    isPinned[1] = true;
-                                    return isPinned;
-                                }
+                if (Move.NothingInTheWay(posKing, pos, position))
+                {
+                    List<Square> rank = pos < posKing ? position.GetRank(pos.Y() * 8, pos - 1, true) : position.GetRank(pos + 1, pos.Y() * 8 + 7, true);
+                    pinned = CheckSquares(rank, posKing, Rook);
+                }
+                if (pinned)
+                {
+                    allowedDirections[1] = true;
+                    return allowedDirections;
+                }
+                return defaultValues;
             }
 
             else if (Math.Abs(pos.Y() - posKing.Y()) == Math.Abs(pos.X() - posKing.X()))
@@ -78,44 +83,63 @@ namespace ChessEngine
                 Math.DivRem(pos - posKing, 9, out int remainder);
                 if (remainder == 0)
                 {
-                    foreach (int i in position.EnemyPieces())
+                    if (Move.NothingInTheWay(posKing, pos, position))
                     {
-                        if (Pieces[i].piece == Queen || Pieces[i].piece == Bishop)
-                        {
-                            if (Math.Abs(Pieces[i].pos.Y() - posKing.Y()) == Math.Abs(Pieces[i].pos.X() - posKing.X()))
-                            {
-                                if ((i.X() < pos.X() && pos.X() < posKing.X()) || (i.X() > pos.X() && pos.X() > posKing.X()))
-                                    if (Move.NothingInTheWay(posKing, pos, position) && Move.NothingInTheWay(pos, i, position))
-                                    {
-                                        isPinned[2] = true;
-                                        return isPinned;
-                                    }
-                            }
-                        }
+                        List<Square> diagonal = pos < posKing ? position.GetDiagonal(pos - 9 * PrecomputedData.numSquareToEdge[pos][5], pos - 9, true) : position.GetDiagonal(pos + 9, pos + 9 * PrecomputedData.numSquareToEdge[pos][4], true);
+                        pinned = CheckSquares(diagonal, posKing, Bishop);
                     }
+                    if (pinned)
+                    {
+                        allowedDirections[2] = true;
+                        return allowedDirections;
+                    }
+                    return defaultValues;
                 }
                 else
                 {
-                    foreach (int i in position.EnemyPieces())
+                    if (Move.NothingInTheWay(posKing, pos, position))
                     {
-                        if (Pieces[i].piece == Queen || Pieces[i].piece == Bishop)
+                        List<Square> diagonal = pos < posKing ? position.GetDiagonal(pos - 7 * PrecomputedData.numSquareToEdge[pos][7], pos - 7, true) : position.GetDiagonal(pos + 7, pos + 7 * PrecomputedData.numSquareToEdge[pos][6], true);
+                        pinned = CheckSquares(diagonal, posKing, Bishop);
+                    }
+                    if (pinned)
+                    {
+                        allowedDirections[3] = true;
+                        return allowedDirections;
+                    }
+                    return defaultValues;
+                }
+            }
+            return defaultValues;
+        }
+
+        public bool CheckSquares(List<Square> squares, int posKing, int AttackingPiece)
+        {
+            bool pinned = false;
+            foreach (Square square in squares)
+            {
+                if (!square.empty)
+                {
+                    if ((square.piece == Queen || square.piece == AttackingPiece) && square.isWhite != isWhite)
+                    {
+                        pinned = true;
+                        if (pos > posKing)
+                            return pinned;
+                    }
+                    else
+                    {
+                        if (pos > posKing)
                         {
-                            if (Math.Abs(Pieces[i].pos.Y() - posKing.Y()) == Math.Abs(Pieces[i].pos.X() - posKing.X()))
-                            {
-                                if ((i.X() < pos.X() && pos.X() < posKing.X()) || (i.X() > pos.X() && pos.X() > posKing.X()))
-                                    if (Move.NothingInTheWay(posKing, pos, position) && Move.NothingInTheWay(pos, i, position))
-                                    {
-                                        isPinned[3] = true;
-                                        return isPinned;
-                                    }
-                            }
+                            return false;
+                        }
+                        else
+                        {
+                            pinned = false;
                         }
                     }
                 }
             }
-            pinned = false;
-            bool[] defaultValues = { true, true, true, true };
-            return defaultValues;
+            return pinned;
         }
 
         public bool Promoting()
