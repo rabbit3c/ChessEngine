@@ -1,6 +1,6 @@
 namespace ChessEngine
 {
-    public class ChessBoard
+    public partial class Position
     {
         public List<Square> Board { get; set; } = new List<Square>() {
                 new(), new(), new(), new(), new(), new(), new(), new(),
@@ -21,6 +21,10 @@ namespace ChessEngine
         public bool WLongCastle = true;
         public bool BShortCastle = true;
         public bool BLongCastle = true;
+        public int WhiteKing;
+        public int BlackKing;
+        public ulong hash;
+
 
         public List<Square> GetFile(int iStart, int iEnd, bool including = false)
         {
@@ -92,6 +96,39 @@ namespace ChessEngine
                 return diagonal;
             }
             return new();
+        }
+        public void Hash()
+        {
+            hash = 0;
+            foreach (Square square in Board)
+            {
+                if (!square.empty)
+                {
+                    HashPiece(square);
+                }
+            }
+            if (!WhitesTurn)
+                hash ^= PrecomputedData.hashes[768];
+            if (WShortCastle)
+                hash ^= PrecomputedData.hashes[769];
+            if (WLongCastle)
+                hash ^= PrecomputedData.hashes[770];
+            if (BShortCastle)
+                hash ^= PrecomputedData.hashes[771];
+            if (BLongCastle)
+                hash ^= PrecomputedData.hashes[772];
+            if (EnPassantTarget != -1)
+            {
+                hash ^= PrecomputedData.hashes[EnPassantTarget + 773];
+            }
+        }
+        public void HashPiece(Piece piece)
+        {
+            int i = 0;
+            i += piece.pos;
+            i += piece.piece * 64;
+            i += Convert.ToInt32(piece.isWhite) * 384;
+            hash ^= PrecomputedData.hashes[i];
         }
     }
 }

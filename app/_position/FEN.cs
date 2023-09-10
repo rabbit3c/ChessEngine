@@ -39,6 +39,10 @@ namespace ChessEngine
                     case 'k':
                     case 'K':
                         piece.piece = Piece.King;
+                        if (c == 'K') 
+                            WhiteKing = currPos.PosXYToInt();
+                        else
+                            BlackKing = currPos.PosXYToInt();
                         break;
                     case '/':
                         currPos.y--;
@@ -111,7 +115,7 @@ namespace ChessEngine
             SplitColors();
         }
 
-        public static string FormatFEN(Position pos)
+        public string FormatFEN()
         {
             string FEN = "";
             for (int y = 7; y >= 0; y--)
@@ -120,7 +124,7 @@ namespace ChessEngine
                 for (int x = 0; x <= 7; x++)
                 {
                     char p = 'x';
-                    foreach (Square square in pos.Board)
+                    foreach (Square square in Board)
                     {
                         if (!square.empty)
                         {
@@ -180,28 +184,28 @@ namespace ChessEngine
                 }
             }
             FEN += ' ';
-            if (pos.WhitesTurn)
+            if (WhitesTurn)
                 FEN += "w";
             else
                 FEN += "b";
             FEN += ' ';
 
-            if (pos.WShortCastle)
+            if (WShortCastle)
                 FEN += "K";
-            if (pos.WLongCastle)
+            if (WLongCastle)
                 FEN += "Q";
-            if (pos.BShortCastle)
+            if (BShortCastle)
                 FEN += "k";
-            if (pos.BLongCastle)
+            if (BLongCastle)
                 FEN += "q";
-            if (!pos.WShortCastle && !pos.WLongCastle && !pos.BShortCastle && !pos.BLongCastle)
+            if (!WShortCastle && !WLongCastle && !BShortCastle && !BLongCastle)
                 FEN += '-';
             FEN += ' ';
 
-            if (pos.EnPassantTarget != -1)
+            if (EnPassantTarget != -1)
             {
-                FEN += char.ToLower(Convert.ToChar(pos.EnPassantTarget.X() + 65));
-                FEN += (pos.EnPassantTarget.Y() + 1).ToString();
+                FEN += char.ToLower(Convert.ToChar(EnPassantTarget.X() + 65));
+                FEN += (EnPassantTarget.Y() + 1).ToString();
             }
             else
             {

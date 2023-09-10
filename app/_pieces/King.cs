@@ -13,7 +13,7 @@ namespace ChessEngine
                 if (PrecomputedData.numSquareToEdge[piece.pos][i] != 0)
                 {
                     int move = piece.pos + directions[i];
-                    if (Move.Unobstructed(move, piece.isWhite, pos) && piece.pos != move)
+                    if (Move.Unobstructed(move, piece.isWhite, pos) && NotInCheck(piece, move, pos))
                         legalMoves.Add(move);
                 }
             }

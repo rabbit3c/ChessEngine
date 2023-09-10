@@ -1,9 +1,4 @@
 
-using System.Data.Common;
-using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.CompilerServices;
-
 namespace ChessEngine
 {
 
@@ -37,16 +32,7 @@ namespace ChessEngine
             bool[] allowedDirections = { false, false, false, false }; //North-South, West-East, Northeast - Southwest, Northwest - Southeast
             bool[] defaultValues = { true, true, true, true };
             pinned = false;
-            int posKing = 0;
-
-            foreach (int i in position.OwnPieces())
-            {
-                if (position.Board[i].piece == King)
-                {
-                    posKing = i;
-                    break;
-                }
-            }
+            int posKing = position.OwnKing();
 
             if (pos.X() == posKing.X())
             {

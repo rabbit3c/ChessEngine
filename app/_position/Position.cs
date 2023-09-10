@@ -1,9 +1,9 @@
 
 namespace ChessEngine
 {
-    public class Position : ChessBoard
+    public partial class Position
     {
-        public ulong hash;
+        public bool check;
         public List<int> OwnPieces()
         {
             return WhitesTurn ? PiecesWhite : PiecesBlack;
@@ -12,6 +12,16 @@ namespace ChessEngine
         public List<int> EnemyPieces()
         {
             return WhitesTurn ? PiecesBlack : PiecesWhite;
+        }
+
+        public int OwnKing()
+        {
+            return WhitesTurn ? WhiteKing : BlackKing;
+        }
+
+        public int EnemyKing() 
+        {
+            return WhitesTurn ? BlackKing : WhiteKing;
         }
 
         public object Copy()
@@ -27,7 +37,10 @@ namespace ChessEngine
                 WShortCastle = WShortCastle,
                 BLongCastle = BLongCastle,
                 BShortCastle = BShortCastle,
-                hash = hash
+                hash = hash,
+                check = check,
+                WhiteKing = WhiteKing,
+                BlackKing = BlackKing
             };
             return copy;
         }
@@ -139,40 +152,6 @@ namespace ChessEngine
                 else if (piece.pos.X() == 0)
                     NoLongCastle(piece);
             }
-        }
-
-        public void Hash()
-        {
-            hash = 0;
-            foreach (Square square in Board)
-            {
-                if (!square.empty)
-                {
-                    HashPiece(square);
-                }
-            }
-            if (!WhitesTurn)
-                hash ^= PrecomputedData.hashes[768];
-            if (WShortCastle)
-                hash ^= PrecomputedData.hashes[769];
-            if (WLongCastle)
-                hash ^= PrecomputedData.hashes[770];
-            if (BShortCastle)
-                hash ^= PrecomputedData.hashes[771];
-            if (BLongCastle)
-                hash ^= PrecomputedData.hashes[772];
-            if (EnPassantTarget != -1)
-            {
-                hash ^= PrecomputedData.hashes[EnPassantTarget + 773];
-            }
-        }
-        public void HashPiece(Piece piece)
-        {
-            int i = 0;
-            i += piece.pos;
-            i += piece.piece * 64;
-            i += Convert.ToInt32(piece.isWhite) * 384;
-            hash ^= PrecomputedData.hashes[i];
         }
     }
 }

@@ -18,9 +18,6 @@ namespace ChessEngine
 
             foreach (Position newPosition in newPositions)
             {
-                /*if (depth == 2) {
-                    Console.WriteLine(FEN.FormatFEN(newPosition));
-                }*/
                 int AmountNewPos = 0;
                 if (Transpositions.lookupTable.ContainsKey(newPosition.hash)) { // checking if position is in look up table
                     TranspositionInfo transposInfo = Transpositions.lookupTable[newPosition.hash];
@@ -35,9 +32,6 @@ namespace ChessEngine
                     Main(newPosition, depth, out AmountNewPos);
                     Transpositions.Add(newPosition, AmountNewPos, depth, 0);
                 }
-                /*if (depth == 2) {
-                    Console.WriteLine(AmountNewPos);
-                }*/
                 AmountPos += AmountNewPos;
             }
         }
