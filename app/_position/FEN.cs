@@ -113,9 +113,10 @@ namespace ChessEngine
             }
 
             SplitColors();
+            check = Check();
         }
 
-        public string FormatFEN()
+        public static string FormatFEN(Position pos)
         {
             string FEN = "";
             for (int y = 7; y >= 0; y--)
@@ -124,7 +125,7 @@ namespace ChessEngine
                 for (int x = 0; x <= 7; x++)
                 {
                     char p = 'x';
-                    foreach (Square square in Board)
+                    foreach (Square square in pos.Board)
                     {
                         if (!square.empty)
                         {
@@ -184,28 +185,28 @@ namespace ChessEngine
                 }
             }
             FEN += ' ';
-            if (WhitesTurn)
+            if (pos.WhitesTurn)
                 FEN += "w";
             else
                 FEN += "b";
             FEN += ' ';
 
-            if (WShortCastle)
+            if (pos.WShortCastle)
                 FEN += "K";
-            if (WLongCastle)
+            if (pos.WLongCastle)
                 FEN += "Q";
-            if (BShortCastle)
+            if (pos.BShortCastle)
                 FEN += "k";
-            if (BLongCastle)
+            if (pos.BLongCastle)
                 FEN += "q";
-            if (!WShortCastle && !WLongCastle && !BShortCastle && !BLongCastle)
+            if (!pos.WShortCastle && !pos.WLongCastle && !pos.BShortCastle && !pos.BLongCastle)
                 FEN += '-';
             FEN += ' ';
 
-            if (EnPassantTarget != -1)
+            if (pos.EnPassantTarget != -1)
             {
-                FEN += char.ToLower(Convert.ToChar(EnPassantTarget.X() + 65));
-                FEN += (EnPassantTarget.Y() + 1).ToString();
+                FEN += char.ToLower(Convert.ToChar(pos.EnPassantTarget.X() + 65));
+                FEN += (pos.EnPassantTarget.Y() + 1).ToString();
             }
             else
             {

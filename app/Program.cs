@@ -7,8 +7,8 @@ namespace ChessEngine
     {
         static void Main()
         {
-            string positionFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-            PerftMain(positionFEN, 4, out int _);
+            string positionFEN = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
+            PerftMain(positionFEN, 3, out int _);
         }
 
         public static void PerftMain(string positionFEN, int depth, out int amountPos)
@@ -25,7 +25,7 @@ namespace ChessEngine
             }
             else
             {
-                Console.WriteLine(pos.FormatFEN());
+                Console.WriteLine(FEN.FormatFEN(pos));
                 pos.Hash();
 
                 Stopwatch stopwatch = new();

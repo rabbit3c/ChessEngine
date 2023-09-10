@@ -21,7 +21,7 @@ namespace ChessEngine
             {
                 if (allowedDirections[0])
                 {
-                    if (pos.WhitesTurn)
+                    if (piece.isWhite)
                     {
                         moves.Add(piece.pos + 8);
                         if (piece.pos.Y() == 1)
@@ -46,14 +46,14 @@ namespace ChessEngine
             }
 
             int[] directions = { 9, 7, -7, -9 };
-            for (int i = pos.WhitesTurn ? 0 : 2; i < (pos.WhitesTurn ? 2 : directions.Length); i++)
+            for (int i = piece.isWhite ? 0 : 2; i < (piece.isWhite ? 2 : directions.Length); i++)
             {
                 if (allowedDirections[(i > 0 && i < 3) ? 3 : 2] || !legal)
                 {
                     if (PrecomputedData.numSquareToEdge[piece.pos][i % 2 == 0 ? 3 : 2] != 0)
                     {
                         var move = piece.pos + directions[i];
-                        if (Takeable(move, pos))
+                        if (Takeable(move, pos, piece.isWhite))
                             moves.Add(move);
                     }
                 }
@@ -62,9 +62,9 @@ namespace ChessEngine
             return moves;
         }
 
-        static bool Takeable(int square, Position pos)
+        static bool Takeable(int square, Position pos, bool isWhite)
         {
-            List<int> enemyPieces = pos.EnemyPieces();
+            List<int> enemyPieces = isWhite ? pos.PiecesBlack : pos.PiecesWhite;
             if (enemyPieces.Contains(square))
                 return true;
             if (pos.EnPassantTarget == square)
