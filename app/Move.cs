@@ -14,29 +14,35 @@ namespace ChessEngine
 
         public static bool NothingInTheWay(int oldPos, int newPos, Position pos)
         {
-            if (oldPos.Y() == newPos.Y() && Math.Abs(oldPos - newPos) > 1)
+            if (oldPos.Y() == newPos.Y())
             {
-                List<Square> line = pos.GetRank(oldPos, newPos);
-                foreach (Square square in line)
+                if (Math.Abs(oldPos - newPos) > 1)
                 {
-                    if (!square.empty)
+                    List<Square> line = pos.GetRank(oldPos, newPos);
+                    foreach (Square square in line)
                     {
-                        return false;
+                        if (!square.empty)
+                        {
+                            return false;
+                        }
                     }
                 }
                 return true;
             }
-            else if (oldPos.X() == newPos.X() && Math.Abs(oldPos - newPos) > 8)
+            else if (oldPos.X() == newPos.X())
             {
-                List<Square> column = pos.GetFile(oldPos, newPos);
-                foreach (Square square in column)
+                if (Math.Abs(oldPos - newPos) > 8)
                 {
-                    if (!square.empty)
-                        return false;
+                    List<Square> column = pos.GetFile(oldPos, newPos);
+                    foreach (Square square in column)
+                    {
+                        if (!square.empty)
+                            return false;
+                    }
                 }
                 return true;
             }
-            else
+            else if (Math.Abs(oldPos.X() - newPos.X()) == Math.Abs(oldPos.Y() - newPos.Y()))
             {
                 if (Math.Abs(oldPos - newPos) >= 14)
                 {
@@ -46,10 +52,10 @@ namespace ChessEngine
                         if (!square.empty)
                             return false;
                     }
-                    return true;
                 }
+                return true;
             }
-            return true;
+            return false; //if none of the Conditions were right, they can't be on the same line
         }
 
         public static List<int> SlidingMoves(Piece piece, Position pos)

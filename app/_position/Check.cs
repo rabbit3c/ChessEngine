@@ -1,3 +1,4 @@
+
 namespace ChessEngine
 {
 
@@ -11,6 +12,47 @@ namespace ChessEngine
         public bool Check()
         {
             return KingThreat(OwnKing(), EnemyPieces());
+        }
+
+        public bool Check(Piece piece)
+        {
+            int posKing = OwnKing();
+            if (piece.piece == Piece.Queen || piece.piece == Piece.Rook)
+            {
+                if (posKing.X() == piece.pos.X() || posKing.Y() == piece.pos.Y())
+                {
+                    return Move.NothingInTheWay(posKing, piece.pos, this);
+                }
+            }
+            if (piece.piece == Piece.Queen || piece.piece == Piece.Bishop)
+            {
+                if (Math.Abs(posKing.X() - piece.pos.X()) == Math.Abs(posKing.Y() - piece.pos.Y()))
+                {
+                    return Move.NothingInTheWay(posKing, piece.pos, this);
+                }
+            }
+            else if (piece.piece == Piece.Pawn)
+            {
+                int modifier = 1;
+                if (!piece.isWhite)
+                    modifier = -1;
+                if (piece.pos + 9 * modifier == posKing || piece.pos + 7 * modifier == posKing)
+                {
+                    return true;
+                }
+            }
+            else if (piece.piece == Piece.Knight)
+            {
+                List<int> moves = Knight.Moves(piece, this);
+                foreach (int knightMove in moves)
+                {
+                    if (knightMove == posKing)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         public bool KingThreat(int posKing, List<int> Pieces)

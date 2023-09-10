@@ -7,8 +7,8 @@ namespace ChessEngine
     {
         static void Main()
         {
-            string positionFEN = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
-            PerftMain(positionFEN, 3, out int _);
+            string positionFEN = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -";
+            PerftMain(positionFEN, 5, out int _);
         }
 
         public static void PerftMain(string positionFEN, int depth, out int amountPos)

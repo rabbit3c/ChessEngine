@@ -22,6 +22,8 @@ namespace ChessEngine
                 (Position)oldPos.Copy()
             };
 
+            bool enPassant = MovedPiece.piece == Piece.Pawn && move == oldPos.EnPassantTarget;
+
             //Move Piece
             MovePiece(oldPos, newPositions, MovedPiece, move);
 
@@ -46,6 +48,10 @@ namespace ChessEngine
                 newPos.ToggleTurn();
             }
 
+            if (enPassant) {
+                newPositions[0].check = true; //Changing check to be true in case of en Passant Discovered Attack, I'm too lazy to check explicitly for the moment
+            }
+
             // Check if the Enemies could take the King, but only if there was a check
             if (newPositions[0].check)
             {
@@ -58,7 +64,10 @@ namespace ChessEngine
 
             foreach (Position newPos in newPositions)
             {
-                newPos.check = newPos.Check();
+                newPos.check = MovedPiece.DiscoveredCheck(newPos, move) || newPos.Check(newPos.Board[move]);
+                if (enPassant) {
+                    newPos.check = true; //Changing check to be true in case of en Passant Discovered Attack, I'm too lazy to check explicitly for the moment
+                }
             }
 
             //Console.WriteLine(MovedPiece.piece);
@@ -112,7 +121,6 @@ namespace ChessEngine
             else if (MovedPiece.piece == Piece.Pawn && move == oldPos.EnPassantTarget)
             {
                 newPositions[0].RemoveAt(oldPos.EnPassantTarget + (MovedPiece.isWhite ? -8 : 8));
-                newPositions[0].check = true; //Changing check to be true in case of en Passant Discovered Attack
             }
 
             //check if any pawn is promoting
