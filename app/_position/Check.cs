@@ -4,6 +4,8 @@ namespace ChessEngine
 
     public partial class Position
     {
+        public bool check;
+        public bool doubleCheck;
         public bool Illegal() //Can the Enemy King be taken?
         {
             return KingThreat(EnemyKing(), OwnPieces());

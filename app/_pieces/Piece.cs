@@ -61,12 +61,13 @@ namespace ChessEngine
                     if (Move.NothingInTheWay(posKing, pos, position))
                     {
                         Math.DivRem(pos - posKing, 9, out int remainder);
-                        List<Square> diagonal = new();
+                        List<Square> diagonal;
                         if (remainder == 0)
                         {
                             diagonal = pos < posKing ? position.GetDiagonal(pos - 9 * PrecomputedData.numSquareToEdge[pos][5], pos - 9, true) : position.GetDiagonal(pos + 9, pos + 9 * PrecomputedData.numSquareToEdge[pos][4], true);
                         }
-                        else {
+                        else
+                        {
                             diagonal = pos < posKing ? position.GetDiagonal(pos - 7 * PrecomputedData.numSquareToEdge[pos][7], pos - 7, true) : position.GetDiagonal(pos + 7, pos + 7 * PrecomputedData.numSquareToEdge[pos][6], true);
                         }
                         return CheckSquares(diagonal, posKing, Bishop, isWhite);

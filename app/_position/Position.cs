@@ -3,7 +3,6 @@ namespace ChessEngine
 {
     public partial class Position
     {
-        public bool check;
         public List<int> OwnPieces()
         {
             return WhitesTurn ? PiecesWhite : PiecesBlack;

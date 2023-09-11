@@ -64,7 +64,17 @@ namespace ChessEngine
 
             foreach (Position newPos in newPositions)
             {
-                newPos.check = MovedPiece.DiscoveredCheck(newPos, move) || newPos.Check(newPos.Board[move]);
+                newPos.check = false;
+                newPos.doubleCheck = false;
+                if (newPos.Check(newPos.Board[move])) {
+                    if (MovedPiece.DiscoveredCheck(newPos, move)) {
+                        newPos.doubleCheck = true;
+                    }
+                    newPos.check = true;
+                }
+                else if (MovedPiece.DiscoveredCheck(newPos, move)) {
+                    newPos.check = true;
+                }
                 if (enPassant) {
                     newPos.check = true; //Changing check to be true in case of en Passant Discovered Attack, I'm too lazy to check explicitly for the moment
                 }

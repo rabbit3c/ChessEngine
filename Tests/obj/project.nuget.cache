@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "R4MKkPNwq83pglw45XV0tmJ4J40XbCdQK42n3478vF38tYh+giK9CxBUa+tVq1o0wdmjg+iGSlFzoC7zsH2bwQ==",
+  "dgSpecHash": "H6InbWUiCq8wb/6NiCsrkHxWxeV1FrpZ7kqHqe2zQw5nJvWr9LAP5M0lECwaZ2E5uKl6479xZFMLlDNrhrTt7g==",
   "success": true,
   "projectFilePath": "/Users/matthieu/Documents/Coding/C#/ChessEngine/Tests/Tests.csproj",
   "expectedPackageFiles": [
