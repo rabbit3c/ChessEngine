@@ -3,6 +3,8 @@ namespace ChessEngine
 {
     public partial class Position
     {
+        public int halfmoves;
+        public List<ulong> hashesThreeFold = new();
         public List<int> OwnPieces()
         {
             return WhitesTurn ? PiecesWhite : PiecesBlack;
@@ -39,7 +41,8 @@ namespace ChessEngine
                 hash = hash,
                 check = check,
                 WhiteKing = WhiteKing,
-                BlackKing = BlackKing
+                BlackKing = BlackKing,
+                halfmoves = halfmoves
             };
             return copy;
         }
@@ -62,11 +65,19 @@ namespace ChessEngine
             HashPiece(piece);
             Square targetSquare = Board[piece.pos];
             if (!targetSquare.empty) {
+                hashesThreeFold.Clear(); //If piece is taken, past positions can't be reached again
+                halfmoves = 0; //reset 50 move rule
                 HashPiece(targetSquare);
                 if (targetSquare.isWhite)
                     PiecesWhite.Remove(targetSquare.pos);
                 else
                     PiecesBlack.Remove(targetSquare.pos);
+            }
+            else if (piece.piece == Piece.Pawn) {
+                halfmoves = 0; //reset 50 move rule
+            }
+            else {
+                halfmoves += 1;
             }
             if (piece.isWhite)
                 PiecesWhite.Add(piece.pos);
@@ -151,6 +162,18 @@ namespace ChessEngine
                 else if (piece.pos.X() == 0)
                     NoLongCastle(piece);
             }
+        }
+
+        public bool ThreeFold() {
+            ulong position = hashesThreeFold.Last();
+            int counter = 0;
+            foreach (ulong hash in hashesThreeFold) {
+                if (hash == position)
+                    counter ++;
+                if (counter == 3)
+                    return true;
+            }
+            return false;
         }
     }
 }

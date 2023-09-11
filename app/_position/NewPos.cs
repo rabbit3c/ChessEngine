@@ -32,9 +32,9 @@ namespace ChessEngine
             newPositions[0].RemoveEnPassantTarget();
 
             //Check if there is a new enPassant target
-            if (MovedPiece.piece == Piece.Pawn && Math.Abs(MovedPiece.pos.Y() - move.Y()) == 2)
-                newPositions[0].AddEnPassantTarget((MovedPiece.pos.X(), MovedPiece.isWhite ? MovedPiece.pos.Y() + 1 : MovedPiece.pos.Y() - 1).PosXYToInt());
-
+            if (MovedPiece.piece == Piece.Pawn)
+                if (Math.Abs(MovedPiece.pos.Y() - move.Y()) == 2)
+                    newPositions[0].AddEnPassantTarget((MovedPiece.pos.X(), MovedPiece.isWhite ? MovedPiece.pos.Y() + 1 : MovedPiece.pos.Y() - 1).PosXYToInt());
 
             //Remove Castling Rights
             if (MovedPiece.piece == Piece.Rook)
@@ -47,7 +47,8 @@ namespace ChessEngine
                 newPos.ToggleTurn();
             }
 
-            if (enPassant) {
+            if (enPassant)
+            {
                 newPositions[0].check = true; //Changing check to be true in case of en Passant Discovered Attack, I'm too lazy to check explicitly for the moment
             }
 
@@ -65,20 +66,22 @@ namespace ChessEngine
             {
                 newPos.check = false;
                 newPos.doubleCheck = false;
-                if (newPos.Check(newPos.Board[move])) {
-                    if (MovedPiece.DiscoveredCheck(newPos, move)) {
+                if (newPos.Check(newPos.Board[move]))
+                {
+                    if (MovedPiece.DiscoveredCheck(newPos, move))
+                    {
                         newPos.doubleCheck = true;
                     }
                     newPos.check = true;
                 }
-                else if (MovedPiece.DiscoveredCheck(newPos, move)) {
+                else if (MovedPiece.DiscoveredCheck(newPos, move))
+                {
                     newPos.check = true;
                 }
-                if (enPassant) {
+                if (enPassant)
                     newPos.check = true; //Changing check to be true in case of en Passant Discovered Attack, I'm too lazy to check explicitly for the moment
-                }
+                newPos.hashesThreeFold.Add(newPos.hash);
             }
-
             //Console.WriteLine(MovedPiece.piece);
             return newPositions;
         }

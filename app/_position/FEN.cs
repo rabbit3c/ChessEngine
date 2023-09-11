@@ -39,7 +39,7 @@ namespace ChessEngine
                     case 'k':
                     case 'K':
                         piece.piece = Piece.King;
-                        if (c == 'K') 
+                        if (c == 'K')
                             WhiteKing = currPos.PosXYToInt();
                         else
                             BlackKing = currPos.PosXYToInt();
@@ -110,6 +110,17 @@ namespace ChessEngine
             else
             {
                 EnPassantTarget = -1;
+            }
+            if (info.Contains(' '))
+            {
+                info = info[(info.IndexOf(' ') + 1)..];
+                if (int.TryParse(info[..info.IndexOf(' ')], out int num))
+                {
+                    halfmoves = num;
+                }
+            }
+            else {
+                halfmoves = 0;
             }
 
             SplitColors();
@@ -212,6 +223,8 @@ namespace ChessEngine
             {
                 FEN += '-';
             }
+            FEN += ' ';
+            FEN += pos.halfmoves;
 
 
             return FEN;
