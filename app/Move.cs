@@ -18,7 +18,7 @@ namespace ChessEngine
             {
                 if (Math.Abs(oldPos - newPos) > 1)
                 {
-                    List<Square> line = pos.GetRank(oldPos, newPos);
+                    Square[] line = pos.GetRank(oldPos, newPos);
                     foreach (Square square in line)
                     {
                         if (!square.empty)
@@ -33,7 +33,7 @@ namespace ChessEngine
             {
                 if (Math.Abs(oldPos - newPos) > 8)
                 {
-                    List<Square> column = pos.GetFile(oldPos, newPos);
+                    Square[] column = pos.GetFile(oldPos, newPos);
                     foreach (Square square in column)
                     {
                         if (!square.empty)
@@ -46,7 +46,7 @@ namespace ChessEngine
             {
                 if (Math.Abs(oldPos - newPos) >= 14)
                 {
-                    List<Square> diagonal = pos.GetDiagonal(oldPos, newPos);
+                    Square[] diagonal = pos.GetDiagonal(oldPos, newPos);
                     foreach (Square square in diagonal)
                     {
                         if (!square.empty)

@@ -2,7 +2,7 @@ namespace ChessEngine
 {
     public partial class Position
     {
-        public List<Square> Board { get; set; } = new List<Square>() {
+        public Square[] Board { get; set; } = {
                 new(), new(), new(), new(), new(), new(), new(), new(),
                 new(), new(), new(), new(), new(), new(), new(), new(),
                 new(), new(), new(), new(), new(), new(), new(), new(),
@@ -26,7 +26,7 @@ namespace ChessEngine
         public ulong hash;
 
 
-        public List<Square> GetFile(int iStart, int iEnd, bool including = false)
+        public Square[] GetFile(int iStart, int iEnd, bool including = false)
         {
             List<Square> column = new();
             if (including)
@@ -46,28 +46,28 @@ namespace ChessEngine
                     column.Add(Board[i]);
                 }
             }
-            return column;
+            return column.ToArray();
         }
 
-        public List<Square> GetRank(int iStart, int iEnd, bool including = false)
+        public Square[] GetRank(int iStart, int iEnd, bool including = false)
         {
             if (including)
             {
                 if (Math.Abs(iStart - iEnd) >= 0 && iStart >= 0 && iEnd >= 0 && iStart < 64 && iEnd < 64)
                 {
-                    List<Square> lineIncluding = Board.GetRange(Math.Min(iStart, iEnd), Math.Abs(iEnd - iStart) + 1);
+                    Square[] lineIncluding = Board[Math.Min(iStart, iEnd)..(Math.Max(iStart, iEnd) + 1)];
                     return lineIncluding;
                 }
             }
             else
             {
-                List<Square> line = Board.GetRange(Math.Min(iStart, iEnd) + 1, Math.Abs(iEnd - iStart) - 1);
-                return line;
+                Square[] line = Board[(Math.Min(iStart, iEnd) + 1)..Math.Max(iStart, iEnd)];
+                return line.ToArray();
             }
-            return new();
+            return Array.Empty<Square>();
         }
 
-        public List<Square> GetDiagonal(int pos1, int pos2, bool including = false)
+        public Square[] GetDiagonal(int pos1, int pos2, bool including = false)
         {
             List<Square> diagonal = new();
             int iStart = pos1;
@@ -87,15 +87,15 @@ namespace ChessEngine
                     {
                         diagonal.Add(Board[i]);
                     }
-                    return diagonal;
+                    return diagonal.ToArray();
                 }
                 for (int i = Math.Min(iStart, iEnd); i <= Math.Max(iEnd, iStart); i += 7)
                 {
                     diagonal.Add(Board[i]);
                 }
-                return diagonal;
+                return diagonal.ToArray();
             }
-            return new();
+            return Array.Empty<Square>();
         }
         public void Hash()
         {

@@ -65,7 +65,7 @@ namespace ChessEngine
             HashPiece(piece);
             Square targetSquare = Board[piece.pos];
             if (!targetSquare.empty) {
-                hashesThreeFold.Clear(); //If piece is taken, past positions can't be reached again
+                hashesThreeFold.Clear(); //Captures are irreversible
                 halfmoves = 0; //reset 50 move rule
                 HashPiece(targetSquare);
                 if (targetSquare.isWhite)
@@ -75,6 +75,7 @@ namespace ChessEngine
             }
             else if (piece.piece == Piece.Pawn) {
                 halfmoves = 0; //reset 50 move rule
+                hashesThreeFold.Clear(); //Pawn moves are irreversible
             }
             else {
                 halfmoves += 1;

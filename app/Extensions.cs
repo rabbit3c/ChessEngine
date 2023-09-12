@@ -2,10 +2,9 @@ namespace ChessEngine
 {
     public static class Extensions
     {
-        public static List<Square> GetClone(this List<Square> source)
+        public static Square[] GetClone(this Square[] source)
         {
-            return source.Select(item => (Square)item.Copy())
-                    .ToList();
+            return source.Select(item => (Square)item.Copy()).ToArray();
         }
 
         public static List<int> GetClone(this List<int> source)

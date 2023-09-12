@@ -10,12 +10,12 @@ namespace ChessEngine
 
             if (depth == 0)
             {
-                GeneratePositions(position, depth, out int n);
+                GeneratePositions(position, out int n);
                 AmountPos = n;
                 return;
             }
 
-            List<Position> newPositions = GeneratePositions(position, depth, out int _);
+            List<Position> newPositions = GeneratePositions(position, out int _);
 
             foreach (Position newPosition in newPositions)
             {
@@ -41,9 +41,9 @@ namespace ChessEngine
                 AmountPos += AmountNewPos;
             }
         }
-        public static List<Position> GeneratePositions(Position pos, int depth, out int newPos)
+        public static List<Position> GeneratePositions(Position pos, out int newPos)
         {
-            List<Square> Pieces = pos.Board;
+            Square[] Pieces = pos.Board;
             List<Position> newPositions = new();
 
             if (!pos.doubleCheck)
@@ -58,24 +58,6 @@ namespace ChessEngine
             }
             newPos = newPositions.Count;
             return newPositions;
-        }
-
-        public static List<Position> GenerateMoves(Position pos, int i)
-        {
-
-            List<Square> Pieces = pos.Board;
-
-            List<int> moves = Pieces[i].piece switch
-            {
-                Piece.King => King.LegalMoves(Pieces[i], pos),
-                Piece.Queen => Queen.LegalMoves(Pieces[i], pos),
-                Piece.Bishop => Bishop.LegalMoves(Pieces[i], pos),
-                Piece.Rook => Rook.LegalMoves(Pieces[i], pos),
-                Piece.Knight => Knight.LegalMoves(Pieces[i], pos),
-                _ => Pawn.LegalMoves(Pieces[i], pos),
-            };
-            //Console.WriteLine($"{Pieces[i].piece}, {n}");
-            return NewPos.New(pos, Pieces[i], moves);
         }
 
         public static List<Position> ParallelGeneration(Position pos)
@@ -93,6 +75,24 @@ namespace ChessEngine
                 }
             });
             return newPositions;
+        }
+
+        public static List<Position> GenerateMoves(Position pos, int i)
+        {
+
+            Square[] Pieces = pos.Board;
+
+            List<int> moves = Pieces[i].piece switch
+            {
+                Piece.King => King.LegalMoves(Pieces[i], pos),
+                Piece.Queen => Queen.LegalMoves(Pieces[i], pos),
+                Piece.Bishop => Bishop.LegalMoves(Pieces[i], pos),
+                Piece.Rook => Rook.LegalMoves(Pieces[i], pos),
+                Piece.Knight => Knight.LegalMoves(Pieces[i], pos),
+                _ => Pawn.LegalMoves(Pieces[i], pos),
+            };
+            //Console.WriteLine($"{Pieces[i].piece}, {n}");
+            return NewPos.New(pos, Pieces[i], moves);
         }
     }
 }

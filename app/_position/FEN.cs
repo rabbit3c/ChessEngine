@@ -114,7 +114,7 @@ namespace ChessEngine
             if (info.Contains(' '))
             {
                 info = info[(info.IndexOf(' ') + 1)..];
-                if (int.TryParse(info[..info.IndexOf(' ')], out int num))
+                if (int.TryParse(info[..(info.Contains(' ') ? info.IndexOf(' ') : info.Length - 1)], out int num))
                 {
                     halfmoves = num;
                 }
