@@ -42,7 +42,9 @@ namespace ChessEngine
                 check = check,
                 WhiteKing = WhiteKing,
                 BlackKing = BlackKing,
-                halfmoves = halfmoves
+                halfmoves = halfmoves,
+                emptyBB = emptyBB,
+                occupiedBB = occupiedBB
             };
             return copy;
         }

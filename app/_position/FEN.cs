@@ -125,6 +125,7 @@ namespace ChessEngine
 
             SplitColors();
             check = Check();
+            InitializeBitBoards();
         }
 
         public static string FormatFEN(Position pos)

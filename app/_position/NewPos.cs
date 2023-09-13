@@ -21,6 +21,8 @@ namespace ChessEngine
                 (Position)oldPos.Copy()
             };
 
+            newPositions[0].UpdateBitBoard(MovedPiece.pos, move);
+
             bool enPassant = MovedPiece.piece == Piece.Pawn && move == oldPos.EnPassantTarget;
 
             //Move Piece
@@ -93,19 +95,22 @@ namespace ChessEngine
                 if (Math.Abs(MovedPiece.pos.X() - move.X()) == 2)
                 {
                     Piece rook = new();
+                    int moveRook = 0;
 
                     if (move.X() == 2)
                     {
                         rook = (Piece)newPosition.Board[(0, move.Y()).PosXYToInt()].Copy();
-                        rook.pos = (3, move.Y()).PosXYToInt();
+                        moveRook = (3, move.Y()).PosXYToInt();
                         newPosition.RemoveAt((0, move.Y()).PosXYToInt());
                     }
                     else if (move.X() == 6)
                     {
                         rook = (Piece)newPosition.Board[(7, move.Y()).PosXYToInt()].Copy();
-                        rook.pos = (5, move.Y()).PosXYToInt();
+                        moveRook = (5, move.Y()).PosXYToInt();
                         newPosition.RemoveAt((7, move.Y()).PosXYToInt());
                     }
+                    newPosition.UpdateBitBoard(rook.pos, moveRook);
+                    rook.pos = moveRook;
                     newPosition.Add(rook);
                 }
                 newPosition.NoCastle(MovedPiece);
@@ -133,6 +138,7 @@ namespace ChessEngine
             else if (MovedPiece.piece == Piece.Pawn && move == oldPos.EnPassantTarget)
             {
                 newPositions[0].RemoveAt(oldPos.EnPassantTarget + (MovedPiece.isWhite ? -8 : 8));
+                newPositions[0].EnPassantBB();
             }
 
             //check if any pawn is promoting
