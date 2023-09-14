@@ -83,10 +83,6 @@ namespace ChessEngine
                 if (enPassant)
                     newPos.check = true; //Changing check to be true in case of en Passant Discovered Attack, I'm too lazy to check explicitly for the moment
                 newPos.hashesThreeFold.Add(newPos.hash);
-                if (newPos.occupiedBB != newPos.OccupiedBB()) {
-                    Console.WriteLine(FEN.FormatFEN(newPos));
-                    throw new Exception("hello");
-                }
             }
             //Console.WriteLine(MovedPiece.piece);
             return newPositions;
