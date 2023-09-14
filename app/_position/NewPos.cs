@@ -83,6 +83,10 @@ namespace ChessEngine
                 if (enPassant)
                     newPos.check = true; //Changing check to be true in case of en Passant Discovered Attack, I'm too lazy to check explicitly for the moment
                 newPos.hashesThreeFold.Add(newPos.hash);
+                if (newPos.occupiedBB != newPos.OccupiedBB()) {
+                    Console.WriteLine(FEN.FormatFEN(newPos));
+                    throw new Exception("hello");
+                }
             }
             //Console.WriteLine(MovedPiece.piece);
             return newPositions;
@@ -138,7 +142,7 @@ namespace ChessEngine
             else if (MovedPiece.piece == Piece.Pawn && move == oldPos.EnPassantTarget)
             {
                 newPositions[0].RemoveAt(oldPos.EnPassantTarget + (MovedPiece.isWhite ? -8 : 8));
-                newPositions[0].EnPassantBB();
+                newPositions[0].EnPassantBB(MovedPiece.isWhite);
             }
 
             //check if any pawn is promoting

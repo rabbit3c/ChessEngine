@@ -12,50 +12,12 @@ namespace ChessEngine
             return true;
         }
 
-        public static bool NothingInTheWay(int oldPos, int newPos, Position pos)
-        {
-            if (oldPos.Y() == newPos.Y())
-            {
-                if (Math.Abs(oldPos - newPos) > 1)
-                {
-                    Square[] line = pos.GetRank(oldPos, newPos);
-                    foreach (Square square in line)
-                    {
-                        if (!square.empty)
-                        {
-                            return false;
-                        }
-                    }
-                }
-                return true;
+        public static bool NothingInTheWay(int oldPos, int newPos, Position pos) {
+            ulong mask = Bitboards.MaskLine(oldPos, newPos, out bool NotInLine);
+            if (NotInLine) {
+                return false;
             }
-            else if (oldPos.X() == newPos.X())
-            {
-                if (Math.Abs(oldPos - newPos) > 8)
-                {
-                    Square[] column = pos.GetFile(oldPos, newPos);
-                    foreach (Square square in column)
-                    {
-                        if (!square.empty)
-                            return false;
-                    }
-                }
-                return true;
-            }
-            else if (Math.Abs(oldPos.X() - newPos.X()) == Math.Abs(oldPos.Y() - newPos.Y()))
-            {
-                if (Math.Abs(oldPos - newPos) >= 14)
-                {
-                    Square[] diagonal = pos.GetDiagonal(oldPos, newPos);
-                    foreach (Square square in diagonal)
-                    {
-                        if (!square.empty)
-                            return false;
-                    }
-                }
-                return true;
-            }
-            return false; //if none of the Conditions were right, they can't be on the same line
+            return (pos.occupiedBB & mask) == 0;
         }
 
         public static List<int> SlidingMoves(Piece piece, Position pos)

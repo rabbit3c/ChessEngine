@@ -7,7 +7,7 @@ namespace ChessEngine
     {
         static void Main()
         {
-            string positionFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+            string positionFEN = "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1";
             PerftMain(positionFEN, 4, out int _);
         }
 
