@@ -9,60 +9,71 @@ namespace ChessEngine
             //string combinedString = string.Join(", ", legalMoves);
             //Console.WriteLine($"Pawn at {piece.pos} to {combinedString}");
             //Console.WriteLine($"{piece.pos}, {legalMoves.Count}");
-            return Moves(piece, pos, true);
+            return Moves(piece, pos);
         }
 
-        public static List<int> Moves(Piece piece, Position pos, bool legal = false)
+        public static List<int> Moves(Piece piece, Position pos)
         {
             bool[] allowedDirections = piece.IsPinned(pos, out bool _);
             List<int> moves = new();
 
-            if (legal)
+            if (allowedDirections[0])
             {
-                if (allowedDirections[0])
+                if (piece.isWhite)
                 {
-                    if (piece.isWhite)
-                    {
-                        moves.Add(piece.pos + 8);
-                        if (piece.pos.Y() == 1)
-                            moves.Add(piece.pos + 16);
-                    }
+                    moves.Add(piece.pos + 8);
+                    if (piece.pos.Y() == 1)
+                        moves.Add(piece.pos + 16);
+                }
 
-                    else
+                else
+                {
+                    moves.Add(piece.pos - 8);
+                    if (piece.pos.Y() == 6)
+                        moves.Add(piece.pos - 16);
+                }
+                for (int i = 0; i < moves.Count; i++)
+                {
+                    if (!Move.Unobstructed(moves[i], piece.isWhite, pos) || !Move.Unobstructed(moves[i], !piece.isWhite, pos) || !Move.NothingInTheWay(piece.pos, moves[i], pos))
                     {
-                        moves.Add(piece.pos - 8);
-                        if (piece.pos.Y() == 6)
-                            moves.Add(piece.pos - 16);
-                    }
-                    for (int i = 0; i < moves.Count; i++)
-                    {
-                        if (!Move.Unobstructed(moves[i], piece.isWhite, pos) || !Move.Unobstructed(moves[i], !piece.isWhite, pos) || !Move.NothingInTheWay(piece.pos, moves[i], pos))
-                        {
-                            moves.RemoveAt(i);
-                            i--;
-                        }
+                        moves.RemoveAt(i);
+                        i--;
                     }
                 }
             }
 
+            moves.AddRange(DiagonalMoves(piece, pos, allowedDirections, true));
+
+            return moves;
+        }
+
+        public static List<int> DiagonalMoves(Piece piece, Position pos, bool[] allowedDirections, bool legal = false)
+        {
+            List<int> diagonalMoves = new();
             int[] directions = { 9, 7, -7, -9 };
             for (int i = piece.isWhite ? 0 : 2; i < (piece.isWhite ? 2 : directions.Length); i++)
             {
-                if (allowedDirections[(i > 0 && i < 3) ? 3 : 2] || !legal)
+                if (!legal)
+                {
+                    if (PrecomputedData.numSquareToEdge[piece.pos][i % 2 == 0 ? 3 : 2] != 0)
+                    {
+                        diagonalMoves.Add(piece.pos + directions[i]);
+                    }
+                }
+                else if (allowedDirections[(i > 0 && i < 3) ? 3 : 2])
                 {
                     if (PrecomputedData.numSquareToEdge[piece.pos][i % 2 == 0 ? 3 : 2] != 0)
                     {
                         var move = piece.pos + directions[i];
                         if (Takeable(move, pos, piece.isWhite))
-                            moves.Add(move);
+                            diagonalMoves.Add(move);
                     }
                 }
             }
-
-            return moves;
+            return diagonalMoves;
         }
 
-        static bool Takeable(int square, Position pos, bool isWhite)
+        public static bool Takeable(int square, Position pos, bool isWhite)
         {
             List<int> enemyPieces = isWhite ? pos.PiecesBlack : pos.PiecesWhite;
             if (enemyPieces.Contains(square))

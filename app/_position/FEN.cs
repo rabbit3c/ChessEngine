@@ -124,7 +124,7 @@ namespace ChessEngine
             }
 
             SplitColors();
-            check = Check();
+            check = Check(OwnKing());
             InitializeBitBoards();
         }
 

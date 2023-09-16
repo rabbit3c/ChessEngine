@@ -11,9 +11,9 @@ namespace ChessEngine
             return KingThreat(EnemyKing(), OwnPieces());
         }
 
-        public bool Check()
+        public bool Check(int position)
         {
-            return KingThreat(OwnKing(), EnemyPieces());
+            return KingThreat(position, EnemyPieces());
         }
 
         public bool Check(Piece piece)
@@ -86,7 +86,7 @@ namespace ChessEngine
                 }
                 else if (Board[i].piece == Piece.Pawn)
                 {
-                    foreach (int moveP in Pawn.Moves(Board[i], this))
+                    foreach (int moveP in Pawn.DiagonalMoves(Board[i], this, new[]{true, true, true, true}))
                         if (moveP == posKing)
                             return true;
                 }

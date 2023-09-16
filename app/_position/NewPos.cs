@@ -54,8 +54,8 @@ namespace ChessEngine
                 newPositions[0].check = true; //Changing check to be true in case of en Passant Discovered Attack, I'm too lazy to check explicitly for the moment
             }
 
-            // Check if the Enemies could take the King, but only if there was a check
-            if (newPositions[0].check)
+            // Check if the Enemies could take the King, but only if there was a check or the piece is a King
+            if (newPositions[0].check || MovedPiece.piece == Piece.King)
             {
                 if (newPositions[0].Illegal())
                 {
