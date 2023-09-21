@@ -138,31 +138,22 @@ namespace ChessEngine
 
         public bool CheckSquares(Square[] squares, int posKing, int AttackingPiece, bool white)
         {
-            bool pinned = false;
-            foreach (Square square in squares)
+            bool asc = pos > posKing; //bool to skim through array from posKing to pos
+            for (int i = asc ? 0 : squares.Length - 1; asc ? i < squares.Length : i >= 0; i += asc ? 1 : -1)
             {
-                if (!square.empty)
+                if (!squares[i].empty)
                 {
-                    if ((square.piece == Queen || square.piece == AttackingPiece) && square.isWhite == white)
+                    if ((squares[i].piece == Queen || squares[i].piece == AttackingPiece) && squares[i].isWhite == white)
                     {
-                        pinned = true;
-                        if (pos > posKing)
-                            return pinned;
+                        return true;
                     }
                     else
                     {
-                        if (pos > posKing)
-                        {
-                            return false;
-                        }
-                        else
-                        {
-                            pinned = false;
-                        }
+                        return false;
                     }
                 }
             }
-            return pinned;
+            return false;
         }
 
         public bool Promoting()
