@@ -66,14 +66,22 @@ namespace ChessEngine
         {
             HashPiece(piece);
             Square targetSquare = Board[piece.pos];
+
             if (!targetSquare.empty) {
                 hashesThreeFold.Clear(); //Captures are irreversible
                 halfmoves = 0; //reset 50 move rule
                 HashPiece(targetSquare);
+
                 if (targetSquare.isWhite)
                     PiecesWhite.Remove(targetSquare.pos);
                 else
                     PiecesBlack.Remove(targetSquare.pos);
+
+                foreach (int i in OwnPieces()) {
+                    if (Board[i].pin.pinningPiece == piece.pos) {
+                        Board[i].pin = new();
+                    }
+                }
             }
             else if (piece.piece == Piece.Pawn) {
                 halfmoves = 0; //reset 50 move rule
@@ -86,7 +94,7 @@ namespace ChessEngine
                 PiecesWhite.Add(piece.pos);
             else 
                 PiecesBlack.Add(piece.pos);
-            Board[piece.pos] = new(piece.pos, piece.isWhite, piece.piece);
+            Board[piece.pos] = new(piece.pos, piece.isWhite, piece.piece, piece.pin);
         }
 
         public void RemoveAt(int i)

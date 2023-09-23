@@ -23,13 +23,12 @@ namespace ChessEngine
             isWhite = whitePiece;
         }
 
-        public virtual object Copy()
+        public object CopyPiece()
         {
             Piece copy = new() {
                 pos = pos,
                 piece = piece,
-                isWhite = isWhite,
-                pin = pin
+                isWhite = isWhite
             };
             return copy;
         }
@@ -84,6 +83,8 @@ namespace ChessEngine
 
         public Pin IsPinned(Position position)
         {
+            Pin pin = new();
+
             int posKing = isWhite ? position.WhiteKing : position.BlackKing;
 
             if (pos.X() == posKing.X())

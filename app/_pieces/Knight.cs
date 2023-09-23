@@ -6,8 +6,9 @@ namespace ChessEngine
 
         public static List<int> LegalMoves(Piece piece, Position pos)
         {
-            bool pinned = piece.pin.pinned;
-            if (!pinned)
+            Pin pin = piece.IsPinned(pos);
+
+            if (!pin.pinned)
             {
                 return Moves(piece, pos);
             }

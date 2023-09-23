@@ -21,7 +21,7 @@ namespace ChessEngine
         { //i: y+, y-, x+, x-, x+y+, x-y-, x-y+, x+y-
             int[] directions = { 8, -8, 1, -1, 9, -9, 7, -7 };
             Func<int, int, bool, Square[]>[] functions = {GetFile, GetFile, GetRank, GetRank, GetDiagonal, GetDiagonal, GetDiagonal, GetDiagonal };
-            Square[] squares = functions[i](posKing + directions[i], directions[i] * PrecomputedData.numSquareToEdge[posKing][i], true);
+            Square[] squares = functions[i](posKing + directions[i], posKing + directions[i] * PrecomputedData.numSquareToEdge[posKing][i], true);
             foreach (Square square in squares)
             {
                 if (square.empty) continue;
@@ -33,6 +33,25 @@ namespace ChessEngine
         {
             int posKing = OwnKing();
             LoopDirections(piece, move, posKing, CheckForPinnedPiece);
+        }
+
+        public bool VerifyPin(Piece piece, int move) {
+            int posKing = piece.isWhite ? WhiteKing : BlackKing;
+
+            if (!piece.pin.pinned) return false;
+
+            if (move == piece.pin.pinningPiece) return false;
+
+            if (piece.pos.X() == move.X()) {
+                if (piece.pos.X() == posKing.X()) return true;
+            }
+            if (piece.pos.Y() == move.Y()) {
+                if (piece.pos.Y() == posKing.Y()) return true;
+            }
+            else if (piece.pos.Diagonal(move)) {
+                if (piece.pos.Diagonal(posKing)) return true;
+            }
+            return false;
         }
 
         public void RemovePin(int piece, int pos)

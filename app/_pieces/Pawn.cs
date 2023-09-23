@@ -14,7 +14,7 @@ namespace ChessEngine
 
         public static List<int> Moves(Piece piece, Position pos)
         {
-            Pin pin = piece.pin;
+            Pin pin = piece.IsPinned(pos);
             List<int> moves = new();
 
             if (pin.allowedDirections[0])

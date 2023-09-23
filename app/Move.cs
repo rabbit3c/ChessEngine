@@ -23,7 +23,7 @@ namespace ChessEngine
         public static List<int> SlidingMoves(Piece piece, Position pos)
         {
             int[] directions = { 8, -8, -1, 1, 9, -9, 7, -7 };
-            Pin pin = piece.pin;
+            Pin pin = piece.IsPinned(pos);
             List<int> legalMoves = new();
             for (int i = piece.piece == Piece.Bishop ? 4 : 0; i < (piece.piece == Piece.Rook ? 4 : directions.Length); i++)
             {

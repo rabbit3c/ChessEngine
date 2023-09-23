@@ -76,7 +76,7 @@ namespace ChessEngine
                 {
                     newPos.RemovePin(MovedPiece.piece, MovedPiece.pos); //Check if piece is unpinning a piece
                 }
-
+                
                 if (MovedPiece.piece != Piece.King)
                 {
                     newPos.RecalculatePins(MovedPiece.pos); //Check if piece creates a new pin because it moves out of the way
@@ -113,29 +113,6 @@ namespace ChessEngine
                     newPos.check = true; //Changing check to be true in case of en Passant Discovered Attack, I'm too lazy to check explicitly for the moment
 
                 newPos.hashesThreeFold.Add(newPos.hash);
-                if (MovedPiece.piece != Piece.King)
-                {
-                    foreach (int piece in newPos.PiecesWhite)
-                    {
-                        Pin pin = newPos.Board[piece].IsPinned(newPos);
-                        if (pin.pinned != newPos.Board[piece].pin.pinned)
-                        {
-                            Console.WriteLine(FEN.FormatFEN(newPos));
-                            throw new Exception("hello");
-                        }
-                        newPos.Board[piece].pin = pin;
-                    }
-                    foreach (int piece in newPos.PiecesBlack)
-                    {
-                        Pin pin = newPos.Board[piece].IsPinned(newPos);
-                        if (pin.pinned != newPos.Board[piece].pin.pinned)
-                        {
-                            Console.WriteLine(FEN.FormatFEN(newPos));
-                            throw new Exception("hello");
-                        }
-                        newPos.Board[piece].pin = pin;
-                    }
-                }
             }
 
             return newPositions;
@@ -180,9 +157,15 @@ namespace ChessEngine
 
         public static void MovePiece(Position oldPos, List<Position> newPositions, Piece MovedPiece, int move)
         {
-            Piece newPiece = (Piece)MovedPiece.Copy();
+            Piece newPiece = (Piece)MovedPiece.CopyPiece();
+            if (oldPos.VerifyPin(MovedPiece, move)) {
+                newPiece.pin = MovedPiece.pin;
+            }
+
             newPiece.pos = move;
+
             newPositions[0].RemoveAt(MovedPiece.pos);
+
             Square targetSquare = (Square)newPositions[0].Board[move].Copy();
             if (!targetSquare.empty && targetSquare.piece == Piece.Rook)
             {
@@ -201,11 +184,10 @@ namespace ChessEngine
                 {
                     newPiece.piece = i;
                     newPositions.Add((Position)newPositions[0].Copy());
-                    newPositions[i].Add((Piece)newPiece.Copy());
+                    newPositions[i].Add((Piece)newPiece.CopyPiece());
                 }
                 newPiece.piece = Piece.Queen;
             }
-
             newPositions[0].Add(newPiece);
         }
     }

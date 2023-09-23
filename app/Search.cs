@@ -66,14 +66,23 @@ namespace ChessEngine
             List<Position> newPositions = new();
             List<int> ownPieces = pos.OwnPieces();
 
-            for( int i = 0; i < ownPieces.Count; i ++)
+            //Multithreading
+            Parallel.For(0, ownPieces.Count, i =>
             {
                 List<Position> positions = GenerateMoves(pos, ownPieces[i]);
                 lock (syncRoot)
                 {
                     newPositions.AddRange(positions);
                 }
-            }
+            });
+
+            //Single Thread
+            /*for( int i = 0; i < ownPieces.Count; i ++)
+            {
+                List<Position> positions = GenerateMoves(pos, ownPieces[i]);
+                newPositions.AddRange(positions);
+            }*/
+            
             return newPositions;
         }
 
