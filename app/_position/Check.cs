@@ -28,7 +28,7 @@ namespace ChessEngine
             }
             if (piece.piece == Piece.Queen || piece.piece == Piece.Bishop)
             {
-                if (Math.Abs(posKing.X() - piece.pos.X()) == Math.Abs(posKing.Y() - piece.pos.Y()))
+                if (piece.pos.Diagonal(posKing))
                 {
                     return Move.NothingInTheWay(posKing, piece.pos, this);
                 }
@@ -73,7 +73,7 @@ namespace ChessEngine
                         return true;
                     }
                 }
-                else if (Math.Abs(i.X() - posKing.X()) == Math.Abs(i.Y() - posKing.Y()) && (Board[i].piece == Piece.Bishop || Board[i].piece == Piece.Queen))
+                else if (i.Diagonal(posKing) && (Board[i].piece == Piece.Bishop || Board[i].piece == Piece.Queen))
                 {
                     if (Move.NothingInTheWay(posKing, i, this))
                         return true;

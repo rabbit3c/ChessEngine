@@ -23,5 +23,9 @@ namespace ChessEngine
         public static int Y (this int source) {
             return source >> 3 & 0b_111;
         }
+
+        public static bool Diagonal (this int pos1, int pos2) {
+            return Math.Abs(pos1.X() - pos2.X()) == Math.Abs(pos1.Y() - pos2.Y());
+        }
     }
 }

@@ -66,8 +66,30 @@ namespace ChessEngine
 
             foreach (Position newPos in newPositions)
             {
-                newPos.check = false;
+                if (MovedPiece.piece == Piece.King)
+                {
+                    newPos.InitializePins(); //if the king moves, all pins must be recalculated
+                }
+                else if (MovedPiece.piece == Piece.Knight) { }
+                else if (MovedPiece.piece == Piece.Pawn) { }
+                else
+                {
+                    newPos.RemovePin(MovedPiece.piece, MovedPiece.pos); //Check if piece is unpinning a piece
+                }
+
+                if (MovedPiece.piece != Piece.King)
+                {
+                    newPos.RecalculatePins(MovedPiece.pos); //Check if piece creates a new pin because it moves out of the way
+                    newPos.RecalculatePins(move); //Check if piece moves in the way of a pin
+                }
+
+                if (enPassant)
+                {
+                    newPos.RecalculatePins(oldPos.EnPassantTarget);
+                }
+
                 newPos.doubleCheck = false;
+
                 if (newPos.Check(newPos.Board[move]))
                 {
                     if (MovedPiece.DiscoveredCheck(newPos, move))
@@ -76,15 +98,46 @@ namespace ChessEngine
                     }
                     newPos.check = true;
                 }
-                else if (MovedPiece.DiscoveredCheck(newPos, move))
+
+                else
                 {
-                    newPos.check = true;
+                    newPos.check = MovedPiece.DiscoveredCheck(newPos, move);
+
+                    if (MovedPiece.piece > Piece.Knight && MovedPiece.piece < Piece.King)
+                    {
+                        newPos.NewPin(MovedPiece.piece, move); //Check if there is a new pin;
+                    }
                 }
+
                 if (enPassant)
                     newPos.check = true; //Changing check to be true in case of en Passant Discovered Attack, I'm too lazy to check explicitly for the moment
+
                 newPos.hashesThreeFold.Add(newPos.hash);
+                if (MovedPiece.piece != Piece.King)
+                {
+                    foreach (int piece in newPos.PiecesWhite)
+                    {
+                        Pin pin = newPos.Board[piece].IsPinned(newPos);
+                        if (pin.pinned != newPos.Board[piece].pin.pinned)
+                        {
+                            Console.WriteLine(FEN.FormatFEN(newPos));
+                            throw new Exception("hello");
+                        }
+                        newPos.Board[piece].pin = pin;
+                    }
+                    foreach (int piece in newPos.PiecesBlack)
+                    {
+                        Pin pin = newPos.Board[piece].IsPinned(newPos);
+                        if (pin.pinned != newPos.Board[piece].pin.pinned)
+                        {
+                            Console.WriteLine(FEN.FormatFEN(newPos));
+                            throw new Exception("hello");
+                        }
+                        newPos.Board[piece].pin = pin;
+                    }
+                }
             }
-            //Console.WriteLine(MovedPiece.piece);
+
             return newPositions;
         }
 

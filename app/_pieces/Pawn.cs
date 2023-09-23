@@ -14,10 +14,10 @@ namespace ChessEngine
 
         public static List<int> Moves(Piece piece, Position pos)
         {
-            bool[] allowedDirections = piece.IsPinned(pos, out bool _);
+            Pin pin = piece.pin;
             List<int> moves = new();
 
-            if (allowedDirections[0])
+            if (pin.allowedDirections[0])
             {
                 if (piece.isWhite)
                 {
@@ -42,7 +42,7 @@ namespace ChessEngine
                 }
             }
 
-            moves.AddRange(DiagonalMoves(piece, pos, allowedDirections, true));
+            moves.AddRange(DiagonalMoves(piece, pos, pin.allowedDirections, true));
 
             return moves;
         }

@@ -20,19 +20,6 @@ namespace ChessEngine
             emptyBB = ~occupiedBB;
         }
 
-        public ulong OccupiedBB()
-        {
-            ulong occupiedBBCopy = 0;
-            for (int i = 0; i < 64; i++)
-            {
-                if (!Board[i].empty)
-                {
-                    occupiedBBCopy |= (ulong)1 << i;
-                }
-            }
-            return occupiedBBCopy;
-        }
-
         public void UpdateBitBoard(int pos, int move)
         {
             occupiedBB ^= (ulong)1 << pos;
@@ -69,7 +56,7 @@ namespace ChessEngine
             {
                 mask &= rank << pos1.Y() * 8;
             }
-            else if (Math.Abs(pos1.X() - pos2.X()) == Math.Abs(pos1.Y() - pos2.Y()))
+            else if (pos1.Diagonal(pos2))
             {
                 Math.DivRem(pos1 - pos2, 9, out int rem9); //if the position are on the primary diagonal, their diffrence must be a multiple of nine
                 int x = pos1.X();
