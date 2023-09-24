@@ -34,7 +34,7 @@ namespace ChessEngine
                 }
                 for (int i = 0; i < moves.Count; i++)
                 {
-                    if (!Move.Unobstructed(moves[i], piece.isWhite, pos) || !Move.Unobstructed(moves[i], !piece.isWhite, pos) || !Move.NothingInTheWay(piece.pos, moves[i], pos))
+                    if (Illegal(piece.pos, moves[i], pos))
                     {
                         moves.RemoveAt(i);
                         i--;
@@ -76,10 +76,22 @@ namespace ChessEngine
         public static bool Takeable(int square, Position pos, bool isWhite)
         {
             List<int> enemyPieces = isWhite ? pos.PiecesBlack : pos.PiecesWhite;
-            if (enemyPieces.Contains(square))
-                return true;
-            if (pos.EnPassantTarget == square)
-                return true;
+
+            if (enemyPieces.Contains(square)) return true;
+
+            if (pos.EnPassantTarget == square) return true;
+
+            return false;
+        }
+
+        public static bool Illegal(int oldPos, int newPos, Position position)
+        {
+            if (!Move.Unobstructed(newPos, false, position)) return true;
+
+            if (!Move.Unobstructed(newPos, true, position)) return true;
+
+            if (!Move.NothingInTheWay(oldPos, newPos, position)) return true;
+
             return false;
         }
     }

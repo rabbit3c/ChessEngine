@@ -1,6 +1,4 @@
 
-using System.IO.Pipes;
-
 namespace ChessEngine
 {
 
@@ -26,7 +24,8 @@ namespace ChessEngine
 
         public object CopyPiece()
         {
-            Piece copy = new() {
+            Piece copy = new()
+            {
                 pos = pos,
                 piece = piece,
                 isWhite = isWhite
@@ -39,45 +38,39 @@ namespace ChessEngine
             int posKing = position.OwnKing();
             if (pos.HorizontalTo(posKing))
             {
-                if (!move.HorizontalTo(posKing))
-                {
-                    if (Move.NothingInTheWay(posKing, pos, position))
-                    {
-                        Square[] file = pos < posKing ? position.GetFile(pos.X(), pos - 8, true) : position.GetFile(pos + 8, pos.X() + 56, true);
-                        return CheckSquares(file, posKing, Rook, isWhite, out int _);
-                    }
-                }
+                if (move.HorizontalTo(posKing)) return false;
+
+                if (!Move.NothingInTheWay(posKing, pos, position)) return false;
+
+                Square[] file = pos < posKing ? position.GetFile(pos.X(), pos - 8, true) : position.GetFile(pos + 8, pos.X() + 56, true);
+                return CheckSquares(file, posKing, Rook, isWhite, out int _);
             }
             else if (pos.VerticalTo(posKing))
             {
-                if (!move.VerticalTo(posKing))
-                {
-                    if (Move.NothingInTheWay(posKing, pos, position))
-                    {
-                        Square[] rank = pos < posKing ? position.GetRank(pos.Y() * 8, pos - 1, true) : position.GetRank(pos + 1, pos.Y() * 8 + 7, true);
-                        return CheckSquares(rank, posKing, Rook, isWhite, out int _);
-                    }
-                }
+                if (move.VerticalTo(posKing)) return false;
+
+                if (!Move.NothingInTheWay(posKing, pos, position)) return false;
+
+                Square[] rank = pos < posKing ? position.GetRank(pos.Y() * 8, pos - 1, true) : position.GetRank(pos + 1, pos.Y() * 8 + 7, true);
+                return CheckSquares(rank, posKing, Rook, isWhite, out int _);
             }
             else if (pos.Diagonal(posKing))
             {
-                if (!move.Diagonal(posKing))
+                if (move.Diagonal(posKing)) return false;
+                    
+                if (!Move.NothingInTheWay(posKing, pos, position)) return false;
+
+                Math.DivRem(pos - posKing, 9, out int remainder);
+                Square[] diagonal;
+                if (remainder == 0)
                 {
-                    if (Move.NothingInTheWay(posKing, pos, position))
-                    {
-                        Math.DivRem(pos - posKing, 9, out int remainder);
-                        Square[] diagonal;
-                        if (remainder == 0)
-                        {
-                            diagonal = pos < posKing ? position.GetDiagonal(pos - 9 * PrecomputedData.numSquareToEdge[pos][5], pos - 9, true) : position.GetDiagonal(pos + 9, pos + 9 * PrecomputedData.numSquareToEdge[pos][4], true);
-                        }
-                        else
-                        {
-                            diagonal = pos < posKing ? position.GetDiagonal(pos - 7 * PrecomputedData.numSquareToEdge[pos][7], pos - 7, true) : position.GetDiagonal(pos + 7, pos + 7 * PrecomputedData.numSquareToEdge[pos][6], true);
-                        }
-                        return CheckSquares(diagonal, posKing, Bishop, isWhite, out int _);
-                    }
+                    diagonal = pos < posKing ? position.GetDiagonal(pos - 9 * PrecomputedData.numSquareToEdge[pos][5], pos - 9, true) : position.GetDiagonal(pos + 9, pos + 9 * PrecomputedData.numSquareToEdge[pos][4], true);
                 }
+                else
+                {
+                    diagonal = pos < posKing ? position.GetDiagonal(pos - 7 * PrecomputedData.numSquareToEdge[pos][7], pos - 7, true) : position.GetDiagonal(pos + 7, pos + 7 * PrecomputedData.numSquareToEdge[pos][6], true);
+                }
+                return CheckSquares(diagonal, posKing, Bishop, isWhite, out int _);
             }
             return false;
         }
@@ -135,10 +128,7 @@ namespace ChessEngine
 
                 }
             }
-            if (pin.pinned)
-            {
-                return pin;
-            }
+            if (pin.pinned) return pin;
             return Pin.Default();
         }
 
@@ -148,20 +138,21 @@ namespace ChessEngine
             piece = 0;
             for (int i = asc ? 0 : squares.Length - 1; asc ? i < squares.Length : i >= 0; i += asc ? 1 : -1)
             {
-                if (!squares[i].empty)
-                {
-                    if ((squares[i].piece == Queen || squares[i].piece == AttackingPiece) && squares[i].isWhite == white)
-                    {
-                        piece = squares[i].pos;
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
+                if (squares[i].empty) continue;
+
+                if (squares[i].piece != Queen && squares[i].piece != AttackingPiece) return false;
+
+                if (squares[i].isWhite != white) return false;
+
+                piece = squares[i].pos;
+                return true;
             }
             return false;
+        }
+
+        public List<int> LegalMoves(Position pos)
+        {
+            return Move.SlidingMoves(this, pos);
         }
 
         public bool Promoting()

@@ -1,6 +1,4 @@
 
-using System.ComponentModel;
-
 namespace ChessEngine
 {
     class King
@@ -12,12 +10,11 @@ namespace ChessEngine
 
             for (int i = 0; i < directions.Length; i++)
             {
-                if (PrecomputedData.numSquareToEdge[piece.pos][i] != 0)
-                {
-                    int move = piece.pos + directions[i];
-                    if (Move.Unobstructed(move, piece.isWhite, pos))
-                        legalMoves.Add(move);
-                }
+                if (PrecomputedData.numSquareToEdge[piece.pos][i] == 0) continue;
+                    
+                int move = piece.pos + directions[i];
+                if (Move.Unobstructed(move, piece.isWhite, pos))
+                    legalMoves.Add(move);
             }
 
             if (NotIllegal(piece.pos, pos))
@@ -53,10 +50,7 @@ namespace ChessEngine
                     }
                 }
             }
-
-            //string combinedString = string.Join( ", ", legalMoves);
-            //Console.WriteLine($"King at {piece.pos} to {combinedString}");
-            //Console.WriteLine($"{piece.piece}, {legalMoves.Count}");
+            
             return legalMoves;
         }
 

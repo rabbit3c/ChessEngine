@@ -35,14 +35,13 @@ namespace ChessEngine
 
         public static void GenerateZobristHashes()
         {
-            if (hashes.Count != 837)
-            {
-                Random random = new();
+            if (hashes.Count == 837) return;
 
-                for (int i = 0; i < 837; i++)
-                {
-                    hashes.Add(i, (ulong)random.NextInt64() * (ulong)(random.NextDouble() + 1));
-                }
+            Random random = new();
+
+            for (int i = 0; i < 837; i++)
+            {
+                hashes.Add(i, (ulong)random.NextInt64() * (ulong)(random.NextDouble() + 1));
             }
         }
 

@@ -160,10 +160,6 @@ namespace ChessEngine
         public static void MovePiece(Position oldPos, List<Position> newPositions, Piece MovedPiece, int move)
         {
             Piece newPiece = (Piece)MovedPiece.CopyPiece();
-            if (oldPos.VerifyPin(MovedPiece, move))
-            {
-                newPiece.pin = MovedPiece.pin;
-            }
 
             newPiece.pos = move;
 
@@ -178,6 +174,12 @@ namespace ChessEngine
             {
                 newPositions[0].RemoveAt(oldPos.EnPassantTarget + (MovedPiece.isWhite ? -8 : 8));
                 newPositions[0].EnPassantBB(MovedPiece.isWhite);
+            }
+
+            if (oldPos.VerifyPin(MovedPiece, move))
+            {
+                newPiece.pin = MovedPiece.pin;
+                newPositions[0].Board[MovedPiece.pin.pinningPiece].pinnedPiece = move;
             }
 
             //check if any pawn is promoting

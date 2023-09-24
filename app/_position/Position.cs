@@ -50,11 +50,10 @@ namespace ChessEngine
         }
 
         public void RemoveEnPassantTarget() {
-            if (EnPassantTarget != -1)
-            {
-                hash ^= PrecomputedData.hashes[EnPassantTarget + 773];
-                EnPassantTarget = -1;
-            }
+            if (EnPassantTarget == -1) return;
+
+            hash ^= PrecomputedData.hashes[EnPassantTarget + 773];
+            EnPassantTarget = -1;
         }
 
         public void AddEnPassantTarget(int pos) {

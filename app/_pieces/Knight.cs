@@ -8,14 +8,9 @@ namespace ChessEngine
         {
             Pin pin = piece.pin;
 
-            if (!pin.pinned)
-            {
-                return Moves(piece, pos);
-            }
-            return new();
+            if (pin.pinned) return new();
 
-            //string combinedString = string.Join(", ", legalMoves);
-            //Console.WriteLine($"Knight at {piece.pos} to {combinedString}");
+            return Moves(piece, pos);
         }
 
         public static List<int> Moves(Piece piece, Position pos)
@@ -25,12 +20,11 @@ namespace ChessEngine
 
             for (int i = 0; i < directions.Length; i++)
             {
-                if (Inbound(piece.pos, i))
-                {
-                    int move = piece.pos + directions[i];
-                    if (Move.Unobstructed(move, piece.isWhite, pos))
-                        moves.Add(move);
-                }
+                if (!Inbound(piece.pos, i)) continue;
+                
+                int move = piece.pos + directions[i];
+                if (Move.Unobstructed(move, piece.isWhite, pos))
+                    moves.Add(move);
             }
 
             return moves;

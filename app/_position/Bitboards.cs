@@ -12,10 +12,8 @@ namespace ChessEngine
             emptyBB = 0;
             for (int i = 0; i < 64; i++)
             {
-                if (!Board[i].empty)
-                {
-                    occupiedBB |= (ulong)1 << i;
-                }
+                if (Board[i].empty) continue;
+                occupiedBB |= (ulong)1 << i;
             }
             emptyBB = ~occupiedBB;
         }

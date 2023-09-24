@@ -48,10 +48,7 @@ namespace ChessEngine
                 List<int> moves = Knight.Moves(piece, this);
                 foreach (int knightMove in moves)
                 {
-                    if (knightMove == posKing)
-                    {
-                        return true;
-                    }
+                    if (knightMove == posKing) return true;
                 }
             }
             return false;

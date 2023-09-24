@@ -6,16 +6,15 @@ namespace ChessEngine
 
         public static void Add(Position pos, int resultingPositions, int depth, int eval)
         {
-            if (!lookupTable.ContainsKey(pos.hash))
+            if (lookupTable.ContainsKey(pos.hash)) return;
+                
+            TranspositionInfo transposInfo = new()
             {
-                TranspositionInfo transposInfo = new()
-                {
-                    resultingPositions = resultingPositions,
-                    depth = depth,
-                    eval = eval
-                };
-                lookupTable.Add(pos.hash, transposInfo);
-            }
+                resultingPositions = resultingPositions,
+                depth = depth,
+                eval = eval
+            };
+            lookupTable.Add(pos.hash, transposInfo);
         }
     }
 

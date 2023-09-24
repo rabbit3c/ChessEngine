@@ -18,25 +18,25 @@ namespace ChessEngine
             Console.WriteLine("Starting...");
             FEN pos = new();
             pos.FormatPosition(positionFEN); //Creating Position
+            
             if (pos.Illegal())
             {
                 Console.WriteLine("This Position is illegal!");
                 amountPos = 0;
+                return;
             }
-            else
-            {
-                Console.WriteLine(FEN.FormatFEN(pos));
-                pos.Hash();
 
-                Stopwatch stopwatch = new();
+            Console.WriteLine(FEN.FormatFEN(pos));
+            pos.Hash();
 
-                stopwatch.Start();
-                Search.Main(pos, depth, out int amount); //Search all moves, in given depth
-                stopwatch.Stop();
+            Stopwatch stopwatch = new();
 
-                amountPos = amount;
-                Console.WriteLine($"{amount}   -   time: {stopwatch.Elapsed}");
-            }
+            stopwatch.Start();
+            Search.Main(pos, depth, out int amount); //Search all moves, in given depth
+            stopwatch.Stop();
+
+            amountPos = amount;
+            Console.WriteLine($"{amount}   -   time: {stopwatch.Elapsed}");
         }
     }
 }

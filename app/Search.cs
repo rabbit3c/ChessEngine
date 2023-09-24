@@ -93,14 +93,11 @@ namespace ChessEngine
 
             List<int> moves = Pieces[i].piece switch
             {
+                Piece.Queen or Piece.Rook or Piece.Bishop => Pieces[i].LegalMoves(pos),
                 Piece.King => King.LegalMoves(Pieces[i], pos),
-                Piece.Queen => Queen.LegalMoves(Pieces[i], pos),
-                Piece.Bishop => Bishop.LegalMoves(Pieces[i], pos),
-                Piece.Rook => Rook.LegalMoves(Pieces[i], pos),
                 Piece.Knight => Knight.LegalMoves(Pieces[i], pos),
                 _ => Pawn.LegalMoves(Pieces[i], pos),
             };
-            //Console.WriteLine($"{Pieces[i].piece}, {n}");
             return NewPos.New(pos, Pieces[i], moves, lastDepth);
         }
     }

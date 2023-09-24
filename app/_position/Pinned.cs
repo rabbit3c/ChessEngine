@@ -27,6 +27,7 @@ namespace ChessEngine
             foreach (Square square in squares)
             {
                 if (square.empty) continue;
+
                 square.pin = square.IsPinned(this);
                 Board[square.pin.pinningPiece].pinnedPiece = square.pos;
             }
@@ -121,26 +122,6 @@ namespace ChessEngine
                     func(diagonal, pos1, remainder == 0 ? 2 : 3);
                     return;
                 }
-            }
-        }
-
-        void RemovePinFromPiece(Square[] squares, int posPiece, int _)
-        {
-            foreach (Square square in squares)
-            {
-                if (square.empty) continue;
-
-                if (square.isWhite != WhitesTurn) continue;
-
-                if (!square.pin.pinned) continue;
-
-                if (square.pin.pinningPiece == posPiece)
-                {
-                    square.pin = square.IsPinned(this);
-
-                    return;
-                }
-
             }
         }
 
