@@ -76,7 +76,7 @@ namespace ChessEngine
                 {
                     newPos.RemovePin(MovedPiece.piece, MovedPiece.pos); //Check if piece is unpinning a piece
                 }
-                
+
                 if (MovedPiece.piece != Piece.King)
                 {
                     newPos.RecalculatePins(MovedPiece.pos); //Check if piece creates a new pin because it moves out of the way
@@ -85,7 +85,7 @@ namespace ChessEngine
 
                 if (enPassant)
                 {
-                    newPos.RecalculatePins(oldPos.EnPassantTarget);
+                    newPos.InitializePins(); //Recalculating all Pins, I'm too lazy to make this more efficient for the moment
                 }
 
                 newPos.doubleCheck = false;
@@ -103,9 +103,9 @@ namespace ChessEngine
                 {
                     newPos.check = MovedPiece.DiscoveredCheck(newPos, move);
 
-                    if (MovedPiece.piece > Piece.Knight && MovedPiece.piece < Piece.King)
+                    if (newPos.Board[move].piece > Piece.Knight && newPos.Board[move].piece < Piece.King)
                     {
-                        newPos.NewPin(MovedPiece.piece, move); //Check if there is a new pin;
+                        newPos.NewPin(newPos.Board[move].piece, move); //Check if there is a new pin;
                     }
                 }
 
@@ -158,7 +158,8 @@ namespace ChessEngine
         public static void MovePiece(Position oldPos, List<Position> newPositions, Piece MovedPiece, int move)
         {
             Piece newPiece = (Piece)MovedPiece.CopyPiece();
-            if (oldPos.VerifyPin(MovedPiece, move)) {
+            if (oldPos.VerifyPin(MovedPiece, move))
+            {
                 newPiece.pin = MovedPiece.pin;
             }
 

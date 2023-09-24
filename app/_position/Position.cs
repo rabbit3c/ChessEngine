@@ -79,7 +79,7 @@ namespace ChessEngine
 
                 foreach (int i in OwnPieces()) {
                     if (Board[i].pin.pinningPiece == piece.pos) {
-                        Board[i].pin = new();
+                        Board[i].pin = Pin.Default();
                     }
                 }
             }

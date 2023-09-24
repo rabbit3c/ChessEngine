@@ -6,7 +6,7 @@ namespace ChessEngine
 
         public static List<int> LegalMoves(Piece piece, Position pos)
         {
-            Pin pin = piece.IsPinned(pos);
+            Pin pin = piece.pin;
 
             if (!pin.pinned)
             {

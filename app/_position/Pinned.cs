@@ -19,7 +19,7 @@ namespace ChessEngine
 
         public void CalculatePins(int i, int posKing)
         { //i: y+, y-, x+, x-, x+y+, x-y-, x-y+, x+y-
-            int[] directions = { 8, -8, 1, -1, 9, -9, 7, -7 };
+            int[] directions = { 8, -8, -1, 1, 9, -9, 7, -7 };
             Func<int, int, bool, Square[]>[] functions = {GetFile, GetFile, GetRank, GetRank, GetDiagonal, GetDiagonal, GetDiagonal, GetDiagonal };
             Square[] squares = functions[i](posKing + directions[i], posKing + directions[i] * PrecomputedData.numSquareToEdge[posKing][i], true);
             foreach (Square square in squares)
@@ -72,7 +72,7 @@ namespace ChessEngine
                 }
                 else if (posKing.Y() == pos.Y())
                 {
-                    CalculatePins(pos > posKing ? 2 : 3, posKing);
+                    CalculatePins(pos > posKing ? 3 : 2, posKing);
                 }
                 else if (pos.Diagonal(posKing))
                 {
@@ -114,7 +114,7 @@ namespace ChessEngine
                 {
                     Square[] diagonal = GetDiagonal(pos1, pos2);
                     Math.DivRem(pos1 - pos2, 9, out int remainder);
-                    func(diagonal, pos1, remainder == 9 ? 2 : 3);
+                    func(diagonal, pos1, remainder == 0 ? 2 : 3);
                     return;
                 }
             }

@@ -9,7 +9,7 @@ namespace ChessEngine
         public int pos;
         public bool isWhite;
         public int piece;
-        public Pin pin = new();
+        public Pin pin = Pin.Default();
         public const int Pawn = 0;
         public const int Knight = 1;
         public const int Bishop = 2;
