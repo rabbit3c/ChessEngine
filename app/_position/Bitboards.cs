@@ -48,13 +48,13 @@ namespace ChessEngine
             NotInLine = false;
             ulong mask = (ulong)Math.Pow(2, Math.Max(pos1, pos2)) - (ulong)Math.Pow(2, Math.Min(pos2, pos1) + 1); //mask of every square between two indices
             //Console.WriteLine(mask);
-            if (pos1.X() == pos2.X())
+            if (pos1.HorizontalTo(pos2))
             {
                 mask &= file << pos1.X();
             }
-            else if (pos1.Y() == pos2.Y())
+            else if (pos1.VerticalTo(pos2))
             {
-                mask &= rank << pos1.Y() * 8;
+                mask &= rank << (pos1.Y() << 3);
             }
             else if (pos1.Diagonal(pos2))
             {
@@ -64,20 +64,20 @@ namespace ChessEngine
                 if (rem9 == 0)
                 {
                     if (x >= y)
-                        mask &= diagonalP >> (x - y) * 8;
+                        mask &= diagonalP >> ((x - y) << 3);
                     else
-                        mask &= diagonalP << (y - x) * 8;
+                        mask &= diagonalP << ((y - x) << 3);
                 }
                 else
                 {
                     int z = 7 - x;
                     if (z >= y)
                     {
-                        mask &= diagonalS >> (z - y) * 8;
+                        mask &= diagonalS >> ((z - y) << 3);
                     }
                     else
                     {
-                        mask &= diagonalS << (y - z) * 8;
+                        mask &= diagonalS << ((y - z) << 3);
                     }
                 }
             }

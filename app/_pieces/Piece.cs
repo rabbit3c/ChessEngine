@@ -36,9 +36,9 @@ namespace ChessEngine
         public bool DiscoveredCheck(Position position, int move)
         {
             int posKing = position.OwnKing();
-            if (pos.X() == posKing.X())
+            if (pos.HorizontalTo(posKing))
             {
-                if (posKing.X() != move.X())
+                if (!move.HorizontalTo(posKing))
                 {
                     if (Move.NothingInTheWay(posKing, pos, position))
                     {
@@ -47,9 +47,9 @@ namespace ChessEngine
                     }
                 }
             }
-            else if (pos.Y() == posKing.Y())
+            else if (pos.VerticalTo(posKing))
             {
-                if (posKing.Y() != move.Y())
+                if (!move.VerticalTo(posKing))
                 {
                     if (Move.NothingInTheWay(posKing, pos, position))
                     {
@@ -87,7 +87,7 @@ namespace ChessEngine
 
             int posKing = isWhite ? position.WhiteKing : position.BlackKing;
 
-            if (pos.X() == posKing.X())
+            if (pos.HorizontalTo(posKing))
             {
                 if (Move.NothingInTheWay(posKing, pos, position))
                 {
@@ -98,7 +98,7 @@ namespace ChessEngine
                     pin.allowedDirections[0] = true;
             }
 
-            else if (pos.Y() == posKing.Y())
+            else if (pos.VerticalTo(posKing))
             {
                 if (Move.NothingInTheWay(posKing, pos, position))
                 {

@@ -21,7 +21,7 @@ namespace ChessEngine
             int posKing = OwnKing();
             if (piece.piece == Piece.Queen || piece.piece == Piece.Rook)
             {
-                if (posKing.X() == piece.pos.X() || posKing.Y() == piece.pos.Y())
+                if (piece.pos.HorizontalTo(posKing) || piece.pos.VerticalTo(posKing))
                 {
                     return Move.NothingInTheWay(posKing, piece.pos, this);
                 }
@@ -61,12 +61,12 @@ namespace ChessEngine
         {
             foreach (int i in Pieces)
             {
-                if (i.X() == posKing.X() && (Board[i].piece == Piece.Rook || Board[i].piece == Piece.Queen))
+                if (i.HorizontalTo(posKing) && (Board[i].piece == Piece.Rook || Board[i].piece == Piece.Queen))
                 {
                     if (Move.NothingInTheWay(posKing, i, this))
                         return true;
                 }
-                else if (i.Y() == posKing.Y() && (Board[i].piece == Piece.Rook || Board[i].piece == Piece.Queen))
+                else if (i.VerticalTo(posKing) && (Board[i].piece == Piece.Rook || Board[i].piece == Piece.Queen))
                 {
                     if (Move.NothingInTheWay(posKing, i, this))
                     {

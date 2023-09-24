@@ -42,11 +42,11 @@ namespace ChessEngine
 
             if (move == piece.pin.pinningPiece) return false;
 
-            if (piece.pos.X() == move.X()) {
-                if (piece.pos.X() == posKing.X()) return true;
+            if (piece.pos.HorizontalTo(move)) {
+                if (piece.pos.HorizontalTo(posKing)) return true;
             }
-            if (piece.pos.Y() == move.Y()) {
-                if (piece.pos.Y() == posKing.Y()) return true;
+            if (piece.pos.VerticalTo(move)) {
+                if (piece.pos.VerticalTo(posKing)) return true;
             }
             else if (piece.pos.Diagonal(move)) {
                 if (piece.pos.Diagonal(posKing)) return true;
@@ -66,11 +66,11 @@ namespace ChessEngine
 
             foreach (int posKing in posisitionsKings)
             {
-                if (posKing.X() == pos.X())
+                if (posKing.HorizontalTo(pos))
                 {
                     CalculatePins(pos > posKing ? 0 : 1, posKing);
                 }
-                else if (posKing.Y() == pos.Y())
+                else if (posKing.VerticalTo(pos))
                 {
                     CalculatePins(pos > posKing ? 3 : 2, posKing);
                 }
@@ -93,14 +93,14 @@ namespace ChessEngine
         {
             if (piece == Piece.Queen || piece == Piece.Rook)
             {
-                if (pos1.X() == pos2.X())
+                if (pos1.HorizontalTo(pos2))
                 {
                     Square[] rank = GetFile(pos1, pos2);
                     func(rank, pos1, 0);
                     return;
                 }
 
-                if (pos1.Y() == pos2.Y())
+                if (pos1.VerticalTo(pos2))
                 {
                     Square[] file = GetRank(pos1, pos2);
                     func(file, pos1, 1);
