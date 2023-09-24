@@ -87,7 +87,7 @@ namespace ChessEngine
 
                 if (enPassant)
                 {
-                    newPos.InitializePins(); //Recalculating all Pins, I'm too lazy to make this more efficient for the moment
+                    newPos.RecalculatePins(oldPos.EnPassantTarget + (MovedPiece.isWhite ? -8 : 8));
                 }
 
                 newPos.doubleCheck = false;
@@ -109,10 +109,13 @@ namespace ChessEngine
                     {
                         newPos.NewPin(newPos.Board[move].piece, move); //Check if there is a new pin;
                     }
-                }
 
-                if (enPassant)
-                    newPos.check = true; //Changing check to be true in case of en Passant Discovered Attack, I'm too lazy to check explicitly for the moment
+                    if (enPassant) {
+                        if (oldPos.Board[oldPos.EnPassantTarget].DiscoveredCheck(newPos, move)) {
+                            newPos.check = true;
+                        }
+                    }
+                }
 
                 newPos.hashesThreeFold.Add(newPos.hash);
             }

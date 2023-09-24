@@ -19,17 +19,21 @@ namespace ChessEngine
             }
         }
 
-        public void CalculatePins(int i, int posKing)
+        public void CalculatePins(int pos, int i, int posKing)
         { //i: y+, y-, x+, x-, x+y+, x-y-, x-y+, x+y-
             int[] directions = { 8, -8, -1, 1, 9, -9, 7, -7 };
             Func<int, int, bool, Square[]>[] functions = {GetFile, GetFile, GetRank, GetRank, GetDiagonal, GetDiagonal, GetDiagonal, GetDiagonal };
             Square[] squares = functions[i](posKing + directions[i], posKing + directions[i] * PrecomputedData.numSquareToEdge[posKing][i], true);
-            foreach (Square square in squares)
-            {
-                if (square.empty) continue;
 
-                square.pin = square.IsPinned(this);
-                Board[square.pin.pinningPiece].pinnedPiece = square.pos;
+            bool asc = directions[i] > 0;
+            
+            for (int n = asc ? 0 : squares.Length - 1; asc ? n < squares.Length : n >= 0; n += asc ? 1 : -1) {
+                if (squares[n].empty) continue;
+
+                squares[n].pin = squares[n].IsPinned(this);
+                Board[squares[n].pin.pinningPiece].pinnedPiece = squares[n].pos;
+
+                if (squares[n].pos != pos) return; //There is no need to continue to look if this piece isn't the moved Piece
             }
         }
 
@@ -73,22 +77,22 @@ namespace ChessEngine
             {
                 if (posKing.HorizontalTo(pos))
                 {
-                    CalculatePins(pos > posKing ? 0 : 1, posKing);
+                    CalculatePins(pos, pos > posKing ? 0 : 1, posKing);
                 }
                 else if (posKing.VerticalTo(pos))
                 {
-                    CalculatePins(pos > posKing ? 3 : 2, posKing);
+                    CalculatePins(pos, pos > posKing ? 3 : 2, posKing);
                 }
                 else if (pos.Diagonal(posKing))
                 {
                     Math.DivRem(pos - posKing, 9, out int remainder);
                     if (remainder == 0)
                     {
-                        CalculatePins(pos > posKing ? 4 : 5, posKing);
+                        CalculatePins(pos, pos > posKing ? 4 : 5, posKing);
                     }
                     else
                     {
-                        CalculatePins(pos > posKing ? 6 : 7, posKing);
+                        CalculatePins(pos, pos > posKing ? 6 : 7, posKing);
                     }
                 }
             }

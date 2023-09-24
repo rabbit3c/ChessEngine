@@ -1,4 +1,6 @@
 
+using System.Diagnostics;
+
 namespace ChessEngine
 {
     class Search
@@ -66,23 +68,25 @@ namespace ChessEngine
             List<Position> newPositions = new();
             List<int> ownPieces = pos.OwnPieces();
 
-            //Multithreading
-            Parallel.For(0, ownPieces.Count, i =>
+            if (Debugger.IsAttached) //Single Threading for Debug Mode
             {
-                List<Position> positions = GenerateMoves(pos, ownPieces[i], lastDepth);
-                lock (syncRoot)
+                for (int i = 0; i < ownPieces.Count; i++)
                 {
+                    List<Position> positions = GenerateMoves(pos, ownPieces[i], lastDepth);
                     newPositions.AddRange(positions);
                 }
-            });
-
-            //Single Thread
-            /*for( int i = 0; i < ownPieces.Count; i ++)
+            }
+            else //Multithreading
             {
-                List<Position> positions = GenerateMoves(pos, ownPieces[i]);
-                newPositions.AddRange(positions);
-            }*/
-            
+                Parallel.For(0, ownPieces.Count, i => {
+                    List<Position> positions = GenerateMoves(pos, ownPieces[i], lastDepth);
+                    lock (syncRoot)
+                    {
+                        newPositions.AddRange(positions);
+                    }
+                });
+            }
+
             return newPositions;
         }
 
