@@ -4,17 +4,17 @@ namespace ChessEngine
     class NewPos
     {
 
-        public static List<Position> New(Position oldPos, Piece Piece, List<int> moves)
+        public static List<Position> New(Position oldPos, Piece Piece, List<int> moves, bool lastDepth)
         {
             List<Position> newPositions = new();
             foreach (int move in moves)
             {
-                newPositions.AddRange(Format(oldPos, Piece, move));
+                newPositions.AddRange(Format(oldPos, Piece, move, lastDepth));
             }
             return newPositions;
         }
 
-        public static List<Position> Format(Position oldPos, Piece MovedPiece, int move)
+        public static List<Position> Format(Position oldPos, Piece MovedPiece, int move, bool lastDepth)
         {
             List<Position> newPositions = new()
             {
@@ -25,7 +25,7 @@ namespace ChessEngine
 
             bool enPassant = MovedPiece.piece == Piece.Pawn && move == oldPos.EnPassantTarget;
 
-            //Move Piece
+            //Move Pieces
             MovePiece(oldPos, newPositions, MovedPiece, move);
 
             //Castle and remove Castling Rights
@@ -63,6 +63,8 @@ namespace ChessEngine
                     return newPositions;
                 }
             }
+
+            if (lastDepth) return newPositions; //if this is the last depth, checks and pins don't have to be calculated
 
             foreach (Position newPos in newPositions)
             {

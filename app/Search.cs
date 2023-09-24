@@ -10,7 +10,7 @@ namespace ChessEngine
 
             if (depth == 0)
             {
-                GeneratePositions(position, out int n);
+                GeneratePositions(position, out int n, true);
                 AmountPos = n;
                 return;
             }
@@ -41,26 +41,26 @@ namespace ChessEngine
                 AmountPos += AmountNewPos;
             }
         }
-        public static List<Position> GeneratePositions(Position pos, out int newPos)
+        public static List<Position> GeneratePositions(Position pos, out int newPos, bool lastDepth = false)
         {
             Square[] Pieces = pos.Board;
             List<Position> newPositions = new();
 
             if (!pos.doubleCheck)
             {
-                newPositions.AddRange(ParallelGeneration(pos));
+                newPositions.AddRange(ParallelGeneration(pos, lastDepth));
             }
             else //if there is a double check, the King has to move
             {
                 int posKing = pos.OwnKing();
                 List<int> moves = King.LegalMoves(Pieces[posKing], pos);
-                newPositions.AddRange(NewPos.New(pos, Pieces[posKing], moves));
+                newPositions.AddRange(NewPos.New(pos, Pieces[posKing], moves, lastDepth));
             }
             newPos = newPositions.Count;
             return newPositions;
         }
 
-        public static List<Position> ParallelGeneration(Position pos)
+        public static List<Position> ParallelGeneration(Position pos, bool lastDepth)
         {
             var syncRoot = new object();
             List<Position> newPositions = new();
@@ -69,7 +69,7 @@ namespace ChessEngine
             //Multithreading
             Parallel.For(0, ownPieces.Count, i =>
             {
-                List<Position> positions = GenerateMoves(pos, ownPieces[i]);
+                List<Position> positions = GenerateMoves(pos, ownPieces[i], lastDepth);
                 lock (syncRoot)
                 {
                     newPositions.AddRange(positions);
@@ -86,7 +86,7 @@ namespace ChessEngine
             return newPositions;
         }
 
-        public static List<Position> GenerateMoves(Position pos, int i)
+        public static List<Position> GenerateMoves(Position pos, int i, bool lastDepth)
         {
 
             Square[] Pieces = pos.Board;
@@ -101,7 +101,7 @@ namespace ChessEngine
                 _ => Pawn.LegalMoves(Pieces[i], pos),
             };
             //Console.WriteLine($"{Pieces[i].piece}, {n}");
-            return NewPos.New(pos, Pieces[i], moves);
+            return NewPos.New(pos, Pieces[i], moves, lastDepth);
         }
     }
 }
