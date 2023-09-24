@@ -10,6 +10,7 @@ namespace ChessEngine
         public bool isWhite;
         public int piece;
         public Pin pin = Pin.Default();
+        public int pinnedPiece = -1;
         public const int Pawn = 0;
         public const int Knight = 1;
         public const int Bishop = 2;

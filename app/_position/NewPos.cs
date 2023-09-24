@@ -76,7 +76,7 @@ namespace ChessEngine
                 else if (MovedPiece.piece == Piece.Pawn) { }
                 else
                 {
-                    newPos.RemovePin(MovedPiece.piece, MovedPiece.pos); //Check if piece is unpinning a piece
+                    newPos.RemovePin(MovedPiece.pinnedPiece); //Check if piece is unpinning a piece
                 }
 
                 if (MovedPiece.piece != Piece.King)

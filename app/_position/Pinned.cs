@@ -9,11 +9,13 @@ namespace ChessEngine
             {
                 Pin pin = Board[piece].IsPinned(this);
                 Board[piece].pin = pin;
+                Board[pin.pinningPiece].pinnedPiece = piece;
             }
             foreach (int piece in PiecesBlack)
             {
                 Pin pin = Board[piece].IsPinned(this);
                 Board[piece].pin = pin;
+                Board[pin.pinningPiece].pinnedPiece = piece;
             }
         }
 
@@ -26,6 +28,7 @@ namespace ChessEngine
             {
                 if (square.empty) continue;
                 square.pin = square.IsPinned(this);
+                Board[square.pin.pinningPiece].pinnedPiece = square.pos;
             }
         }
 
@@ -54,10 +57,11 @@ namespace ChessEngine
             return false;
         }
 
-        public void RemovePin(int piece, int pos)
+        public void RemovePin(int pinnedPiece)
         {
-            int posKing = OwnKing();
-            LoopDirections(piece, pos, posKing, RemovePinFromPiece);
+            if (pinnedPiece == -1) return;
+
+            Board[pinnedPiece].pin = Board[pinnedPiece].IsPinned(this);
         }
 
         public void RecalculatePins(int pos)
@@ -133,6 +137,7 @@ namespace ChessEngine
                 if (square.pin.pinningPiece == posPiece)
                 {
                     square.pin = square.IsPinned(this);
+
                     return;
                 }
 
@@ -161,6 +166,7 @@ namespace ChessEngine
                 };
                 pin.allowedDirections[direction] = true;
                 Board[pinnedPiece].pin = pin;
+                Board[pin.pinningPiece].pinnedPiece = pinnedPiece;
             }
         }
     }
