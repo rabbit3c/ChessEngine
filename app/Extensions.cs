@@ -28,11 +28,11 @@ namespace ChessEngine
             return Math.Abs(pos1.X() - pos2.X()) == Math.Abs(pos1.Y() - pos2.Y());
         }
 
-        public static bool HorizontalTo (this int pos1, int pos2) {
+        public static bool VerticalTo (this int pos1, int pos2) {
             return ((pos1 ^ pos2) & 0b_111) == 0;
         }
 
-        public static bool VerticalTo (this int pos1, int pos2) {
+        public static bool HorizontalTo (this int pos1, int pos2) {
             return ((pos1 ^ pos2) & 0b_111_000)== 0;
         }
     }

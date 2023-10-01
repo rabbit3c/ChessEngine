@@ -46,11 +46,11 @@ namespace ChessEngine
             NotInLine = false;
             ulong mask = (ulong)Math.Pow(2, Math.Max(pos1, pos2)) - (ulong)Math.Pow(2, Math.Min(pos2, pos1) + 1); //mask of every square between two indices
             //Console.WriteLine(mask);
-            if (pos1.HorizontalTo(pos2))
+            if (pos1.VerticalTo(pos2))
             {
                 mask &= file << pos1.X();
             }
-            else if (pos1.VerticalTo(pos2))
+            else if (pos1.HorizontalTo(pos2))
             {
                 mask &= rank << (pos1.Y() << 3);
             }

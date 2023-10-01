@@ -36,18 +36,18 @@ namespace ChessEngine
         public bool DiscoveredCheck(Position position, int move)
         {
             int posKing = position.OwnKing();
-            if (pos.HorizontalTo(posKing))
+            if (pos.VerticalTo(posKing))
             {
-                if (move.HorizontalTo(posKing)) return false;
+                if (move.VerticalTo(posKing)) return false;
 
                 if (!Move.NothingInTheWay(posKing, pos, position)) return false;
 
                 Square[] file = pos < posKing ? position.GetFile(pos.X(), pos - 8, true) : position.GetFile(pos + 8, pos.X() + 56, true);
                 return CheckSquares(file, posKing, Rook, isWhite, out int _);
             }
-            else if (pos.VerticalTo(posKing))
+            else if (pos.HorizontalTo(posKing))
             {
-                if (move.VerticalTo(posKing)) return false;
+                if (move.HorizontalTo(posKing)) return false;
 
                 if (!Move.NothingInTheWay(posKing, pos, position)) return false;
 
@@ -81,7 +81,7 @@ namespace ChessEngine
 
             int posKing = isWhite ? position.WhiteKing : position.BlackKing;
 
-            if (pos.HorizontalTo(posKing))
+            if (pos.VerticalTo(posKing))
             {
                 if (Move.NothingInTheWay(posKing, pos, position))
                 {
@@ -92,7 +92,7 @@ namespace ChessEngine
                     pin.allowedDirections[0] = true;
             }
 
-            else if (pos.VerticalTo(posKing))
+            else if (pos.HorizontalTo(posKing))
             {
                 if (Move.NothingInTheWay(posKing, pos, position))
                 {
