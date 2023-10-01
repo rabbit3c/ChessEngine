@@ -3,19 +3,26 @@ namespace ChessEngine
 {
     partial class Position
     {
-        public void InitializePins()
+        public void InitializePins(bool white = true, bool black = true)
         {
-            foreach (int piece in PiecesWhite)
+            if (white)
             {
-                Pin pin = Board[piece].IsPinned(this);
-                Board[piece].pin = pin;
-                Board[pin.pinningPiece].pinnedPiece = piece;
+                foreach (int piece in PiecesWhite)
+                {
+                    Pin pin = Board[piece].IsPinned(this);
+                    Board[piece].pin = pin;
+                    Board[pin.pinningPiece].pinnedPiece = piece;
+                }
             }
-            foreach (int piece in PiecesBlack)
+
+            if (black)
             {
-                Pin pin = Board[piece].IsPinned(this);
-                Board[piece].pin = pin;
-                Board[pin.pinningPiece].pinnedPiece = piece;
+                foreach (int piece in PiecesBlack)
+                {
+                    Pin pin = Board[piece].IsPinned(this);
+                    Board[piece].pin = pin;
+                    Board[pin.pinningPiece].pinnedPiece = piece;
+                }
             }
         }
 
@@ -31,7 +38,11 @@ namespace ChessEngine
             {
                 if (squares[n].empty) continue;
 
-                if (squares[n].isWhite != Board[posKing].isWhite) continue;
+                if (squares[n].isWhite != Board[posKing].isWhite)
+                {
+                    if (squares[n].pos == pos) continue;
+                    return;
+                }
 
                 squares[n].pin = IsPinned(squares[n], asc ? squares[(n + 1)..] : squares[..n], i);
                 Board[squares[n].pin.pinningPiece].pinnedPiece = squares[n].pos;
@@ -56,7 +67,8 @@ namespace ChessEngine
 
             pin.pinned = CheckSquares(squares, posKing, i < 4 ? Piece.Rook : Piece.Bishop, !piece.isWhite, pos, out pin.pinningPiece);
 
-            if (pin.pinned) {
+            if (pin.pinned)
+            {
                 pin.allowedDirections[Math.DivRem(i, 2, out _)] = true;
                 return pin;
             }
@@ -90,23 +102,20 @@ namespace ChessEngine
         public bool VerifyPin(Piece piece, int move)
         {
             int posKing = piece.isWhite ? WhiteKing : BlackKing;
+            Func<int, int, bool>[] funcsAlignment = { Extensions.VerticalTo, Extensions.HorizontalTo, Extensions.Diagonal };
 
             if (!piece.pin.pinned) return false;
 
             if (move == piece.pin.pinningPiece) return false;
 
-            if (piece.pos.VerticalTo(move))
+            foreach (Func<int, int, bool> funcAlignment in funcsAlignment)
             {
-                if (piece.pos.VerticalTo(posKing)) return true;
+                if (funcAlignment(piece.pos, move))
+                {
+                    if (funcAlignment(piece.pos, posKing)) return true;
+                }
             }
-            if (piece.pos.HorizontalTo(move))
-            {
-                if (piece.pos.HorizontalTo(posKing)) return true;
-            }
-            else if (piece.pos.Diagonal(move))
-            {
-                if (piece.pos.Diagonal(posKing)) return true;
-            }
+
             return false;
         }
 
@@ -117,33 +126,85 @@ namespace ChessEngine
             Board[pinnedPiece].pin = Board[pinnedPiece].IsPinned(this);
         }
 
-        public void RecalculatePins(int pos)
+        public void RecalculatePins(int pos, int move, bool capture = false)
         {
             int[] positionsKings = { WhiteKing, BlackKing };
 
+            Func<int, int, bool>[] funcsAlignment = { Extensions.VerticalTo, Extensions.HorizontalTo, Extensions.Diagonal };
+            Func<int, int, bool>[] funcsPin = { VerticalPin, HorizontalPin, DiagonalPin, VerticalPin, HorizontalPin };
+
             foreach (int posKing in positionsKings)
             {
-                if (posKing.VerticalTo(pos))
+                bool aligned = false;
+                for (int i = 0; i < 3; i++)
                 {
-                    CalculatePins(pos, pos > posKing ? 0 : 1, posKing);
-                }
-                else if (posKing.HorizontalTo(pos))
-                {
-                    CalculatePins(pos, pos > posKing ? 3 : 2, posKing);
-                }
-                else if (pos.Diagonal(posKing))
-                {
-                    Math.DivRem(pos - posKing, 9, out int remainder);
-                    if (remainder == 0)
+                    if (funcsAlignment[i](pos, move))
                     {
-                        CalculatePins(pos, pos > posKing ? 4 : 5, posKing);
+                        if (funcsPin[i + 1](posKing, pos))
+                        {
+                            funcsPin[i + 2](posKing, move);
+                        }
+                        else if (funcsPin[i + 2](posKing, pos))
+                        {
+                            funcsPin[i + 1](posKing, move);
+                        }
+                        else if (funcsPin[i + 1](posKing, move)) { }
+                        else if (funcsPin[i + 2](posKing, move)) { }
+
+                        if (capture)
+                        {
+                            funcsPin[i](posKing, pos);
+                            funcsPin[i](posKing, move);
+                        }
+
+                        aligned = true;
+                        break;
                     }
-                    else
-                    {
-                        CalculatePins(pos, pos > posKing ? 6 : 7, posKing);
-                    }
+                }
+
+                if (aligned) continue;
+
+                foreach (Func<int, int, bool> funcPin in funcsPin)
+                {
+                    if (funcPin(posKing, pos)) break;
+                }
+
+                foreach (Func<int, int, bool> funcPin in funcsPin)
+                {
+                    if (funcPin(posKing, move)) break;
                 }
             }
+        }
+
+        public bool VerticalPin(int posKing, int pos)
+        {
+            if (!posKing.VerticalTo(pos)) return false;
+            CalculatePins(pos, pos > posKing ? 0 : 1, posKing);
+            return true;
+        }
+
+        public bool HorizontalPin(int posKing, int pos)
+        {
+            if (!posKing.HorizontalTo(pos)) return false;
+            CalculatePins(pos, pos > posKing ? 3 : 2, posKing);
+            return true;
+        }
+
+        public bool DiagonalPin(int posKing, int pos)
+        {
+            if (!pos.Diagonal(posKing)) return false;
+
+            Math.DivRem(pos - posKing, 9, out int remainder);
+            if (remainder == 0)
+            {
+                CalculatePins(pos, pos > posKing ? 4 : 5, posKing);
+
+            }
+            else
+            {
+                CalculatePins(pos, pos > posKing ? 6 : 7, posKing);
+            }
+            return true;
         }
 
         void LoopDirections(int piece, int pos1, int pos2, Action<Square[], int, int, bool> func)
