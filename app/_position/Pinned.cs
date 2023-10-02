@@ -30,24 +30,78 @@ namespace ChessEngine
         { //i: y+, y-, x+, x-, x+y+, x-y-, x-y+, x+y-
             int[] directions = { 8, -8, -1, 1, 9, -9, 7, -7 };
             Func<int, int, bool, Square[]>[] functions = { GetFile, GetFile, GetRank, GetRank, GetDiagonal, GetDiagonal, GetDiagonal, GetDiagonal };
-            Square[] squares = functions[i](posKing + directions[i], posKing + directions[i] * PrecomputedData.numSquareToEdge[posKing][i], true);
 
             bool asc = directions[i] > 0;
 
-            for (int n = asc ? 0 : squares.Length - 1; asc ? n < squares.Length - 1 : n > 0; n += asc ? 1 : -1)
+            if (!Board[pos].empty)
             {
-                if (squares[n].empty) continue;
-
-                if (squares[n].isWhite != Board[posKing].isWhite)
+                if (!Move.NothingInTheWay(pos, posKing, this))
                 {
-                    if (squares[n].pos == pos) continue;
-                    return;
+                    if (posKing == pos) return;
+                    Square[] squares = functions[i](posKing, pos, false);
+
+                    for (int n = asc ? 0 : squares.Length - 1; asc ? n < squares.Length : n >= 0; n += asc ? 1 : -1)
+                    {
+                        if (squares[n].empty) continue;
+
+                        if (squares[n].isWhite != Board[posKing].isWhite) return;
+
+                        if (squares[n].pin.pinningPiece == pos) return;
+
+                        if (squares[n].pin.pinningPiece < pos && asc) return;
+
+                        if (squares[n].pin.pinningPiece > pos && !asc) return;
+
+                        squares[n].pin = Pin.Default();
+
+                        return; //Stop after first piece
+                    }
                 }
+                else
+                {
+                    Square[] squares = functions[i](pos + directions[i], pos + directions[i] * PrecomputedData.numSquareToEdge[pos][i], true);
 
-                squares[n].pin = IsPinned(squares[n], asc ? squares[(n + 1)..] : squares[..n], i);
-                Board[squares[n].pin.pinningPiece].pinnedPiece = squares[n].pos;
+                    for (int n = asc ? 0 : squares.Length - 1; asc ? n < squares.Length - 1 : n > 0; n += asc ? 1 : -1)
+                    {
+                        if (squares[n].empty) continue;
 
-                if (squares[n].pos != pos) return; //There is no need to continue to look if this piece isn't the moved Piece
+                        if (squares[n].isWhite != Board[posKing].isWhite)
+                        {
+                            if (Board[pos].isWhite != Board[posKing].isWhite) return;
+
+                            if (squares[n].piece != (i < 4 ? Piece.Rook : Piece.Bishop)) return;
+
+                            Board[pos].pin = new()
+                            {
+                                pinned = true,
+                                pinningPiece = squares[n].pos
+                            };
+                            Board[pos].pin.allowedDirections[Math.DivRem(i, 2, out _)] = true;
+                            Board[Board[pos].pin.pinningPiece].pinnedPiece = pos;
+                            
+                            return;
+                        }
+
+                        squares[n].pin = Pin.Default();
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                Square[] squares = functions[i](posKing + directions[i], posKing + directions[i] * PrecomputedData.numSquareToEdge[posKing][i], true);
+
+                for (int n = asc ? 0 : squares.Length - 1; asc ? n < squares.Length - 1 : n > 0; n += asc ? 1 : -1)
+                {
+                    if (squares[n].empty) continue;
+
+                    if (squares[n].isWhite != Board[posKing].isWhite) return;
+
+                    squares[n].pin = IsPinned(squares[n], asc ? squares[(n + 1)..] : squares[..n], i);
+                    Board[squares[n].pin.pinningPiece].pinnedPiece = squares[n].pos;
+
+                    return; //Stop after first piece
+                }
             }
         }
 

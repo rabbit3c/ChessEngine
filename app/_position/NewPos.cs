@@ -74,13 +74,17 @@ namespace ChessEngine
                 }
                 else if (MovedPiece.piece == Piece.Knight) { }
                 else if (MovedPiece.piece == Piece.Pawn) { }
-                else
+                else    
                 {
                     newPos.RemovePin(MovedPiece.pinnedPiece); //Check if piece is unpinning a piece
                 }
 
+                if (newPos.Board[move].piece > Piece.Knight && newPos.Board[move].piece < Piece.King)
+                {
+                    newPos.NewPin(newPos.Board[move].piece, move); //Check if there is a new pin;
+                }
+
                 newPos.RecalculatePins(MovedPiece.pos, move, oldPos.Board[move].empty); //Check if piece creates a new pin because it moves out of the way
-                newPos.RecalculatePins(move, MovedPiece.pos, oldPos.Board[move].empty); //Check if piece moves in the way of a pin
 
                 if (enPassant)
                 {
@@ -102,13 +106,10 @@ namespace ChessEngine
                 {
                     newPos.check = MovedPiece.DiscoveredCheck(newPos, move);
 
-                    if (newPos.Board[move].piece > Piece.Knight && newPos.Board[move].piece < Piece.King)
+                    if (enPassant)
                     {
-                        newPos.NewPin(newPos.Board[move].piece, move); //Check if there is a new pin;
-                    }
-
-                    if (enPassant) {
-                        if (oldPos.Board[oldPos.EnPassantTarget].DiscoveredCheck(newPos, move)) {
+                        if (oldPos.Board[oldPos.EnPassantTarget].DiscoveredCheck(newPos, move))
+                        {
                             newPos.check = true;
                         }
                     }
