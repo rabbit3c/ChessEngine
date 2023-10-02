@@ -7,6 +7,7 @@ namespace ChessEngine
         public static List<Position> New(Position oldPos, Piece Piece, List<int> moves, bool lastDepth)
         {
             List<Position> newPositions = new();
+            
             foreach (int move in moves)
             {
                 newPositions.AddRange(Format(oldPos, Piece, move, lastDepth));

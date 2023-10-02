@@ -7,17 +7,76 @@ namespace ChessEngine
     {
         public static void Main(Position position, int depth, out int AmountPos)
         {
-            AmountPos = 0;
+            Generation(position, depth, out AmountPos);
+        }
+        public static void Generation(Position pos, int depth, out int amountPos)
+        {
+            if (!pos.doubleCheck)
+            {
+                if (depth == 1) {
+                    ParallelGeneration(pos, depth, out amountPos);
+                }
+                else {
+                    SequentialGeneration(pos, depth, out amountPos);
+                }
+            }
+            else //if there is a double check, the King has to move
+            {
+                int posKing = pos.OwnKing();
+                GeneratePositions(pos, posKing, depth, out amountPos);
+            }
+        }
+
+        public static void ParallelGeneration(Position pos, int depth, out int amountPos)
+        {
+            var syncRoot = new object();
+            List<Position> newPositions = new();
+            List<int> ownPieces = pos.OwnPieces();
+
+            if (Debugger.IsAttached) //Single Threading for Debug Mode
+            {
+                SequentialGeneration(pos, depth, out amountPos);
+            }
+            else //Multithreading
+            {
+                Parallel.For(0, ownPieces.Count, i =>
+                {
+                    List<Position> positions = GeneratePositions(pos, ownPieces[i], depth, out _);
+                    lock (syncRoot)
+                    {
+                        newPositions.AddRange(positions);
+                    }
+                });
+                amountPos = newPositions.Count;
+            }
+        }
+
+        public static void SequentialGeneration(Position pos, int depth, out int amountPos)
+        {
+            List<int> ownPieces = pos.OwnPieces();
+
+            amountPos = 0;
+
+            for (int i = 0; i < ownPieces.Count; i++)
+            {
+                GeneratePositions(pos, ownPieces[i], depth, out int amountNewPos);
+                amountPos += amountNewPos;
+            }
+        }
+
+        public static List<Position> GeneratePositions(Position pos, int i, int depth, out int amountPos)
+        {
             depth--;
 
-            if (depth == 0)
-            {
-                GeneratePositions(position, out int n, true);
-                AmountPos = n;
-                return;
+            List<int> moves = GenerateMoves(pos, i);
+            List<Position> newPositions = NewPos.New(pos, pos.Board[i], moves, depth == 0);
+
+            if (depth == 0) {
+                amountPos = newPositions.Count;
+                return newPositions;
             }
 
-            List<Position> newPositions = GeneratePositions(position, out int _);
+            amountPos = 0;
 
             foreach (Position newPosition in newPositions)
             {
@@ -32,65 +91,21 @@ namespace ChessEngine
                     }
                     else
                     {
-                        Main(newPosition, depth, out AmountNewPos);
+                        Generation(newPosition, depth, out AmountNewPos);
                     }
                 }
                 else
                 { //if not generate resulting positions and add to Transposition table
-                    Main(newPosition, depth, out AmountNewPos);
+                    Generation(newPosition, depth, out AmountNewPos);
                     Transpositions.Add(newPosition, AmountNewPos, depth, 0);
                 }
-                AmountPos += AmountNewPos;
-            }
-        }
-        public static List<Position> GeneratePositions(Position pos, out int newPos, bool lastDepth = false)
-        {
-            Square[] Pieces = pos.Board;
-            List<Position> newPositions = new();
-
-            if (!pos.doubleCheck)
-            {
-                newPositions.AddRange(ParallelGeneration(pos, lastDepth));
-            }
-            else //if there is a double check, the King has to move
-            {
-                int posKing = pos.OwnKing();
-                List<int> moves = King.LegalMoves(Pieces[posKing], pos);
-                newPositions.AddRange(NewPos.New(pos, Pieces[posKing], moves, lastDepth));
-            }
-            newPos = newPositions.Count;
-            return newPositions;
-        }
-
-        public static List<Position> ParallelGeneration(Position pos, bool lastDepth)
-        {
-            var syncRoot = new object();
-            List<Position> newPositions = new();
-            List<int> ownPieces = pos.OwnPieces();
-
-            if (Debugger.IsAttached) //Single Threading for Debug Mode
-            {
-                for (int i = 0; i < ownPieces.Count; i++)
-                {
-                    List<Position> positions = GenerateMoves(pos, ownPieces[i], lastDepth);
-                    newPositions.AddRange(positions);
-                }
-            }
-            else //Multithreading
-            {
-                Parallel.For(0, ownPieces.Count, i => {
-                    List<Position> positions = GenerateMoves(pos, ownPieces[i], lastDepth);
-                    lock (syncRoot)
-                    {
-                        newPositions.AddRange(positions);
-                    }
-                });
+                amountPos += AmountNewPos;
             }
 
             return newPositions;
         }
 
-        public static List<Position> GenerateMoves(Position pos, int i, bool lastDepth)
+        public static List<int> GenerateMoves(Position pos, int i)
         {
 
             Square[] Pieces = pos.Board;
@@ -102,7 +117,7 @@ namespace ChessEngine
                 Piece.Knight => Knight.LegalMoves(Pieces[i], pos),
                 _ => Pawn.LegalMoves(Pieces[i], pos),
             };
-            return NewPos.New(pos, Pieces[i], moves, lastDepth);
+            return moves;
         }
     }
 }
