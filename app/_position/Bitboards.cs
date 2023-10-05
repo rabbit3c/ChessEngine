@@ -34,6 +34,12 @@ namespace ChessEngine
             occupiedBB ^= (ulong)1 << (EnPassantTarget + modifier);
             emptyBB |= (ulong)1 << (EnPassantTarget + modifier);
         }
+
+        public int PieceInTheWay(int pos1, int pos2) {
+            ulong mask = Bitboards.MaskLine(pos1, pos2, out _);
+            mask &= occupiedBB;
+            return (int) Math.Log2(mask);
+        }
     }
 
     public class Bitboards

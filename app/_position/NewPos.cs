@@ -3,7 +3,6 @@ namespace ChessEngine
 {
     class NewPos
     {
-
         public static List<Position> New(Position oldPos, Piece Piece, List<int> moves, bool lastDepth)
         {
             List<Position> newPositions = new();
@@ -80,12 +79,12 @@ namespace ChessEngine
                     newPos.RemovePin(MovedPiece.pinnedPiece); //Check if piece is unpinning a piece
                 }
 
+                newPos.RecalculatePins(MovedPiece.pos, move, !oldPos.Board[move].empty); //Check if piece creates a new pin because it moves out of the way
+
                 if (newPos.Board[move].piece > Piece.Knight && newPos.Board[move].piece < Piece.King)
                 {
                     newPos.NewPin(newPos.Board[move].piece, move); //Check if there is a new pin;
                 }
-
-                newPos.RecalculatePins(MovedPiece.pos, move, oldPos.Board[move].empty); //Check if piece creates a new pin because it moves out of the way
 
                 if (enPassant)
                 {
@@ -180,8 +179,11 @@ namespace ChessEngine
 
             if (oldPos.VerifyPin(MovedPiece, move))
             {
-                newPiece.pin = MovedPiece.pin;
-                newPositions[0].Board[MovedPiece.pin.pinningPiece].pinnedPiece = move;
+                Pin pin = MovedPiece.pin;
+                newPositions[0].AddPin(move, pin, MovedPiece.isWhite);
+            }
+            else {
+                newPositions[0].DeletePin(MovedPiece.pin, MovedPiece.isWhite);
             }
 
             //check if any pawn is promoting

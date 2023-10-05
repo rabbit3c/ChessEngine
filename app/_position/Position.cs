@@ -44,7 +44,9 @@ namespace ChessEngine
                 BlackKing = BlackKing,
                 halfmoves = halfmoves,
                 emptyBB = emptyBB,
-                occupiedBB = occupiedBB
+                occupiedBB = occupiedBB, 
+                pinsWhite = pinsWhite,
+                pinsBlack = pinsBlack
             };
             return copy;
         }
@@ -71,16 +73,16 @@ namespace ChessEngine
                 halfmoves = 0; //reset 50 move rule
                 HashPiece(targetSquare);
 
+                if (targetSquare.pinnedPiece != -1)
+                    DeletePin(targetSquare.pinnedPiece);
+
+                if (targetSquare.pin.pinned)
+                    DeletePin(targetSquare.pos);
+
                 if (targetSquare.isWhite)
                     PiecesWhite.Remove(targetSquare.pos);
                 else
                     PiecesBlack.Remove(targetSquare.pos);
-
-                foreach (int i in OwnPieces()) {
-                    if (Board[i].pin.pinningPiece == piece.pos) {
-                        Board[i].pin = Pin.Default();
-                    }
-                }
             }
             else if (piece.piece == Piece.Pawn) {
                 halfmoves = 0; //reset 50 move rule

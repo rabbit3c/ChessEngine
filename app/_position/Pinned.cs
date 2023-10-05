@@ -5,6 +5,8 @@ namespace ChessEngine
     {
         public void InitializePins()
         {
+            pinsBlack = 0;
+            pinsWhite = 0;
             foreach (int piece in PiecesWhite)
             {
                 Pin pin = Board[piece].IsPinned(this);
@@ -16,31 +18,119 @@ namespace ChessEngine
                 Pin pin = Board[piece].IsPinned(this);
                 AddPin(piece, pin);
             }
-
         }
 
-        void AddPin(int piece, Pin pin) {
+        public void AddPin(int piece, Pin pin, bool? isWhite= null)
+        {
             Board[piece].pin = pin;
+            bool PieceIsWhite = Board[piece].isWhite;
+
+            if (!pin.pinned) return;
+
             Board[pin.pinningPiece].pinnedPiece = piece;
-            if (Board[piece].isWhite) {
+
+            if (isWhite != null) {
+                PieceIsWhite = (bool)isWhite;
+            }
+
+            if (PieceIsWhite)
+            {
                 pinsWhite |= Bitboards.MaskLine(WhiteKing, pin.pinningPiece, out _);
             }
-            else {
+            else
+            {
                 pinsBlack |= Bitboards.MaskLine(BlackKing, pin.pinningPiece, out _);
             }
         }
 
-        void DeletePin(int piece) {
+        public void DeletePin(int piece, int posKing = -1)
+        {
             Pin pin = Board[piece].pin;
-            if (pin.pinned) {
-                if (Board[piece].isWhite) {
-                    pinsWhite ^= Bitboards.MaskLine(WhiteKing, pin.pinningPiece, out _);
+            if (pin.pinned)
+            {
+                if (Board[piece].isWhite)
+                {
+                    pinsWhite ^= Bitboards.MaskLine(posKing != -1 ? posKing : WhiteKing, pin.pinningPiece, out _);
                 }
-                else {
-                    pinsBlack ^= Bitboards.MaskLine(WhiteKing, pin.pinningPiece, out _);
+                else
+                {
+                    pinsBlack ^= Bitboards.MaskLine(posKing != -1 ? posKing : BlackKing, pin.pinningPiece, out _);
                 }
             }
             Board[piece].pin = Pin.Default();
+        }
+
+        public void DeletePin(Pin pin, bool isWhite)
+        {
+            if (pin.pinned)
+            {
+                if (isWhite)
+                {
+                    pinsWhite ^= Bitboards.MaskLine(WhiteKing, pin.pinningPiece, out _);
+                }
+                else
+                {
+                    pinsBlack ^= Bitboards.MaskLine(BlackKing, pin.pinningPiece, out _);
+                }
+            }
+        }
+
+        void BreakingPin(int move)
+        {
+            if ((pinsWhite & (ulong)1 << move) != 0)
+            {
+                int posKing = WhiteKing;
+                RemovePin(posKing, move);
+            }
+            else if ((pinsBlack & (ulong)1 << move) != 0)
+            {
+                int posKing = BlackKing;
+                RemovePin(posKing, move);
+            }
+        }
+
+        void RemovePin(int posKing, int move)
+        {
+            int pinnedPiece = PieceInTheWay(posKing, move);
+            if (pinnedPiece < 0)
+            {
+                pinnedPiece = FindPinnedPiece(posKing, move);
+            }
+            DeletePin(pinnedPiece);
+        }
+
+        int FindPinnedPiece(int posKing, int move)
+        {
+            bool asc = move > posKing;
+            int offset;
+
+            if (posKing.HorizontalTo(move))
+            {
+                offset = asc ? 1 : -1;
+            }
+            else if (posKing.VerticalTo(move))
+            {
+                offset = asc ? 8 : -8;
+            }
+            else
+            {
+                Math.DivRem(posKing - move, 9, out int remainder);
+                if (remainder == 0)
+                {
+                    offset = asc ? 9 : -9;
+                }
+                else
+                {
+                    offset = asc ? 7 : -7;
+                }
+            }
+
+            for (int i = move + offset; asc ? i < 64 : i > 0; i += offset)
+            {
+                if (Board[i].empty) continue;
+                return i;
+            }
+            return 0;
         }
 
         void CalculatePins(int pos, int i, int posKing)
@@ -51,52 +141,19 @@ namespace ChessEngine
             bool asc = directions[i] > 0;
             if (!Board[pos].empty)
             {
-                if (posKing + directions[i] != pos && !Move.NothingInTheWay(pos, posKing, this))
-                {
-                    Square[] squares = functions[i](posKing, pos, false);
-
-                    for (int n = asc ? 0 : squares.Length - 1; asc ? n < squares.Length : n >= 0; n += asc ? 1 : -1)
-                    {
-                        if (squares[n].empty) continue;
-
-                        if (squares[n].isWhite != Board[posKing].isWhite) return;
-
-                        if (squares[n].pin.pinningPiece == pos) return;
-
-                        if (squares[n].pin.pinningPiece < pos && asc) return;
-
-                        if (squares[n].pin.pinningPiece > pos && !asc) return;
-
-                        DeletePin(squares[n].pos);
-                        return; //Stop after first piece
-                    }
-                }
-                else
+                if (posKing + directions[i] == pos || Move.NothingInTheWay(pos, posKing, this)) 
                 {
                     Square[] squares = functions[i](pos + directions[i], pos + directions[i] * PrecomputedData.numSquareToEdge[pos][i], true);
 
-                    for (int n = asc ? 0 : squares.Length - 1; asc ? n < squares.Length : n >= 0; n += asc ? 1 : -1)
-                    {
-                        if (squares[n].empty) continue;
+                    if (Board[pos].isWhite != Board[posKing].isWhite) return;
 
-                        if (squares[n].isWhite != Board[posKing].isWhite)
-                        {
-                            if (Board[pos].isWhite != Board[posKing].isWhite) return;
-
-                            if (squares[n].piece != (i < 4 ? Piece.Rook : Piece.Bishop)) return;
-
-                            Pin pin = new()
-                            {
-                                pinned = true,
-                                pinningPiece = squares[n].pos
-                            };
-                            pin.allowedDirections[Math.DivRem(i, 2, out _)] = true;
-                            
-                            AddPin(pos, pin);
-                            return;
-                        }
-
-                        DeletePin(squares[n].pos);
+                    if (CheckSquares(squares, posKing, i < 4 ? Piece.Rook : Piece.Bishop, !Board[posKing].isWhite, pos, out int pinningPiece)) {
+                        Pin pin = new() {
+                            pinned = true,
+                            pinningPiece = pinningPiece
+                        };
+                        pin.allowedDirections[Math.DivRem(i, 2, out _)] = true;
+                        AddPin(pos, pin);
                         return;
                     }
                 }
@@ -132,7 +189,7 @@ namespace ChessEngine
 
                     if (Board[i].piece == Piece.King) continue;
 
-                    DeletePin(i);
+                    DeletePin(Board[i].pos, posKing);
                     break;
                 }
             }
@@ -293,12 +350,14 @@ namespace ChessEngine
             Func<int, int, bool>[] funcsAlignment = { Extensions.VerticalTo, Extensions.HorizontalTo, Extensions.Diagonal };
             Func<int, int, bool>[] funcsPin = { VerticalPin, HorizontalPin, DiagonalPin, VerticalPin, HorizontalPin };
 
+            BreakingPin(move);
+
             foreach (int posKing in positionsKings)
             {
                 bool aligned = false;
                 for (int i = 0; i < 3; i++)
                 {
-                    if (funcsAlignment[i](pos, move))
+                    if (funcsAlignment[i](pos, move) && i != 2)
                     {
                         if (funcsPin[i + 1](posKing, pos))
                         {
