@@ -32,11 +32,10 @@ namespace ChessEngine
             Stopwatch stopwatch = new();
 
             stopwatch.Start();
-            Search.Main(pos, depth, out int amount); //Search all moves, in given depth
+            Search.Main(pos, depth, out amountPos); //Search all moves, in given depth
             stopwatch.Stop();
 
-            amountPos = amount;
-            Console.WriteLine($"{amount}   -   time: {stopwatch.Elapsed}");
+            Console.WriteLine($"{amountPos}   -   time: {stopwatch.Elapsed}");
         }
     }
 }

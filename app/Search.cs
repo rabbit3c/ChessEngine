@@ -13,10 +13,12 @@ namespace ChessEngine
         {
             if (!pos.doubleCheck)
             {
-                if (depth == 1) {
+                if (depth == 1)
+                {
                     ParallelGeneration(pos, depth, out amountPos);
                 }
-                else {
+                else
+                {
                     SequentialGeneration(pos, depth, out amountPos);
                 }
             }
@@ -24,30 +26,6 @@ namespace ChessEngine
             {
                 int posKing = pos.OwnKing();
                 GeneratePositions(pos, posKing, depth, out amountPos);
-            }
-        }
-
-        public static void ParallelGeneration(Position pos, int depth, out int amountPos)
-        {
-            var syncRoot = new object();
-            List<Position> newPositions = new();
-            List<int> ownPieces = pos.OwnPieces();
-
-            if (Debugger.IsAttached) //Single Threading for Debug Mode
-            {
-                SequentialGeneration(pos, depth, out amountPos);
-            }
-            else //Multithreading
-            {
-                Parallel.For(0, ownPieces.Count, i =>
-                {
-                    List<Position> positions = GeneratePositions(pos, ownPieces[i], depth, out _);
-                    lock (syncRoot)
-                    {
-                        newPositions.AddRange(positions);
-                    }
-                });
-                amountPos = newPositions.Count;
             }
         }
 
@@ -64,6 +42,30 @@ namespace ChessEngine
             }
         }
 
+        public static void ParallelGeneration(Position pos, int depth, out int amountPos)
+        {
+            if (Debugger.IsAttached) //Single Threading for Debug Mode
+            {
+                SequentialGeneration(pos, depth, out amountPos);
+            }
+            else //Multithreading
+            {
+                var syncRoot = new object();
+                List<Position> newPositions = new();
+                List<int> ownPieces = pos.OwnPieces();
+
+                Parallel.For(0, ownPieces.Count, i =>
+                {
+                    List<Position> positions = GeneratePositions(pos, ownPieces[i], depth, out _);
+                    lock (syncRoot)
+                    {
+                        newPositions.AddRange(positions);
+                    }
+                });
+                amountPos = newPositions.Count;
+            }
+        }
+
         public static List<Position> GeneratePositions(Position pos, int i, int depth, out int amountPos)
         {
             depth--;
@@ -71,7 +73,8 @@ namespace ChessEngine
             List<int> moves = GenerateMoves(pos, i);
             List<Position> newPositions = NewPos.New(pos, pos.Board[i], moves, depth == 0);
 
-            if (depth == 0) {
+            if (depth == 0)
+            {
                 amountPos = newPositions.Count;
                 return newPositions;
             }

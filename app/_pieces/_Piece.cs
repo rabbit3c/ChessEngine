@@ -1,7 +1,6 @@
 
 namespace ChessEngine
 {
-
     public class Piece
     {
         public int pos;

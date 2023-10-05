@@ -5,7 +5,9 @@ namespace ChessEngine
     {
         public ulong occupiedBB = 0;
         public ulong emptyBB = 0;
-
+        public ulong pinsWhite = 0;
+        public ulong pinsBlack = 0;
+ 
         public void InitializeBitBoards()
         {
             occupiedBB = 0;
