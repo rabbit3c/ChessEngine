@@ -26,7 +26,7 @@ namespace ChessEngine
             }
         }
 
-        public void CalculatePins(int pos, int i, int posKing)
+        void CalculatePins(int pos, int i, int posKing)
         { //i: y+, y-, x+, x-, x+y+, x-y-, x-y+, x+y-
             int[] directions = { 8, -8, -1, 1, 9, -9, 7, -7 };
             Func<int, int, bool, Square[]>[] functions = { GetFile, GetFile, GetRank, GetRank, GetDiagonal, GetDiagonal, GetDiagonal, GetDiagonal };
@@ -105,7 +105,7 @@ namespace ChessEngine
             }
         }
 
-        public Pin IsPinned(Piece piece, Square[] squares, int i)
+        Pin IsPinned(Piece piece, Square[] squares, int i)
         {
             Pin pin = new();
 
@@ -129,7 +129,7 @@ namespace ChessEngine
             return Pin.Default();
         }
 
-        public static bool CheckSquares(Square[] squares, int posKing, int AttackingPiece, bool white, int pos, out int piece)
+        static bool CheckSquares(Square[] squares, int posKing, int AttackingPiece, bool white, int pos, out int piece)
         {
             bool asc = pos > posKing; //bool to skim through array from posKing to pos
             piece = 0;
@@ -230,21 +230,21 @@ namespace ChessEngine
             }
         }
 
-        public bool VerticalPin(int posKing, int pos)
+        bool VerticalPin(int posKing, int pos)
         {
             if (!posKing.VerticalTo(pos)) return false;
             CalculatePins(pos, pos > posKing ? 0 : 1, posKing);
             return true;
         }
 
-        public bool HorizontalPin(int posKing, int pos)
+        bool HorizontalPin(int posKing, int pos)
         {
             if (!posKing.HorizontalTo(pos)) return false;
             CalculatePins(pos, pos > posKing ? 3 : 2, posKing);
             return true;
         }
 
-        public bool DiagonalPin(int posKing, int pos)
+        bool DiagonalPin(int posKing, int pos)
         {
             if (!pos.Diagonal(posKing)) return false;
 
