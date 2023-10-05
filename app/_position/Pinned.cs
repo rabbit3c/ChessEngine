@@ -3,27 +3,22 @@ namespace ChessEngine
 {
     partial class Position
     {
-        public void InitializePins(bool white = true, bool black = true)
+        public void InitializePins()
         {
-            if (white)
+            foreach (int piece in PiecesWhite)
             {
-                foreach (int piece in PiecesWhite)
-                {
-                    Pin pin = Board[piece].IsPinned(this);
-                    Board[piece].pin = pin;
-                    Board[pin.pinningPiece].pinnedPiece = piece;
-                }
+                Pin pin = Board[piece].IsPinned(this);
+                Board[piece].pin = pin;
+                Board[pin.pinningPiece].pinnedPiece = piece;
             }
 
-            if (black)
+            foreach (int piece in PiecesBlack)
             {
-                foreach (int piece in PiecesBlack)
-                {
-                    Pin pin = Board[piece].IsPinned(this);
-                    Board[piece].pin = pin;
-                    Board[pin.pinningPiece].pinnedPiece = piece;
-                }
+                Pin pin = Board[piece].IsPinned(this);
+                Board[piece].pin = pin;
+                Board[pin.pinningPiece].pinnedPiece = piece;
             }
+
         }
 
         void CalculatePins(int pos, int i, int posKing)
@@ -32,12 +27,10 @@ namespace ChessEngine
             Func<int, int, bool, Square[]>[] functions = { GetFile, GetFile, GetRank, GetRank, GetDiagonal, GetDiagonal, GetDiagonal, GetDiagonal };
 
             bool asc = directions[i] > 0;
-
             if (!Board[pos].empty)
             {
-                if (!Move.NothingInTheWay(pos, posKing, this))
+                if (posKing + directions[i] != pos && !Move.NothingInTheWay(pos, posKing, this))
                 {
-                    if (posKing == pos) return;
                     Square[] squares = functions[i](posKing, pos, false);
 
                     for (int n = asc ? 0 : squares.Length - 1; asc ? n < squares.Length : n >= 0; n += asc ? 1 : -1)
@@ -61,7 +54,7 @@ namespace ChessEngine
                 {
                     Square[] squares = functions[i](pos + directions[i], pos + directions[i] * PrecomputedData.numSquareToEdge[pos][i], true);
 
-                    for (int n = asc ? 0 : squares.Length - 1; asc ? n < squares.Length - 1 : n > 0; n += asc ? 1 : -1)
+                    for (int n = asc ? 0 : squares.Length - 1; asc ? n < squares.Length : n >= 0; n += asc ? 1 : -1)
                     {
                         if (squares[n].empty) continue;
 
@@ -78,7 +71,7 @@ namespace ChessEngine
                             };
                             Board[pos].pin.allowedDirections[Math.DivRem(i, 2, out _)] = true;
                             Board[Board[pos].pin.pinningPiece].pinnedPiece = pos;
-                            
+
                             return;
                         }
 
@@ -103,6 +96,95 @@ namespace ChessEngine
                     return; //Stop after first piece
                 }
             }
+        }
+
+        void DeletePinsKing(int posKing, bool isWhite)
+        {
+            int[] directions = { 8, -8, -1, 1, 9, -9, 7, -7 };
+            for (int j = 0; j < directions.Length; j++)
+            {
+                if (PrecomputedData.numSquareToEdge[posKing][j] < 1) continue;
+
+                for (int i = posKing + directions[j]; directions[j] > 0 ? i <= posKing + directions[j] * PrecomputedData.numSquareToEdge[posKing][j] : i >= 0; i += directions[j])
+                {
+                    if (Board[i].empty) continue;
+
+                    if (isWhite != Board[i].isWhite) break;
+
+                    if (Board[i].piece == Piece.King) continue;
+
+                    Board[i].pin = Pin.Default();
+                    break;
+                }
+            }
+        }
+
+        void NewPinsKing(int move)
+        {
+            int[] directions = { 8, -8, -1, 1, 9, -9, 7, -7 };
+            for (int j = 0; j < directions.Length; j++)
+            {
+                int pinnedPiece = -1;
+                int pinningPiece = -1;
+
+                if (PrecomputedData.numSquareToEdge[move][j] < 1) continue;
+
+                for (int i = move + directions[j];
+                     directions[j] > 0 ? i <= move + directions[j] * PrecomputedData.numSquareToEdge[move][j] :
+                     i >= move + directions[j] * PrecomputedData.numSquareToEdge[move][j];
+                     i += directions[j])
+                {
+                    if (Board[i].empty) continue;
+
+                    if (Board[move].isWhite != Board[i].isWhite)
+                    {
+                        int piece = Board[i].piece;
+                        if (pinnedPiece == -1) break;
+
+                        if (j < 4)
+                        {
+                            if (piece != Piece.Rook && piece != Piece.Queen)
+                            {
+                                pinnedPiece = -1;
+                                break;
+                            }
+                        }
+                        else if (piece != Piece.Bishop && piece != Piece.Queen)
+                        {
+                            pinnedPiece = -1;
+                            break;
+                        }
+
+                        pinningPiece = i;
+                        break;
+                    }
+
+                    if (pinnedPiece != -1)
+                    {
+                        pinnedPiece = -1;
+                        break;
+                    }
+
+                    pinnedPiece = i;
+                }
+                if (pinnedPiece != -1 && pinningPiece != -1)
+                {
+                    Pin pin = new()
+                    {
+                        pinningPiece = pinningPiece,
+                        pinned = true
+                    };
+                    pin.allowedDirections[Math.DivRem(j, 2, out _)] = true;
+                    Board[pinnedPiece].pin = pin;
+                    Board[pin.pinningPiece].pinnedPiece = pinnedPiece;
+                }
+            }
+        }
+
+        public void RecalculatePinsKing(int posKing, bool isWhite, int move)
+        {
+            DeletePinsKing(posKing, isWhite);
+            NewPinsKing(move);
         }
 
         Pin IsPinned(Piece piece, Square[] squares, int i)
@@ -182,7 +264,12 @@ namespace ChessEngine
 
         public void RecalculatePins(int pos, int move, bool capture = false)
         {
-            int[] positionsKings = { WhiteKing, BlackKing };
+            List<int> positionsKings = new() { WhiteKing, BlackKing };
+
+            if (Board[move].piece == Piece.King)
+            {
+                positionsKings.Remove(move);
+            }
 
             Func<int, int, bool>[] funcsAlignment = { Extensions.VerticalTo, Extensions.HorizontalTo, Extensions.Diagonal };
             Func<int, int, bool>[] funcsPin = { VerticalPin, HorizontalPin, DiagonalPin, VerticalPin, HorizontalPin };
@@ -268,14 +355,14 @@ namespace ChessEngine
                 if (pos1.VerticalTo(pos2))
                 {
                     Square[] rank = GetFile(pos1, pos2);
-                    func(rank, pos1, 0, pos2 > pos1);
+                    func(rank, pos2, 0, pos2 > pos1);
                     return;
                 }
 
                 if (pos1.HorizontalTo(pos2))
                 {
                     Square[] file = GetRank(pos1, pos2);
-                    func(file, pos1, 1, pos2 > pos1);
+                    func(file, pos2, 1, pos2 > pos1);
                     return;
                 }
             }
@@ -286,7 +373,7 @@ namespace ChessEngine
                 {
                     Square[] diagonal = GetDiagonal(pos1, pos2);
                     Math.DivRem(pos1 - pos2, 9, out int remainder);
-                    func(diagonal, pos1, remainder == 0 ? 2 : 3, pos2 > pos1);
+                    func(diagonal, pos2, remainder == 0 ? 2 : 3, pos2 > pos1);
                     return;
                 }
             }
@@ -303,8 +390,6 @@ namespace ChessEngine
                 if (square.empty) continue;
 
                 if (square.isWhite != WhitesTurn) return;
-
-                if (square.pos == move) break; //it is the pinning piece
 
                 if (pinnedPiece != -1) return; //Don't add new Piece because there are two pieces in the way
 

@@ -7,7 +7,7 @@ namespace ChessEngine
         public static List<Position> New(Position oldPos, Piece Piece, List<int> moves, bool lastDepth)
         {
             List<Position> newPositions = new();
-            
+
             foreach (int move in moves)
             {
                 newPositions.AddRange(Format(oldPos, Piece, move, lastDepth));
@@ -71,11 +71,11 @@ namespace ChessEngine
             {
                 if (MovedPiece.piece == Piece.King)
                 {
-                    newPos.InitializePins(MovedPiece.isWhite, !MovedPiece.isWhite); //if the king moves, all pins are recalculated
+                    newPos.RecalculatePinsKing(MovedPiece.pos, MovedPiece.isWhite, move);
                 }
                 else if (MovedPiece.piece == Piece.Knight) { }
                 else if (MovedPiece.piece == Piece.Pawn) { }
-                else    
+                else
                 {
                     newPos.RemovePin(MovedPiece.pinnedPiece); //Check if piece is unpinning a piece
                 }
