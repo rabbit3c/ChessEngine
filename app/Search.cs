@@ -5,9 +5,9 @@ namespace ChessEngine
 {
     class Search
     {
-        public static void Main(Position position, int depth, out int AmountPos)
+        public static void Main(Position position, int depth, out int amountPos)
         {
-            Generation(position, depth, out AmountPos);
+            Generation(position, depth, out amountPos);
         }
         public static void Generation(Position pos, int depth, out int amountPos)
         {
@@ -51,22 +51,22 @@ namespace ChessEngine
             else //Multithreading
             {
                 var syncRoot = new object();
-                List<Position> newPositions = new();
                 List<int> ownPieces = pos.OwnPieces();
+                int amountNewPos = 0;
 
                 Parallel.For(0, ownPieces.Count, i =>
                 {
-                    List<Position> positions = GeneratePositions(pos, ownPieces[i], depth, out _);
+                    GeneratePositions(pos, ownPieces[i], depth, out int newPos);
                     lock (syncRoot)
                     {
-                        newPositions.AddRange(positions);
+                        amountNewPos += newPos;
                     }
                 });
-                amountPos = newPositions.Count;
+                amountPos = amountNewPos;
             }
         }
 
-        public static List<Position> GeneratePositions(Position pos, int i, int depth, out int amountPos)
+        public static void GeneratePositions(Position pos, int i, int depth, out int amountPos)
         {
             depth--;
 
@@ -76,7 +76,7 @@ namespace ChessEngine
             if (depth == 0)
             {
                 amountPos = newPositions.Count;
-                return newPositions;
+                return;
             }
 
             amountPos = 0;
@@ -105,7 +105,7 @@ namespace ChessEngine
                 amountPos += AmountNewPos;
             }
 
-            return newPositions;
+            return;
         }
 
         public static List<int> GenerateMoves(Position pos, int i)

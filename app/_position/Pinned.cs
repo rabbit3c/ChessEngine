@@ -20,7 +20,7 @@ namespace ChessEngine
             }
         }
 
-        public void AddPin(int piece, Pin pin, bool? isWhite= null)
+        public void AddPin(int piece, Pin pin, bool? isWhite = null)
         {
             Board[piece].pin = pin;
             bool PieceIsWhite = Board[piece].isWhite;
@@ -29,7 +29,8 @@ namespace ChessEngine
 
             Board[pin.pinningPiece].pinnedPiece = piece;
 
-            if (isWhite != null) {
+            if (isWhite != null)
+            {
                 PieceIsWhite = (bool)isWhite;
             }
 
@@ -141,21 +142,22 @@ namespace ChessEngine
             bool asc = directions[i] > 0;
             if (!Board[pos].empty)
             {
-                if (posKing + directions[i] == pos || Move.NothingInTheWay(pos, posKing, this)) 
+                if (!check) return;
+                if (Board[pos].isWhite != Board[posKing].isWhite) return;
+                if ((checkBB & (ulong)1 << pos) == 0) return;
+
+                Square[] squares = functions[i](pos + directions[i], pos + directions[i] * PrecomputedData.numSquareToEdge[pos][i], true);
+
+                if (CheckSquares(squares, posKing, i < 4 ? Piece.Rook : Piece.Bishop, !Board[posKing].isWhite, pos, out int pinningPiece))
                 {
-                    Square[] squares = functions[i](pos + directions[i], pos + directions[i] * PrecomputedData.numSquareToEdge[pos][i], true);
-
-                    if (Board[pos].isWhite != Board[posKing].isWhite) return;
-
-                    if (CheckSquares(squares, posKing, i < 4 ? Piece.Rook : Piece.Bishop, !Board[posKing].isWhite, pos, out int pinningPiece)) {
-                        Pin pin = new() {
-                            pinned = true,
-                            pinningPiece = pinningPiece
-                        };
-                        pin.allowedDirections[Math.DivRem(i, 2, out _)] = true;
-                        AddPin(pos, pin);
-                        return;
-                    }
+                    Pin pin = new()
+                    {
+                        pinned = true,
+                        pinningPiece = pinningPiece
+                    };
+                    pin.allowedDirections[Math.DivRem(i, 2, out _)] = true;
+                    AddPin(pos, pin);
+                    return;
                 }
             }
             else

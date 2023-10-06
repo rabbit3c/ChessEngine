@@ -48,13 +48,8 @@ namespace ChessEngine
                 newPos.ToggleTurn();
             }
 
-            if (enPassant)
-            {
-                newPositions[0].check = true; //Changing check to be true in case of en Passant Discovered Attack, I'm too lazy to check explicitly for the moment
-            }
-
             // Check if the Enemies could take the King, but only if there was a check or the piece is a King
-            if (MovedPiece.piece == Piece.King || enPassant)
+            if (MovedPiece.piece == Piece.King || enPassant) //Changing check to be true in case of en Passant Discovered Attack, I'm too lazy to check explicitly for the moment
             {
                 if (newPositions[0].Illegal())
                 {
