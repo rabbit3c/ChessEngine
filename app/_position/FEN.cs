@@ -119,14 +119,15 @@ namespace ChessEngine
                     halfmoves = num;
                 }
             }
-            else {
+            else
+            {
                 halfmoves = 0;
             }
 
             SplitColors();
-            check = Check(OwnKing());
             InitializePins();
             InitializeBitBoards();
+            check = Check(OwnKing(), out checkBB);
         }
 
         public static string FormatFEN(Position pos)

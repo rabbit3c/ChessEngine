@@ -6,7 +6,6 @@ namespace ChessEngine
         public static List<Position> New(Position oldPos, Piece Piece, List<int> moves, bool lastDepth)
         {
             List<Position> newPositions = new();
-
             foreach (int move in moves)
             {
                 newPositions.AddRange(Format(oldPos, Piece, move, lastDepth));
@@ -55,7 +54,7 @@ namespace ChessEngine
             }
 
             // Check if the Enemies could take the King, but only if there was a check or the piece is a King
-            if (newPositions[0].check || MovedPiece.piece == Piece.King)
+            if (MovedPiece.piece == Piece.King || enPassant)
             {
                 if (newPositions[0].Illegal())
                 {
@@ -92,24 +91,29 @@ namespace ChessEngine
                 }
 
                 newPos.doubleCheck = false;
+                newPos.checkBB = 0;
 
-                if (newPos.Check(newPos.Board[move]))
+                if (newPos.Check(newPos.Board[move], out ulong checkBB))
                 {
-                    if (MovedPiece.DiscoveredCheck(newPos, move))
+                    if (MovedPiece.DiscoveredCheck(newPos, move, out _))
                     {
                         newPos.doubleCheck = true;
                     }
+                    newPos.checkBB = checkBB;
                     newPos.check = true;
                 }
 
                 else
                 {
-                    newPos.check = MovedPiece.DiscoveredCheck(newPos, move);
+                    newPos.check = MovedPiece.DiscoveredCheck(newPos, move, out ulong checkBBDisc);
+
+                    if (newPos.check) newPos.checkBB = checkBBDisc;
 
                     if (enPassant)
                     {
-                        if (oldPos.Board[oldPos.EnPassantTarget].DiscoveredCheck(newPos, move))
+                        if (oldPos.Board[oldPos.EnPassantTarget].DiscoveredCheck(newPos, move, out ulong checkBBEP))
                         {
+                            newPos.checkBB = checkBBEP;
                             newPos.check = true;
                         }
                     }
@@ -182,7 +186,8 @@ namespace ChessEngine
                 Pin pin = MovedPiece.pin;
                 newPositions[0].AddPin(move, pin, MovedPiece.isWhite);
             }
-            else {
+            else
+            {
                 newPositions[0].DeletePin(MovedPiece.pin, MovedPiece.isWhite);
             }
 

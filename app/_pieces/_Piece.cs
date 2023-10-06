@@ -32,9 +32,11 @@ namespace ChessEngine
             return copy;
         }
 
-        public bool DiscoveredCheck(Position position, int move)
+        public bool DiscoveredCheck(Position position, int move, out ulong bitboard)
         {
+            bitboard = 0;
             int posKing = position.OwnKing();
+
             if (pos.VerticalTo(posKing))
             {
                 if (move.VerticalTo(posKing)) return false;
@@ -42,7 +44,10 @@ namespace ChessEngine
                 if (!Move.NothingInTheWay(posKing, pos, position)) return false;
 
                 Square[] file = pos < posKing ? position.GetFile(pos.X(), pos - 8, true) : position.GetFile(pos + 8, pos.X() + 56, true);
-                return CheckSquares(file, posKing, Rook, isWhite, out int _);
+
+                bool check = CheckSquares(file, posKing, Rook, isWhite, out int checkingPiece);
+                bitboard = Bitboards.MaskLine(posKing, checkingPiece, out _, true);
+                return check;
             }
             else if (pos.HorizontalTo(posKing))
             {
@@ -51,7 +56,10 @@ namespace ChessEngine
                 if (!Move.NothingInTheWay(posKing, pos, position)) return false;
 
                 Square[] rank = pos < posKing ? position.GetRank(pos.Y() * 8, pos - 1, true) : position.GetRank(pos + 1, pos.Y() * 8 + 7, true);
-                return CheckSquares(rank, posKing, Rook, isWhite, out int _);
+
+                bool check = CheckSquares(rank, posKing, Rook, isWhite, out int checkingPiece);
+                bitboard = Bitboards.MaskLine(posKing, checkingPiece, out _, true);
+                return check;
             }
             else if (pos.Diagonal(posKing))
             {
@@ -69,7 +77,9 @@ namespace ChessEngine
                 {
                     diagonal = pos < posKing ? position.GetDiagonal(pos - 7 * PrecomputedData.numSquareToEdge[pos][7], pos - 7, true) : position.GetDiagonal(pos + 7, pos + 7 * PrecomputedData.numSquareToEdge[pos][6], true);
                 }
-                return CheckSquares(diagonal, posKing, Bishop, isWhite, out int _);
+                bool check = CheckSquares(diagonal, posKing, Bishop, isWhite, out int checkingPiece);
+                bitboard = Bitboards.MaskLine(posKing, checkingPiece, out _, true);
+                return check;
             }
             return false;
         }

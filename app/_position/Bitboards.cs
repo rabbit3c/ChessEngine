@@ -7,7 +7,8 @@ namespace ChessEngine
         public ulong emptyBB = 0;
         public ulong pinsWhite = 0;
         public ulong pinsBlack = 0;
- 
+        public ulong checkBB = 0;
+
         public void InitializeBitBoards()
         {
             occupiedBB = 0;
@@ -35,10 +36,11 @@ namespace ChessEngine
             emptyBB |= (ulong)1 << (EnPassantTarget + modifier);
         }
 
-        public int PieceInTheWay(int pos1, int pos2) {
+        public int PieceInTheWay(int pos1, int pos2)
+        {
             ulong mask = Bitboards.MaskLine(pos1, pos2, out _);
             mask &= occupiedBB;
-            return (int) Math.Log2(mask);
+            return (int)Math.Log2(mask);
         }
     }
 
@@ -49,10 +51,18 @@ namespace ChessEngine
         public const ulong diagonalP = 0x80_40_20_10_08_04_02_01;
         public const ulong diagonalS = 0x01_02_04_08_10_20_40_80;
 
-        public static ulong MaskLine(int pos1, int pos2, out bool NotInLine)
+        public static ulong MaskLine(int pos1, int pos2, out bool NotInLine, bool including = false)
         { //Line doesn't include pos1 and pos 2
             NotInLine = false;
-            ulong mask = (ulong)Math.Pow(2, Math.Max(pos1, pos2)) - (ulong)Math.Pow(2, Math.Min(pos2, pos1) + 1); //mask of every square between two indices
+            ulong mask;
+            if (including)
+            {
+                mask = (ulong)Math.Pow(2, Math.Max(pos1, pos2) + 1) - (ulong)Math.Pow(2, Math.Min(pos2, pos1)); //mask of every square between two indices
+            }
+            else
+            {
+                mask = (ulong)Math.Pow(2, Math.Max(pos1, pos2)) - (ulong)Math.Pow(2, Math.Min(pos2, pos1) + 1);
+            }
             //Console.WriteLine(mask);
             if (pos1.VerticalTo(pos2))
             {

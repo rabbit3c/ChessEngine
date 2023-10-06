@@ -10,7 +10,22 @@ namespace ChessEngine
 
             if (pin.pinned) return new();
 
-            return Moves(piece, pos);
+            List<int> moves = Moves(piece, pos);
+
+            if (!pos.check) return moves;
+
+            for (int i = 0; i < moves.Count; i++)
+            {
+                if (pos.check)
+                {
+                    if ((pos.checkBB & (ulong)1 << moves[i]) == 0)
+                    {
+                        moves.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+            return moves;
         }
 
         public static List<int> Moves(Piece piece, Position pos)
@@ -21,7 +36,7 @@ namespace ChessEngine
             for (int i = 0; i < directions.Length; i++)
             {
                 if (!Inbound(piece.pos, i)) continue;
-                
+
                 int move = piece.pos + directions[i];
                 if (Move.Unobstructed(move, piece.isWhite, pos))
                     moves.Add(move);

@@ -46,7 +46,8 @@ namespace ChessEngine
                 emptyBB = emptyBB,
                 occupiedBB = occupiedBB, 
                 pinsWhite = pinsWhite,
-                pinsBlack = pinsBlack
+                pinsBlack = pinsBlack, 
+                checkBB = checkBB
             };
             return copy;
         }

@@ -1,14 +1,12 @@
 
+using System.Runtime.InteropServices;
+
 namespace ChessEngine
 {
     class Pawn
     {
         public static List<int> LegalMoves(Piece piece, Position pos)
         {
-            //List<int> legalMoves = Moves(piece, pos, true);
-            //string combinedString = string.Join(", ", legalMoves);
-            //Console.WriteLine($"Pawn at {piece.pos} to {combinedString}");
-            //Console.WriteLine($"{piece.pos}, {legalMoves.Count}");
             return Moves(piece, pos);
         }
 
@@ -38,11 +36,24 @@ namespace ChessEngine
                     {
                         moves.RemoveAt(i);
                         i--;
+                        continue;
                     }
                 }
             }
 
             moves.AddRange(DiagonalMoves(piece, pos, pin.allowedDirections, true));
+
+            if (!pos.check) return moves;
+
+            for (int i = 0; i < moves.Count; i++)
+            {
+                if ((pos.checkBB & (ulong)1 << moves[i]) == 0)
+                {
+                    if (moves[i] == pos.EnPassantTarget) continue;
+                    moves.RemoveAt(i);
+                    i--;
+                }
+            }
 
             return moves;
         }

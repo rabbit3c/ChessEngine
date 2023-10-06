@@ -41,6 +41,16 @@ namespace ChessEngine
                         if (move != piece.pos) break;
                         continue;
                     }
+
+                    if (pos.check)
+                    {
+                        if ((pos.checkBB & (ulong)1 << move) == 0)
+                        {
+                            if (!Unobstructed(move, !pos.WhitesTurn, pos)) break;
+                            continue;
+                        }
+                    }
+
                     legalMoves.Add(move);
 
                     if (!Unobstructed(move, !pos.WhitesTurn, pos)) break;
