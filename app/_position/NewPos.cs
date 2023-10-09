@@ -178,8 +178,7 @@ namespace ChessEngine
 
             if (oldPos.VerifyPin(MovedPiece, move))
             {
-                Pin pin = MovedPiece.pin;
-                newPositions[0].AddPin(move, pin, MovedPiece.isWhite);
+                newPositions[0].AddPin(move, MovedPiece.pin, MovedPiece.isWhite);
             }
             else
             {

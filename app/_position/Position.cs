@@ -96,7 +96,7 @@ namespace ChessEngine
                 PiecesWhite.Add(piece.pos);
             else 
                 PiecesBlack.Add(piece.pos);
-            Board[piece.pos] = new(piece.pos, piece.isWhite, piece.piece, piece.pin);
+            Board[piece.pos] = new(piece);
         }
 
         public void RemoveAt(int i)

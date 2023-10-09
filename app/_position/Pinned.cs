@@ -58,7 +58,7 @@ namespace ChessEngine
                     pinsBlack ^= Bitboards.MaskLine(posKing != -1 ? posKing : BlackKing, pin.pinningPiece, out _);
                 }
             }
-            Board[piece].pin = Pin.Default();
+            Board[piece].pin = new();
         }
 
         public void DeletePin(Pin pin, bool isWhite)
@@ -153,9 +153,9 @@ namespace ChessEngine
                     Pin pin = new()
                     {
                         pinned = true,
-                        pinningPiece = pinningPiece
+                        pinningPiece = pinningPiece,
+                        allowedDirections = Math.DivRem(i, 2, out _)
                     };
-                    pin.allowedDirections[Math.DivRem(i, 2, out _)] = true;
                     AddPin(pos, pin);
                     return;
                 }
@@ -250,9 +250,9 @@ namespace ChessEngine
                     Pin pin = new()
                     {
                         pinningPiece = pinningPiece,
-                        pinned = true
+                        pinned = true,
+                        allowedDirections = Math.DivRem(j, 2, out _)
                     };
-                    pin.allowedDirections[Math.DivRem(j, 2, out _)] = true;
                     AddPin(pinnedPiece, pin);
                 }
             }
@@ -275,17 +275,16 @@ namespace ChessEngine
 
             if (!Move.NothingInTheWay(posKing, pos, this))
             {
-                return Pin.Default();
+                return pin;
             }
 
             pin.pinned = CheckSquares(squares, posKing, i < 4 ? Piece.Rook : Piece.Bishop, !piece.isWhite, pos, out pin.pinningPiece);
 
             if (pin.pinned)
             {
-                pin.allowedDirections[Math.DivRem(i, 2, out _)] = true;
-                return pin;
+                pin.allowedDirections = Math.DivRem(i, 2, out _);
             }
-            return Pin.Default();
+            return pin;
         }
 
         static bool CheckSquares(Square[] squares, int posKing, int AttackingPiece, bool white, int pos, out int piece)
@@ -481,9 +480,9 @@ namespace ChessEngine
                 Pin pin = new()
                 {
                     pinningPiece = move,
-                    pinned = true
+                    pinned = true,
+                    allowedDirections = direction
                 };
-                pin.allowedDirections[direction] = true;
                 AddPin(pinnedPiece, pin);
             }
         }

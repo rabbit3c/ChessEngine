@@ -114,7 +114,7 @@ namespace ChessEngine
                 }
                 else if (Board[i].piece == Piece.Pawn)
                 {
-                    foreach (int moveP in Pawn.DiagonalMoves(Board[i], this, new[] { true, true, true, true }))
+                    foreach (int moveP in Pawn.DiagonalMoves(Board[i], this, -1))
                         if (moveP == posKing)
                         {
                             bitboard = Bitboards.MaskLine(posKing, i, out _, true);

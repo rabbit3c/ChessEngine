@@ -6,7 +6,7 @@ namespace ChessEngine
         public int pos;
         public bool isWhite;
         public int piece;
-        public Pin pin = Pin.Default();
+        public Pin pin = new();
         public int pinnedPiece = -1;
         public const int Pawn = 0;
         public const int Knight = 1;
@@ -27,7 +27,7 @@ namespace ChessEngine
             {
                 pos = pos,
                 piece = piece,
-                isWhite = isWhite
+                isWhite = isWhite,
             };
             return copy;
         }
@@ -98,7 +98,7 @@ namespace ChessEngine
                     pin.pinned = CheckSquares(file, posKing, Rook, !isWhite, out pin.pinningPiece);
                 }
                 if (pin.pinned)
-                    pin.allowedDirections[0] = true;
+                    pin.allowedDirections = 0;
             }
 
             else if (pos.HorizontalTo(posKing))
@@ -109,7 +109,7 @@ namespace ChessEngine
                     pin.pinned = CheckSquares(rank, posKing, Rook, !isWhite, out pin.pinningPiece);
                 }
                 if (pin.pinned)
-                    pin.allowedDirections[1] = true;
+                    pin.allowedDirections = 1;
             }
 
             else if (pos.Diagonal(posKing))
@@ -123,7 +123,7 @@ namespace ChessEngine
                         pin.pinned = CheckSquares(diagonal, posKing, Bishop, !isWhite, out pin.pinningPiece);
                     }
                     if (pin.pinned)
-                        pin.allowedDirections[2] = true;
+                        pin.allowedDirections = 2;
                 }
                 else
                 {
@@ -133,12 +133,11 @@ namespace ChessEngine
                         pin.pinned = CheckSquares(diagonal, posKing, Bishop, !isWhite, out pin.pinningPiece);
                     }
                     if (pin.pinned)
-                        pin.allowedDirections[3] = true;
+                        pin.allowedDirections = 3;
 
                 }
             }
-            if (pin.pinned) return pin;
-            return Pin.Default();
+            return pin;
         }
 
         public bool CheckSquares(Square[] squares, int posKing, int AttackingPiece, bool white, out int piece)

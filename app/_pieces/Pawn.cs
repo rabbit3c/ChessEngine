@@ -1,6 +1,4 @@
 
-using System.Runtime.InteropServices;
-
 namespace ChessEngine
 {
     class Pawn
@@ -12,10 +10,9 @@ namespace ChessEngine
 
         public static List<int> Moves(Piece piece, Position pos)
         {
-            Pin pin = piece.pin;
             List<int> moves = new();
 
-            if (pin.allowedDirections[0])
+            if (piece.pin.allowedDirections == 0 || !piece.pin.pinned)
             {
                 if (piece.isWhite)
                 {
@@ -41,7 +38,7 @@ namespace ChessEngine
                 }
             }
 
-            moves.AddRange(DiagonalMoves(piece, pos, pin.allowedDirections, true));
+            moves.AddRange(DiagonalMoves(piece, pos, piece.pin.allowedDirections, true));
 
             if (!pos.check) return moves;
 
@@ -58,7 +55,7 @@ namespace ChessEngine
             return moves;
         }
 
-        public static List<int> DiagonalMoves(Piece piece, Position pos, bool[] allowedDirections, bool legal = false)
+        public static List<int> DiagonalMoves(Piece piece, Position pos, int allowedDirections, bool legal = false)
         {
             List<int> diagonalMoves = new();
             int[] directions = { 9, 7, -7, -9 };
@@ -71,7 +68,7 @@ namespace ChessEngine
                         diagonalMoves.Add(piece.pos + directions[i]);
                     }
                 }
-                else if (allowedDirections[(i > 0 && i < 3) ? 3 : 2])
+                else if (allowedDirections == ((i > 0 && i < 3) ? 3 : 2) || !piece.pin.pinned)
                 {
                     if (PrecomputedData.numSquareToEdge[piece.pos][i % 2 == 0 ? 3 : 2] != 0)
                     {

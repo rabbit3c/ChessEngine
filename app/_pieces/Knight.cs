@@ -1,14 +1,11 @@
+
 namespace ChessEngine
 {
-
     class Knight
     {
-
         public static List<int> LegalMoves(Piece piece, Position pos)
         {
-            Pin pin = piece.pin;
-
-            if (pin.pinned) return new();
+            if (piece.pin.pinned) return new();
 
             List<int> moves = Moves(piece, pos);
 
